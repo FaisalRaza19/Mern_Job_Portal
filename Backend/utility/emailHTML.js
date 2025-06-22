@@ -69,7 +69,7 @@ const verificationEmailHTML = (code) => {
 
 
 // html for reset password
-export const changePasswordEmail = (link) => {
+const changePasswordEmail = (link) => {
     return `
         <h3>Password Reset Requested</h3>
       <p>Click the button below to reset your password:</p>

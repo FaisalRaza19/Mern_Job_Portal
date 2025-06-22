@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { verificationEmailHTML,changePasswordEmail} from "./emailHTML";
+import { verificationEmailHTML,changePasswordEmail} from "./emailHTML.js";
 
 // generate verification code
 const generateCode = () => {

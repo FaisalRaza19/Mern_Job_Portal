@@ -11,7 +11,7 @@ const valid_register = async (req, res) => {
     try {
         const { fullName, email, password, role } = req.body;
         // check user input is valid
-        if (![fullName, email, password, role].every((e) => e & e.trim() !== "")) {
+        if ([fullName, email, password, role].every((e) => e & e.trim() !== "")) {
             return res.status(400).json({ statusCode: 400, message: "All Fields are required" })
         }
         const inputVerify = validateUserInput(fullName, email, password);
