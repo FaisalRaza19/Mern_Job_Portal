@@ -36,10 +36,8 @@ app.get('/', (req, res) => {
   res.send('Hello world');
 });
 // change pass
-app.get(`/change-password/:id`, (req, res) => {
-  const id = req.params?.id;
-  console.log(id);
-  res.send('change the password',id);8
+app.get(`/change-password/:token`, (req, res) => {
+  res.send('change the password');
 });
 
 app.use("/user",router);

@@ -18,6 +18,6 @@ router.route("/change-avatar").post(upload.fields([{ name: "avatar", maxCount: 1
 router.route("/edit-profile").post(upload.none(),verify_token, editProfile);
 router.route("/verify-profile").post(upload.none(),verify_token, updateProfile);
 router.route("/email-pass").post(upload.none(),verify_token, email_for_Pass);
-router.route("/change-pass").post(upload.none(),verify_token, update_pass);
+router.route("/change-pass/:token").post(upload.none(),verify_token,update_pass);
 router.route("/get-user").get(upload.none(),verify_token, getUser);
 

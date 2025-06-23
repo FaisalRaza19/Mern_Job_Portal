@@ -1,7 +1,9 @@
 import { User } from "../Models/user_model.js";
 import { validateUserInput } from "../utility/userInput_verifier.js";
-import { generate_accessToken, generate_refreshToken } from "../utility/generateToken.js";
+import { generate_accessToken, generate_refreshToken, generate_passToken } from "../utility/generateToken.js";
 import { sendEmail, verifyEmail, pas_Email } from "../utility/emailVerification.js";
+import { fileUploadOnCloudinary, removeFileFromCloudinary } from "../utility/fileUpload_remove.js"
+import jwt from "jsonwebtoken"
 import { generateUsername } from "../utility/userNameGenerator.js"
 import bcrypt from "bcryptjs";
 
@@ -49,7 +51,7 @@ const resendVerificationCode = async (req, res) => {
         }
 
         // resend email  
-        const verificationCode = await sendEmail(userData.email);
+        const verificationCode = await sendEmail(userInfo.email);
         console.log(verificationCode)
         req.session.emailCode = verificationCode;
 
@@ -86,9 +88,9 @@ const register_user = async (req, res) => {
 
         // hashed the password
         const hashedPassword = await bcrypt.hash(password, 10)
-        console.log(hashedPassword);
 
         // create the new user user
+
         const user = new User({
             fullName,
             email,
@@ -140,13 +142,13 @@ const login = async (req, res) => {
         }
 
         // find the user in db
-        const user = await User.findOne({ $or: [{ email: email || null }, { userName: userName || null }] });
+        const user = await User.findOne({ $or: [{ email }, { userName }], });
         if (!user) {
-            return res.status(400).json({ statusCode: 400, message: "User did not exist" })
+            return res.status(400).json({ statusCode: 400, message: "User did have not exist" })
         }
 
         // compare the pass 
-        const matchPass = bcrypt.compare(password, user.password)
+        const matchPass = await bcrypt.compare(password, user.password)
         if (!matchPass) {
             return res.status(400).json({ statusCode: 400, message: "Incorrect Password" })
         }
@@ -214,8 +216,8 @@ const changeAvatar = async (req, res) => {
         }
 
         // If user has an existing avatar, clear it
-        if (user.avatar.publicId) {
-            await removeFileFromCloudinary(user.avatar.publicId);
+        if (user.avatar?.public_Id) {
+            await removeFileFromCloudinary(user.avatar.public_Id);
         }
 
         // upload avatar to Cloudinary
@@ -223,12 +225,11 @@ const changeAvatar = async (req, res) => {
         const fileUpload = await fileUploadOnCloudinary(avatarPath, folder);
 
         // update in db
-        await User.findByIdAndUpdate(userId, {
-            avatar: {
-                avatar_Url: fileUpload.url,
-                public_Id: fileUpload.public_id,
-            }
-        });
+        user.avatar = {
+            avatar_Url: fileUpload.url,
+            public_Id: fileUpload.public_id,
+        }
+        await user.save();
 
         return res.status(200).json({ statusCode: 200, data: fileUpload.url, message: "Avatar updated successfully" });
     } catch (error) {
@@ -250,9 +251,9 @@ const editProfile = async (req, res) => {
         }
 
         // validate input 
-        const validationResult = validateUserInput(req.body);
-        if (validationResult !== true) {
-            return res.status(400).json({ statusCode: 400, message: "Invalid input", errors: validationResult });
+        const inputVerify = validateUserInput(fullName, email, undefined, userName);
+        if (!inputVerify.isValid) {
+            return res.status(400).json({ statusCode: 400, message: inputVerify.errors })
         }
 
         // Check if email or username is already in use by another user, excluding the current user
@@ -285,21 +286,11 @@ const editProfile = async (req, res) => {
         }
 
         // if email is not changed then simply update in db
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            {
-                fullName,
-                email,
-                userName,
-            },
-            { new: true }
-        );
+        currentUser.fullName = fullName;
+        currentUser.userName = userName;
+        await currentUser.save();
 
-        if (!updatedUser) {
-            return res.status(500).json({ statusCode: 500, message: "Failed to update profile. Please try again." });
-        }
-
-        return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: updatedUser });
+        return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: currentUser });
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the profile.", error: error.message });
     }
@@ -335,25 +326,16 @@ const updateProfile = async (req, res) => {
         const { fullName, email, userName } = userInfo;
 
         // Update the user profile
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            {
-                fullName,
-                email,
-                userName,
-            },
-            { new: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(500).json({ statusCode: 500, message: "Failed to update profile. Please try again." });
-        }
+        user.fullName = fullName;
+        user.email = email;
+        user.userName = userName;
+        await user.save();
 
         // Clear session data after update
         req.session.emailCode = null;
         req.session.userInfo = null;
 
-        return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: updatedUser });
+        return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: user });
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the profile.", error: error.message });
     }
@@ -389,8 +371,11 @@ const email_for_Pass = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "User did not exist" })
         };
 
+        const token = generate_passToken(userId);
+        req.session.passToken = { token, used: false }
+
         // send the email for pass change
-        const sendEmail = await pas_Email(user.email, user._id);
+        const sendEmail = await pas_Email(user.email, token);
         if (!sendEmail) {
             return res.status(500).json({ statusCode: 500, message: "Something went wrong to send the email" })
         }
@@ -405,8 +390,17 @@ const email_for_Pass = async (req, res) => {
 const update_pass = async (req, res) => {
     try {
         // get id from token
-        const { id } = req.params;
+        const { token } = req.params;
         const { new_pass } = req.body;
+
+        // check token
+        const sessionToken = req.session.passToken;
+        if (!sessionToken || sessionToken.token !== token || sessionToken.used) {
+            return res.status(401).json({ statusCode: 400, message: "Token is invalid or already used" });
+        }
+
+        // verify token
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
         // validate pass
         const checkPass = validateUserInput(null, null, new_pass, null)
@@ -415,13 +409,15 @@ const update_pass = async (req, res) => {
         }
 
         // create password hash
-        const hashedPassword = bcrypt.hash(new_pass, 10);
+        const hashedPassword = await bcrypt.hash(new_pass, 10);
 
         // find the user and change the pass in db
-        const changePass = await User.findByIdAndUpdate(id, { $set: { password: hashedPassword } })
+        const changePass = await User.findByIdAndUpdate(decoded?.id, { $set: { password: hashedPassword } })
         if (!changePass) {
             return res.status(500).json({ statusCode: 500, message: "something went wrong to change the pass" })
         };
+
+        req.session.passToken = null
 
         return res.status(200).json({ statusCode: 200, message: "Your password change successfully" });
     } catch (error) {
@@ -431,5 +427,5 @@ const update_pass = async (req, res) => {
 
 export {
     valid_register, resendVerificationCode, register_user, login, logOut, changeAvatar, editProfile,
-    updateProfile,email_for_Pass, update_pass, getUser
-} 
+    updateProfile, email_for_Pass, update_pass, getUser
+}
