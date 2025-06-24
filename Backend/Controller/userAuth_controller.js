@@ -10,37 +10,46 @@ import bcrypt from "bcryptjs";
 
 // register user
 const valid_register = async (req, res) => {
-    try {
-        const { fullName, email, password, role } = req.body;
-        // check user input is valid
-        if ([fullName, email, password, role].every((e) => e & e.trim() !== "")) {
-            return res.status(400).json({ statusCode: 400, message: "All Fields are required" })
-        }
-        const inputVerify = validateUserInput(fullName, email, password);
-        if (!inputVerify.isValid) {
-            return res.status(400).json({ statusCode: 400, message: inputVerify.errors })
-        }
-        // find the user already exist
-        const findUser = await User.findOne({ email });
-        if (findUser) {
-            return res.status(400).json({ statusCode: 400, message: "User already exist" })
-        }
+  try {
+    const { fullName, email, password, role, companyName} = req.body;
 
-        // send email to the user
-        const verificationCode = await sendEmail(email);
-        if (!verificationCode) {
-            return res.status(500).json({ statusCode: 500, message: "Something went wrong to send the email" })
-        }
-
-        // save info in session 
-        req.session.userInfo = req.body
-        req.session.emailCode = verificationCode;
-
-        return res.status(200).json({ statusCode: 200, message: "Verification code send to your email.Please verify it" })
-    } catch (error) {
-        return res.status(500).json({ statusCode: 500, message: "Internal server error", error: error.message })
+    // Check basic fields
+    if (![fullName, email, password, role].every(e => e && e.trim() !== "")) {
+      return res.status(400).json({ statusCode: 400, message: "All fields are required" });
     }
-}
+
+    // If role is employer, company must be provided
+    if (role === "employer" && (!companyName || companyName.trim() === "")) {
+      return res.status(400).json({ statusCode: 400, message: "Company name is required for employers" });
+    }
+
+    // Input validation
+    const inputVerify = validateUserInput(fullName, email, password);
+    if (!inputVerify.isValid) {
+      return res.status(400).json({ statusCode: 400, message: inputVerify.errors });
+    }
+
+    // Check if user already exists
+    const findUser = await User.findOne({ email });
+    if (findUser) {
+      return res.status(400).json({ statusCode: 400, message: "User already exists" });
+    }
+
+    // Send email verification code
+    const verificationCode = await sendEmail(email);
+    if (!verificationCode) {
+      return res.status(500).json({ statusCode: 500, message: "Something went wrong while sending the email" });
+    }
+
+    // Save info in session
+    req.session.userInfo = {fullName,email,password,role,...(role === "employer" && { companyName })};
+    req.session.emailCode = verificationCode;
+
+    return res.status(200).json({statusCode: 200,message: "Verification code sent to your email. Please verify it."});
+  } catch (error) {
+    return res.status(500).json({statusCode: 500,message: "Internal server error",error: error.message});
+  }
+};
 
 // Resend verification code
 const resendVerificationCode = async (req, res) => {
@@ -67,7 +76,7 @@ const register_user = async (req, res) => {
         // get info
         const { code } = req.body;
         const { emailCode, userInfo } = req.session;
-        const { fullName, email, password, role } = userInfo
+        const { fullName, email, password, role,companyName} = userInfo
 
         // verify email
         const verifyMail = verifyEmail(code, emailCode);
@@ -90,14 +99,28 @@ const register_user = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10)
 
         // create the new user user
+        let user;
+        if(role == "employer"){
+            user = new User({
+                fullName,
+                email,
+                password : hashedPassword,
+                userName,
+                role,
+                companyInfo : {
+                    companyName : companyName
+                }
+            })
+        }else{
+            user = new User({
+                fullName,
+                email,
+                password: hashedPassword,
+                userName,
+                role,
+            });
+        }
 
-        const user = new User({
-            fullName,
-            email,
-            password: hashedPassword,
-            userName,
-            role,
-        });
 
         await user.save();
 

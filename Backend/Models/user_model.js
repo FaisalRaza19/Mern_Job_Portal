@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema(
         role: {
             type: String,
             default: 'jobseeker',
+            enum : ["jobseeker","employer"]
         },
         avatar: {
             type: Object,
@@ -32,6 +33,24 @@ const userSchema = new mongoose.Schema(
         refreshToken: {
             type: String,
         },
+
+        // company info
+        companyInfo : {
+            companyName : {
+                type : String,
+            },
+            companyDescription : {
+                type : String,
+            },
+            companyAvatar : {
+                type : Object,
+                avatar_Url: String,
+                public_Id: String,
+            },
+            companyWeb : {
+                type : String,
+            }
+        }
     },
     {
         timestamps: true,

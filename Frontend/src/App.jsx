@@ -4,12 +4,16 @@ import Footer from "./Components/pages/Fixed Pages/Footer.jsx";
 import HomePage from "./Components/pages/Home/HomePage.jsx";
 import Login from "./Components/Forms/login.jsx"
 import Register from "./Components/Forms/Register.jsx"
-import { Routes, Route} from "react-router-dom"
-
+import EmailVerify from "./Components/Forms/emailVerify.jsx"
+import { Routes, Route, useLocation} from "react-router-dom"
+import JobSeekerDashboard from "./Components/pages/Dashboard/JobSeeker/dashboard.jsx"
+import EmployerDashboard from "./Components/pages/Dashboard/employer/employerDashboard.jsx"
 
 function App() {
   const [darkMode, setDarkMode] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const authPage = useLocation()
+  const isAuthPage = ["/login","/register","/email-verify","/jobseeker-dashboard","/employer-dashboard"].includes(authPage.pathname)
 
   useEffect(() => {
     const savedDarkMode = localStorage.getItem("darkMode")
@@ -39,13 +43,17 @@ function App() {
   return (
     <div className={`min-h-screen ${darkMode ? "dark" : ""}`}>
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
-        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
+        {!isAuthPage && <Navbar darkMode={darkMode} setDarkMode={setDarkMode} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>}
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn}/>}/>
+
+            <Route path="/jobseeker-dashboard" element={<JobSeekerDashboard/>}/>
+            <Route path="/employer-dashboard" element={<EmployerDashboard/>}/>
             <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn}/>}/>
+            <Route path="/email-verify" element={<EmailVerify/>}/>
+            <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn}/>}/>
           </Routes>
-        <Footer/>
+        {!isAuthPage && <Footer/>}
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import JobCategories from "./Home Components/jobCategories.jsx"
 import Testimonials from "./Home Components/Testimonials.jsx"
 
 const HomePage = () => {
+  console.log(name)
   return (
     <div className='min-h-screen'>
       <Hero/>
