@@ -1,12 +1,16 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi"
-import {FaArrowLeft } from "react-icons/fa"
+import { FaArrowLeft } from "react-icons/fa"
+import { Context } from "../../Context/context"
 
 const Login = ({ setIsLoggedIn }) => {
+  const {userAuth,setUserData} = useContext(Context)
+  const { Login } = userAuth
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
+    userName: "",
     password: "",
   })
   const [errors, setErrors] = useState({})
@@ -16,16 +20,24 @@ const Login = ({ setIsLoggedIn }) => {
   const validateForm = () => {
     const newErrors = {}
 
-    if (!formData.email) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid"
+    if (!formData.email && !formData.userName) {
+      newErrors.email = "Email or Username is required";
+    } else {
+      if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = "Email is invalid";
+      }
+
+      if (formData.userName && !/^[a-zA-Z0-9_]{3,20}$/.test(formData.userName)) {
+        newErrors.userName = "Username is invalid";
+      }
     }
 
+    const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+
     if (!formData.password) {
-      newErrors.password = "Password is required"
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
+      newErrors.password = "Password is required";
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password = "Password must be at least 8 characters and include one special character";
     }
 
     setErrors(newErrors)
@@ -34,18 +46,17 @@ const Login = ({ setIsLoggedIn }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
     if (!validateForm()) return
-
     setIsLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoggedIn(true)
-      localStorage.setItem("isLoggedIn", "true")
+    try {
+      const data = await Login({ formData, navigate, setIsLoggedIn })
+      console.log(data);
+      setUserData(data.data)
+    } catch (error) {
+      console.log("Login ", error.message)
+    } finally {
       setIsLoading(false)
-      navigate("/")
-    }, 1500)
+    }
   }
 
   const handleChange = (e) => {
@@ -89,17 +100,17 @@ const Login = ({ setIsLoggedIn }) => {
             <div className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2">
-                  Email Address
+                  Email Address or UserName
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 z-20 left-0 pl-3 flex items-center pointer-events-none">
                     <FiMail className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
                     id="email"
                     name="email"
-                    type="email"
-                    value={formData.email}
+                    type="email_userName"
+                    value={formData.email || formData.userName}
                     onChange={handleChange}
                     className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${errors.email ? "border-red-500" : "border-gray-300 dark:border-gray-600"
                       } placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 transition-colors duration-200`}
@@ -114,7 +125,7 @@ const Login = ({ setIsLoggedIn }) => {
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 z-20 left-0 pl-3 flex items-center pointer-events-none">
                     <FiLock className="h-5 w-5 text-gray-400" />
                   </div>
                   <input

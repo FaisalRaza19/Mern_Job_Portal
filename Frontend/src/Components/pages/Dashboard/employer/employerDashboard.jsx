@@ -18,7 +18,7 @@ const mockNotifications = [
   { id: "3", text: "Candidate John Doe accepted interview invitation", time: "1 day ago", read: true },
 ]
 
-const EmployerDashboard = ()=>{
+const EmployerDashboard = ({setIsLoggedIn})=>{
   const [activeTab, setActiveTab] = useState("overview")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -72,7 +72,7 @@ const EmployerDashboard = ()=>{
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Topbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} />
+        <Topbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} setIsLoggedIn={setIsLoggedIn} />
 
         <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>

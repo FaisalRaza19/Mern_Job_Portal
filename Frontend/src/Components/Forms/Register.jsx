@@ -1,10 +1,14 @@
-import React,{ useState } from "react"
-import {Link} from "react-router-dom"
+import React, { useContext, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { FiEye, FiEyeOff, FiMail, FiLock, FiUser } from "react-icons/fi"
 import { FaBuilding, FaArrowLeft } from "react-icons/fa"
+import { Context } from "../../Context/context"
 
 
-const Register = ({ setIsLoggedIn })=>{
+const Register = () => {
+  const {userAuth} = useContext(Context)
+  const { register } = userAuth;
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [userType, setUserType] = useState("jobseeker")
@@ -13,7 +17,7 @@ const Register = ({ setIsLoggedIn })=>{
     email: "",
     password: "",
     confirmPassword: "",
-    company: "",
+    companyName: "",
     role: "jobseeker",
     agreeToTerms: false,
   })
@@ -22,10 +26,6 @@ const Register = ({ setIsLoggedIn })=>{
 
   const validateForm = () => {
     const newErrors = {}
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required"
-    }
 
     if (!formData.email) {
       newErrors.email = "Email is required"
@@ -45,9 +45,10 @@ const Register = ({ setIsLoggedIn })=>{
       newErrors.confirmPassword = "Passwords do not match"
     }
 
-    if (userType === "employer" && !formData.company.trim()) {
-      newErrors.company = "Company name is required for employers"
+    if (userType === "employer" && !formData.companyName.trim()) {
+      newErrors.companyName = "Company name is required for employers"
     }
+
 
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = "You must agree to the terms and conditions"
@@ -59,22 +60,17 @@ const Register = ({ setIsLoggedIn })=>{
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    if (!validateForm()) return
-
+    if (!validateForm()) return;
     setIsLoading(true)
-    console.log(formData)
-
-    // Simulate API call
-    setTimeout(() => {
-      if (setIsLoggedIn) {
-        setIsLoggedIn(true)
-        localStorage.setItem("isLoggedIn", "true")
-      }
+    try {
+      const data = await register(formData, navigate);
       setIsLoading(false)
-      // In Next.js, you would use router.push('/') instead
-      window.location.href = "/"
-    }, 2000)
+    } catch (error) {
+      console.log("register",error.message)
+    }finally{
+      setIsLoading(false)
+
+    }
   }
 
   const handleChange = (e) => {
@@ -98,6 +94,8 @@ const Register = ({ setIsLoggedIn })=>{
     setFormData((prev) => ({
       ...prev,
       role: type,
+      fullName: type === "employer" ? "" : prev.fullName,
+      companyName: type === "employer" ? prev.companyName : "",
     }))
   }
 
@@ -131,22 +129,20 @@ const Register = ({ setIsLoggedIn })=>{
             <button
               type="button"
               onClick={() => handleUserTypeChange("jobseeker")}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                userType === "jobseeker"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              }`}
+              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 ${userType === "jobseeker"
+                ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                }`}
             >
               Job Seeker
             </button>
             <button
               type="button"
               onClick={() => handleUserTypeChange("employer")}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                userType === "employer"
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              }`}
+              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 ${userType === "employer"
+                ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                }`}
             >
               Employer
             </button>
@@ -156,30 +152,55 @@ const Register = ({ setIsLoggedIn })=>{
           <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               {/* Full Name */}
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                    <FiUser className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${
-                      errors.fullName
+              {userType != "employer" ? (
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                      <FiUser className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${errors.fullName
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                    } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
-                    placeholder="Enter your full name"
-                  />
+                        } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  {errors.fullName && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fullName}</p>}
                 </div>
-                {errors.fullName && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fullName}</p>}
-              </div>
+              ) : (
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Company Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                      <FaBuilding className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="companyName"
+                      name="companyName"
+                      type="text"
+                      value={formData.companyName}
+                      onChange={handleChange}
+                      className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${errors.company
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                        } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
+                      placeholder="Enter your company name"
+                    />
+                  </div>
+                  {errors.companyName && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.companyName}</p>}
+                </div>
+              )}
 
               {/* Email */}
               <div>
@@ -196,44 +217,15 @@ const Register = ({ setIsLoggedIn })=>{
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${
-                      errors.email
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                    } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
+                    className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${errors.email
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                      : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                      } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
                     placeholder="Enter your email"
                   />
                 </div>
                 {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
               </div>
-
-              {/* Company Name (for employers) */}
-              {userType === "employer" && (
-                <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Company Name
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                      <FaBuilding className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="company"
-                      name="company"
-                      type="text"
-                      value={formData.company}
-                      onChange={handleChange}
-                      className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${
-                        errors.company
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                      } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
-                      placeholder="Enter your company name"
-                    />
-                  </div>
-                  {errors.company && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.company}</p>}
-                </div>
-              )}
 
               {/* Password */}
               <div>
@@ -250,11 +242,10 @@ const Register = ({ setIsLoggedIn })=>{
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`appearance-none relative block w-full pl-10 pr-10 py-3 border ${
-                      errors.password
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                    } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
+                    className={`appearance-none relative block w-full pl-10 pr-10 py-3 border ${errors.password
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                      : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                      } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
                     placeholder="Create a password"
                   />
                   <button
@@ -290,11 +281,10 @@ const Register = ({ setIsLoggedIn })=>{
                     type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className={`appearance-none relative block w-full pl-10 pr-10 py-3 border ${
-                      errors.confirmPassword
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                    } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
+                    className={`appearance-none relative block w-full pl-10 pr-10 py-3 border ${errors.confirmPassword
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                      : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                      } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-white dark:bg-gray-800 transition-colors duration-200`}
                     placeholder="Confirm your password"
                   />
                   <button

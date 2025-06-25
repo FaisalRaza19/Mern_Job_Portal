@@ -1,21 +1,21 @@
-import {userAuth} from "../Api's.js"
+import { userAuth } from "../Api's.js"
 
-export const register = async({formData,navigate})=>{
+export const register = async (formData, navigate) => {
     try {
-        const response = await fetch(userAuth.register,{
-            method : "POST",
-            headers : {'Content-Type': 'application/json'},
-            body : JSON.stringify(formData),
-            credentials : "include"
+        localStorage.setItem("email", formData.email)
+        const response = await fetch(userAuth.register, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+            credentials: "include"
         });
 
-        if(!response.ok){
+        if (!response.ok) {
             const errorDetails = await response.json();
             return { message: errorDetails.message.message || errorDetails.message };
         }
         const data = await response.json();
-        console.log("register",data)
-        navigate("/")
+        navigate("/email-verify")
         return data
     } catch (error) {
         return error.message
@@ -29,7 +29,7 @@ export const verify_register = async ({ code, navigate, setIsLogedIn }) => {
         const response = await fetch(userAuth.verify_register, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({code}),
+            body: JSON.stringify({ code }),
             credentials: 'include',
         });
 
@@ -39,10 +39,13 @@ export const verify_register = async ({ code, navigate, setIsLogedIn }) => {
         }
 
         const data = await response.json();
-         consle.log(data)
-         localStorage.setItem("user_token", data.data.accessToken);
-         navigate("/user-dashboard");
-         setIsLogedIn(true);
+        localStorage.setItem("user_token", data.accesstoken);
+        if (data.data.role === "jobseeker") {
+            navigate("/jobseeker-dashboard");
+        } else {
+            navigate("/employer-dashboard");
+        }
+        setIsLogedIn(true);
         return data;
     } catch (error) {
         return error.message;
@@ -64,7 +67,6 @@ export const ResendCode = async () => {
         }
 
         const data = await response.json();
-        consle.log(data)
         return data;
     } catch (error) {
         return error.message
@@ -72,7 +74,7 @@ export const ResendCode = async () => {
 };
 
 // login user
-export const Login = async ({formData, navigate, setIsLogedIn }) => {
+export const Login = async ({ formData, navigate, setIsLoggedIn }) => {
     try {
         const response = await fetch(userAuth.login, {
             method: "POST",
@@ -86,22 +88,26 @@ export const Login = async ({formData, navigate, setIsLogedIn }) => {
         }
 
         const data = await response.json();
-        consle.log(data)
-        localStorage.setItem("user_token", data.data.accessToken)
-        setIsLogedIn(true);
-        navigate("/user-dashboard");
-        FetchUser();
+        localStorage.setItem("user_token", data.accesstoken)
+        setIsLoggedIn(true);
+        if (data.data.role === "jobseeker") {
+            navigate("/jobseeker-dashboard");
+        } else {
+            navigate("/employer-dashboard");
+        }
+        // FetchUser();
         return data;
     } catch (error) {
         return error.message;
     }
 };
 
-export const LogOut = async ({ navigate, setIsLogedIn }) => {
+// LogOut User
+export const LogOut = async ({ navigate, setIsLoggedIn }) => {
     try {
         const token = localStorage.getItem("user_token");
 
-        const response = await fetch(api.LogOut, {
+        const response = await fetch(userAuth.logOut, {
             method: "POST",
             headers: {
                 "Authorization": token,
@@ -114,7 +120,7 @@ export const LogOut = async ({ navigate, setIsLogedIn }) => {
             return { message: errorDetails.message };
         }
         const data = await response.json();
-        setIsLogedIn(false);
+        setIsLoggedIn(false);
         localStorage.removeItem("user_token");
         navigate("/login")
         return data;
@@ -122,3 +128,57 @@ export const LogOut = async ({ navigate, setIsLogedIn }) => {
         return error.message;
     }
 };
+
+// fetch User
+export const getUser = async () => {
+    try {
+        const token = localStorage.getItem("user_token");
+
+        const response = await fetch(userAuth.getUser, {
+            method: "GET",
+            headers: {
+                "Authorization": token,
+                "Content-Type": "application/json"
+            },
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails.message };
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error.message;
+    }
+};
+
+
+// update avatar
+export const updateAvatar = async (file) => {
+    if (!file) {
+        return { message: "Please select a file to upload." };
+    }
+    try {
+        const token = localStorage.getItem("user_token");
+        const formData = new FormData();
+        formData.append("avatar", file);
+        const response = await fetch(userAuth.updateAvatar, {
+            method: "POST",
+            headers: {
+                "Authorization": token,
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails.message };
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error.message;
+    }
+};
+

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { FiMenu, FiX, FiSun, FiMoon, FiUser, FiLogOut, FiBriefcase } from "react-icons/fi"
 
-const Navbar = ({ darkMode, setDarkMode, isLoggedIn, setIsLoggedIn })=>{
+const Navbar = ({ isEmployer, darkMode, setDarkMode, isLoggedIn, setIsLoggedIn }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
@@ -54,18 +54,13 @@ const Navbar = ({ darkMode, setDarkMode, isLoggedIn, setIsLoggedIn })=>{
 
             {/* Auth Buttons */}
             {isLoggedIn ? (
-              <div className="flex items-center space-x-3">
-                <button className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
-                  <FiUser className="h-4 w-4" />
-                  <span className="text-sm font-medium">Profile</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
-                >
-                  <FiLogOut className="h-4 w-4" />
-                  <span className="text-sm font-medium">Logout</span>
-                </button>
+              <div className="flex items-center space-x-3 ml-12">
+                <Link to={isEmployer ? "/employer-dashboard" : "/jobseeker-dashboard"}>
+                  <button className="flex items-center space-x-2 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                    <FiUser className="h-4 w-4" />
+                    <span className="text-sm font-medium">Profile</span>
+                  </button>
+                </Link>
               </div>
             ) : (
               <div className="flex items-center space-x-3">
@@ -121,17 +116,12 @@ const Navbar = ({ darkMode, setDarkMode, isLoggedIn, setIsLoggedIn })=>{
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
               {isLoggedIn ? (
                 <div className="space-y-1">
-                  <button className="flex items-center space-x-2 w-full px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200">
-                    <FiUser className="h-5 w-5" />
-                    <span>Profile</span>
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-2 w-full px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
-                  >
-                    <FiLogOut className="h-5 w-5" />
-                    <span>Logout</span>
-                  </button>
+                  <Link to={isEmployer ? "/employer-dashboard" : "/jobseeker-dashboard"}>
+                    <button className="flex items-center space-x-2 w-full px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200">
+                      <FiUser className="h-5 w-5" />
+                      <span>Profile</span>
+                    </button>
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-1">

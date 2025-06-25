@@ -1,16 +1,18 @@
 import React from 'react'
+import { FaHome } from 'react-icons/fa'
 import {
   FiHome,
   FiPlus,
   FiBriefcase,
   FiUsers,
   FiMessageCircle,
-  // FiBarChart3,
   FiSettings,
   FiChevronLeft,
   FiChevronRight,
   FiFileText,
 } from "react-icons/fi"
+import { FaChartLine } from "react-icons/fa";
+import { Link } from 'react-router-dom'
 
 
 const menuItems = [
@@ -19,7 +21,7 @@ const menuItems = [
   { id: "manage-jobs", label: "Manage Jobs", icon: FiBriefcase },
   { id: "applicants", label: "Applicants", icon: FiUsers },
   { id: "messages", label: "Messages", icon: FiMessageCircle },
-  { id: "analytics", label: "Analytics", icon:  FiMessageCircle},
+  { id: "analytics", label: "Analytics", icon:  FaChartLine},
   { id: "admin-requests", label: "Admin Requests", icon: FiFileText },
   { id: "settings", label: "Settings", icon: FiSettings },
 ]
@@ -33,6 +35,7 @@ const EmployerSidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse
     >
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
+          <Link to="/"><FaHome size={16}/></Link>
           {!isCollapsed && <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Employer</h2>}
           <button
             onClick={onToggleCollapse}

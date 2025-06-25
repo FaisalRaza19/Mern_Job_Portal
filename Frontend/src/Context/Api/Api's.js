@@ -4,5 +4,7 @@ export const userAuth = {
     verify_register : `http://localhost:${port}/user/verify-register`,
     resendCode : `http://localhost:${port}/user/resend-code`,
     login : `http://localhost:${port}/user/login`,
-    logOut : `http://localhost:${port}/user/logOut`
+    logOut : `http://localhost:${port}/user/logOut`,
+    getUser : `http://localhost:${port}/user/get-user`,
+    updateAvatar : `http://localhost:${port}/user/change-avatar`,
 }

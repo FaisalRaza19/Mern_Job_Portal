@@ -6,9 +6,11 @@ import React from 'react'
 import { ContextApi } from './Context/context.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <ContextApi>
+  <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <ContextApi>
+        <App />
+      </ContextApi>
     </BrowserRouter>
-  </ContextApi>,
+  </React.StrictMode>
 )

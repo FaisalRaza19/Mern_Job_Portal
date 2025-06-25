@@ -16,7 +16,7 @@ const mockNotifications = [
   { id: "3", text: "Interview scheduled for UI/UX Designer position", time: "2 days ago", read: true },
 ]
 
-const JobSeekerDashboard = ()=>{
+const JobSeekerDashboard = ({setIsLoggedIn})=>{
   const [activeTab, setActiveTab] = useState("overview")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -66,7 +66,7 @@ const JobSeekerDashboard = ()=>{
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Topbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} />
+        <Topbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} setIsLoggedIn={setIsLoggedIn}/>
 
         <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>

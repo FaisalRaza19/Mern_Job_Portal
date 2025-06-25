@@ -1,15 +1,29 @@
-import { useState } from "react"
-// import { useAuth } from "../../contexts/AuthContext"
-// import { useTheme } from "../../contexts/ThemeContext"
-import { FiBell, FiSun, FiMoon, FiUser, FiSettings, FiLogOut, FiMenu } from "react-icons/fi"
+import { useContext, useState } from "react"
+import { Context } from "../../../../Context/context.jsx"
+import {Link} from "react-router-dom"
+import { FiBell, FiSun, FiMoon, FiUser, FiSettings, FiLogOut, FiMenu} from "react-icons/fi"
+import { useNavigate } from "react-router-dom";
 
-const Topbar = ({ onMenuClick, notifications = [] })=>{
-  const { user, logout } = useState(null)
+const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, }) => {
+  const { userAuth, userData } = useContext(Context);
+  const { LogOut } = userAuth;
+  const navigate = useNavigate();
   const { isDark, toggleTheme } = useState("dark")
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const user = userData;
 
   const unreadCount = notifications.filter((n) => !n.read).length
+
+  // logout the user
+  const logOut = async () => {
+    try {
+      const data = await LogOut({ navigate, setIsLoggedIn });
+    } catch (error) {
+      console.log("logOut", error.message)
+    } 
+  }
+
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
@@ -59,9 +73,8 @@ const Topbar = ({ onMenuClick, notifications = [] })=>{
                     notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                          !notification.read ? "bg-blue-50 dark:bg-blue-900/20" : ""
-                        }`}
+                        className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${!notification.read ? "bg-blue-50 dark:bg-blue-900/20" : ""
+                          }`}
                       >
                         <p className="text-sm text-gray-900 dark:text-white">{notification.text}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notification.time}</p>
@@ -77,21 +90,17 @@ const Topbar = ({ onMenuClick, notifications = [] })=>{
 
           {/* Profile Dropdown */}
           <div className="relative">
-            <button
-              onClick={() => setShowProfile(!showProfile)}
+            <button onClick={() => setShowProfile(!showProfile)}
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <img
-                src={user?.avatar || "/placeholder.svg?height=32&width=32"}
-                alt={user?.name}
-                className="w-8 h-8 rounded-full"
-              />
-              <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-300">{user?.name}</span>
+              <img src={user?.avatar?.avatar_Url || "/placeholder.svg?height=32&width=32"} alt="" className="w-8 h-8 rounded-full" />
             </button>
 
             {showProfile && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                 <div className="p-2">
+                  {/* <Link to="/settings">
+                  </Link> */}
                   <button className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <FiUser className="w-4 h-4" />
                     <span>Profile</span>
@@ -101,7 +110,7 @@ const Topbar = ({ onMenuClick, notifications = [] })=>{
                     <span>Settings</span>
                   </button>
                   <button
-                    onClick={logout}
+                    onClick={() => logOut()}
                     className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                   >
                     <FiLogOut className="w-4 h-4" />

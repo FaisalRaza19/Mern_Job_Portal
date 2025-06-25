@@ -1,4 +1,5 @@
 "use client"
+import { FaHome } from "react-icons/fa"
 import {
   FiHome,
   FiBookmark,
@@ -9,6 +10,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi"
+import { Link } from "react-router-dom"
 
 
 const menuItems = [
@@ -29,6 +31,7 @@ const JobSeekerSidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollaps
     >
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
+          <Link to="/"><FaHome size={16}/></Link>
           {!isCollapsed && <h2 className="text-lg font-semibold text-gray-900 dark:text-white">JobSeeker</h2>}
           <button
             onClick={onToggleCollapse}

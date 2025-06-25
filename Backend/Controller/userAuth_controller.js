@@ -10,46 +10,64 @@ import bcrypt from "bcryptjs";
 
 // register user
 const valid_register = async (req, res) => {
-  try {
-    const { fullName, email, password, role, companyName} = req.body;
+    try {
+        const { fullName, email, password, role, companyName } = req.body;
 
-    // Check basic fields
-    if (![fullName, email, password, role].every(e => e && e.trim() !== "")) {
-      return res.status(400).json({ statusCode: 400, message: "All fields are required" });
+        // Check basic required fields (excluding fullName for employer)
+        if (![email, password, role].every(e => e && e.trim() !== "")) {
+            return res.status(400).json({ statusCode: 400, message: "Email, password and role are required" });
+        }
+
+        // fullName is required for non-employer roles
+        if (role !== "employer" && (!fullName || fullName.trim() === "")) {
+            return res.status(400).json({ statusCode: 400, message: "Full name is required" });
+        }
+
+        // companyName is required if role is employer
+        if (role === "employer" && (!companyName || companyName.trim() === "")) {
+            return res.status(400).json({ statusCode: 400, message: "Company name is required for employers" });
+        }
+
+        // Validate inputs (only pass fullName if it's required)
+        const inputVerify = validateUserInput(
+            role === "employer" ? undefined : fullName,
+            email,
+            password,
+            undefined
+        );
+
+        if (!inputVerify.isValid) {
+            return res.status(400).json({ statusCode: 400, message: inputVerify.errors });
+        }
+
+        // Check if user already exists
+        const findUser = await User.findOne({ email });
+        if (findUser) {
+            return res.status(400).json({ statusCode: 400, message: "User already exists" });
+        }
+
+        // Send email verification code
+        const verificationCode = await sendEmail(email);
+        if (!verificationCode) {
+            return res.status(500).json({ statusCode: 500, message: "Something went wrong while sending the email" });
+        }
+
+        // Save info in session
+        req.session.userInfo = {
+            email,
+            password,
+            role,
+            ...(role !== "employer" && { fullName }),
+            ...(role === "employer" && { companyName }),
+        };
+        req.session.emailCode = verificationCode;
+
+        return res.status(200).json({statusCode: 200,message: "Verification code sent to your email. Please verify it.",});
+    } catch (error) {
+        return res.status(500).json({statusCode: 500,message: "Internal server error",error: error.message,});
     }
-
-    // If role is employer, company must be provided
-    if (role === "employer" && (!companyName || companyName.trim() === "")) {
-      return res.status(400).json({ statusCode: 400, message: "Company name is required for employers" });
-    }
-
-    // Input validation
-    const inputVerify = validateUserInput(fullName, email, password);
-    if (!inputVerify.isValid) {
-      return res.status(400).json({ statusCode: 400, message: inputVerify.errors });
-    }
-
-    // Check if user already exists
-    const findUser = await User.findOne({ email });
-    if (findUser) {
-      return res.status(400).json({ statusCode: 400, message: "User already exists" });
-    }
-
-    // Send email verification code
-    const verificationCode = await sendEmail(email);
-    if (!verificationCode) {
-      return res.status(500).json({ statusCode: 500, message: "Something went wrong while sending the email" });
-    }
-
-    // Save info in session
-    req.session.userInfo = {fullName,email,password,role,...(role === "employer" && { companyName })};
-    req.session.emailCode = verificationCode;
-
-    return res.status(200).json({statusCode: 200,message: "Verification code sent to your email. Please verify it."});
-  } catch (error) {
-    return res.status(500).json({statusCode: 500,message: "Internal server error",error: error.message});
-  }
 };
+
 
 // Resend verification code
 const resendVerificationCode = async (req, res) => {
@@ -76,7 +94,7 @@ const register_user = async (req, res) => {
         // get info
         const { code } = req.body;
         const { emailCode, userInfo } = req.session;
-        const { fullName, email, password, role,companyName} = userInfo
+        const { fullName, email, password, role, companyName } = userInfo
 
         // verify email
         const verifyMail = verifyEmail(code, emailCode);
@@ -86,7 +104,7 @@ const register_user = async (req, res) => {
         // assign userName 
         let userName;
         while (true) {
-            const sampleUserName = generateUsername(fullName);
+            const sampleUserName = generateUsername(fullName || companyName);
             // find the user
             const findUserName = await User.findOne({ userName: sampleUserName })
             if (!findUserName) {
@@ -100,18 +118,17 @@ const register_user = async (req, res) => {
 
         // create the new user user
         let user;
-        if(role == "employer"){
+        if (role == "employer") {
             user = new User({
-                fullName,
+                companyInfo: {
+                    companyName: companyName
+                },
                 email,
-                password : hashedPassword,
+                password: hashedPassword,
                 userName,
                 role,
-                companyInfo : {
-                    companyName : companyName
-                }
             })
-        }else{
+        } else {
             user = new User({
                 fullName,
                 email,
