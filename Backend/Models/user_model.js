@@ -38,6 +38,15 @@ const userSchema = new mongoose.Schema(
             companyName : {
                 type : String,
             },
+            companyType : {
+                type : String,
+            },
+            socialLinks : {
+                type : Object
+            },
+            companySize : {
+                type : String
+            },
             companyDescription : {
                 type : String,
             },

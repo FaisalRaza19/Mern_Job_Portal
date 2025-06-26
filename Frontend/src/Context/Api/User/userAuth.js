@@ -153,7 +153,6 @@ export const getUser = async () => {
     }
 };
 
-
 // update avatar
 export const updateAvatar = async (file) => {
     if (!file) {
@@ -182,3 +181,54 @@ export const updateAvatar = async (file) => {
     }
 };
 
+// verify jwt
+export const verifyJWT = async (setIsVerify) => {
+    try {
+        const token = localStorage.getItem("user_token");
+        if (!token || token === "undefined" || token === null) {
+            setIsVerify(false)
+            localStorage.removeItem("user_token");
+        }
+        const response = await fetch(userAuth.verifyJWT, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token,
+            },
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails.message }
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error.message;
+    }
+};
+
+// edit profile
+export const editProfile = async ({formData}) => {
+    try {
+        const token = localStorage.getItem("user_token");
+
+        const response = await fetch(userAuth.updateAvatar, {
+            method: "POST",
+            headers: {
+                "Authorization": token,
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails.message };
+        }
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        return error.message;
+    }
+};

@@ -2,12 +2,14 @@ import { useContext, useRef, useState } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiSave, FiTrash2, FiEye, FiEyeOff, FiUpload, FiLoader } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
+import { industryOptions } from "../../../../temp/data.js"
 
 const EmployerSettings = () => {
-  const { userData, userAuth } = useContext(Context);
+  const { userData, userAuth, userImage } = useContext(Context);
   const { updateAvatar } = userAuth
+  const { image, setImage } = userImage
   const user = userData
-  const { isLoading, setLoading } = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -25,6 +27,7 @@ const EmployerSettings = () => {
     website: "",
     description: "",
     contactNumber: "",
+    socialLinks: {} || "",
   })
 
   const handleInputChange = (field, value) => {
@@ -58,7 +61,7 @@ const EmployerSettings = () => {
         console.log("File is required",);
       }
       const data = await updateAvatar(file)
-      console.log(data);
+      setImage(data.data)
       setLoading(false)
     } catch (error) {
       console.log("upload image", error.message)
@@ -76,99 +79,111 @@ const EmployerSettings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Company Information */}
         <DashboardCard title="Company Information">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
-                {userData?.avatar?.avatar_Url ? (
-                  <img
-                    src={userData.avatar.avatar_Url}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover rounded-lg"
+          <form typeof="sumbit">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
+                  {user?.companyInfo?.companyAvatar?.avatar_Url ? (
+                    <img
+                      src={image || user?.companyInfo?.companyAvatar?.avatar_Url}
+                      alt="User Avatar"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <span className="text-sm text-gray-500 dark:text-gray-300">{user?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <button type="button" onClick={handleButtonClick}
+                    className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <FiUpload className="w-4 h-4" />
+                    <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
+                  </button>
+
+                  <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
+                  <input
+                    type="text"
+                    value={formData.companyName}
+                    onChange={(e) => handleInputChange("companyName", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
-                ) : (
-                  <span className="text-sm text-gray-500 dark:text-gray-300">{userData?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
-                )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Industry</label>
+                  <select value={formData.industry} onChange={(e) => handleInputChange("industry", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">Select Industry</option>
+                    {industryOptions.map((industry) => (
+                      <option key={industry} value={industry}>
+                        {industry}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Size</label>
+                  <select
+                    value={formData.companySize}
+                    onChange={(e) => handleInputChange("companySize", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">Select Company Size</option>
+                    <option value="1-10">1–10 employees</option>
+                    <option value="11-50">11–50 employees</option>
+                    <option value="51-200">51–200 employees</option>
+                    <option value="201-500">201–500 employees</option>
+                    <option value="501-1000">501–1000 employees</option>
+                    <option value="1001-5000">1001–5000 employees</option>
+                    <option value="5001-10000">5001–10,000 employees</option>
+                    <option value="10001+">10,001+ employees</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => handleInputChange("website", e.target.value)}
+                    placeholder="https://www.company.com"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Social Links</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="facebook=https://...,twitter=https://..."
+                    value={formData.socialLinks}
+                    onChange={(e) => handleInputChange("socialLinks", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                  <textarea
+                    rows={6}
+                    value={formData.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    placeholder="Write a brief description of your company, culture, and what makes it a great place to work..."
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  />
+                </div>
               </div>
-              <div className="flex-1">
-                <button type="button" onClick={handleButtonClick}
-                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <FiUpload className="w-4 h-4" />
-                  <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
-                </button>
 
-                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-              </div>
+              <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <FiSave className="w-4 h-4" />
+                <span>Save Company Info</span>
+              </button>
             </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
-                <input
-                  type="text"
-                  value={formData.companyName}
-                  onChange={(e) => handleInputChange("companyName", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Industry</label>
-                <select
-                  value={formData.industry}
-                  onChange={(e) => handleInputChange("industry", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="Technology">Technology</option>
-                  <option value="Healthcare">Healthcare</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Education">Education</option>
-                  <option value="Manufacturing">Manufacturing</option>
-                  <option value="Retail">Retail</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Size</label>
-                <select
-                  value={formData.companySize}
-                  onChange={(e) => handleInputChange("companySize", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="1-10">1-10 employees</option>
-                  <option value="11-50">11-50 employees</option>
-                  <option value="51-100">51-100 employees</option>
-                  <option value="101-500">101-500 employees</option>
-                  <option value="500+">500+ employees</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
-                <input
-                  type="url"
-                  value={formData.website}
-                  onChange={(e) => handleInputChange("website", e.target.value)}
-                  placeholder="https://www.company.com"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Contact Number
-                </label>
-                <input
-                  type="tel"
-                  value={formData.contactNumber}
-                  onChange={(e) => handleInputChange("contactNumber", e.target.value)}
-                  placeholder="+1 (555) 123-4567"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-
-            <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <FiSave className="w-4 h-4" />
-              <span>Save Company Info</span>
-            </button>
-          </div>
+          </form>
         </DashboardCard>
 
         {/* Change Password */}
@@ -245,22 +260,6 @@ const EmployerSettings = () => {
           </div>
         </DashboardCard>
       </div>
-
-      {/* Company Description */}
-      <DashboardCard title="Company Description">
-        <div className="space-y-4">
-          <textarea
-            rows={6}
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            placeholder="Write a brief description of your company, culture, and what makes it a great place to work..."
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
-          />
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Save Description
-          </button>
-        </div>
-      </DashboardCard>
 
       {/* Notification Preferences */}
       <DashboardCard title="Notification Preferences">

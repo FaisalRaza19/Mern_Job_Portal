@@ -7,4 +7,7 @@ export const userAuth = {
     logOut : `http://localhost:${port}/user/logOut`,
     getUser : `http://localhost:${port}/user/get-user`,
     updateAvatar : `http://localhost:${port}/user/change-avatar`,
+    verifyJWT : `http://localhost:${port}/user/verify-jwt`,
+    editProfile : `http://localhost:${port}/user/edit-profile`,
+    verify_edit : `http://localhost:${port}/user/verify-profile`,
 }

@@ -1,15 +1,10 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { FiMenu, FiX, FiSun, FiMoon, FiUser, FiLogOut, FiBriefcase } from "react-icons/fi"
+import { FiMenu, FiX, FiSun, FiMoon, FiUser,FiBriefcase } from "react-icons/fi"
 
-const Navbar = ({ isEmployer, darkMode, setDarkMode, isLoggedIn, setIsLoggedIn }) => {
+const Navbar = ({ isEmployer, darkMode, setDarkMode, isLoggedIn,}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const handleLogout = () => {
-    setIsLoggedIn(false)
-    localStorage.setItem("isLoggedIn", "false")
-    setIsMobileMenuOpen(false)
-  }
 
   const navLinks = [
     { href: "/", label: "Home" },

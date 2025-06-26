@@ -1,12 +1,14 @@
-"use client"
-
-import { useState } from "react"
-// import { useAuth } from "../../contexts/AuthContext"
+import { useContext, useState, useRef } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
-import { FiUpload, FiFileText, FiPlus, FiX } from "react-icons/fi"
+import { FiUpload, FiFileText, FiPlus, FiX, FiLoader } from "react-icons/fi"
+import { Context } from "../../../../Context/context.jsx"
 
-const JobSeekerProfile = ()=>{
-  const { user } = useState(null)
+const JobSeekerProfile = () => {
+  const { userAuth, userData, userImage } = useContext(Context)
+  const { updateAvatar } = userAuth;
+  const { image, setImage } = userImage
+  const user = userData;
+  const [isLoading, setLoading] = useState(false);
   const [skills, setSkills] = useState(["React", "JavaScript", "TypeScript", "Node.js", "Python"])
   const [newSkill, setNewSkill] = useState("")
   const [showAddSkill, setShowAddSkill] = useState(false)
@@ -23,6 +25,29 @@ const JobSeekerProfile = ()=>{
     setSkills(skills.filter((skill) => skill !== skillToRemove))
   }
 
+  // update avatar
+  const fileInputRef = useRef();
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+  const handleFileChange = async (e) => {
+    try {
+      const file = e.target.files[0];
+      setLoading(true)
+      if (!file) {
+        console.log("File is required",);
+      }
+      const data = await updateAvatar(file)
+      setImage(data.data)
+      setLoading(false)
+    } catch (error) {
+      console.log("upload image", error.message)
+    } finally {
+      setLoading(false)
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -34,16 +59,26 @@ const JobSeekerProfile = ()=>{
         <DashboardCard title="Personal Information">
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
-              <img
-                src={user?.avatar || "/placeholder.svg?height=80&width=80"}
-                alt={user?.name}
-                className="w-20 h-20 rounded-full"
-              />
+              <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
+                {userData?.avatar?.avatar_Url ? (
+                  <img
+                    src={image || userData.avatar.avatar_Url}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <span className="text-sm text-gray-500 dark:text-gray-300">{userData?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
+                )}
+              </div>
               <div className="flex-1">
-                <button className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <button type="button" onClick={handleButtonClick}
+                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
                   <FiUpload className="w-4 h-4" />
-                  <span>Change Photo</span>
+                  <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
                 </button>
+
+                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
               </div>
             </div>
 
@@ -52,7 +87,7 @@ const JobSeekerProfile = ()=>{
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                 <input
                   type="text"
-                  defaultValue={user?.name}
+                  defaultValue={user?.fullName || "User"}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
@@ -60,15 +95,15 @@ const JobSeekerProfile = ()=>{
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                 <input
                   type="email"
-                  defaultValue={user?.email}
+                  defaultValue={user?.email || "example123@gmail.com"}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">userName</label>
                 <input
-                  type="tel"
-                  placeholder="+1 (555) 123-4567"
+                  type="userName"
+                  defaultValue={user?.userName || "user_123"}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
@@ -181,11 +216,10 @@ const JobSeekerProfile = ()=>{
                   key={skill}
                   onClick={() => !skills.includes(skill) && setSkills([...skills, skill])}
                   disabled={skills.includes(skill)}
-                  className={`px-2 py-1 text-sm rounded ${
-                    skills.includes(skill)
-                      ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
-                  }`}
+                  className={`px-2 py-1 text-sm rounded ${skills.includes(skill)
+                    ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
+                    }`}
                 >
                   {skill}
                 </button>

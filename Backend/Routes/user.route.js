@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
     valid_register, resendVerificationCode, register_user, login, logOut, changeAvatar, editProfile,
-    updateProfile, email_for_Pass, update_pass, getUser
+    updateProfile, email_for_Pass, update_pass, getUser,userVerifyJWT
 } from "../Controller/userAuth_controller.js";
 
 import { upload } from "../Middleware/Multer.js";
@@ -20,4 +20,5 @@ router.route("/verify-profile").post(upload.none(),verify_token, updateProfile);
 router.route("/email-pass").post(upload.none(),verify_token, email_for_Pass);
 router.route("/change-pass/:token").post(upload.none(),verify_token,update_pass);
 router.route("/get-user").get(upload.none(),verify_token, getUser);
+router.route("/verify-jwt").post(upload.none(),verify_token,userVerifyJWT);
 

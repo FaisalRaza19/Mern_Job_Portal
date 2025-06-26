@@ -62,12 +62,11 @@ const valid_register = async (req, res) => {
         };
         req.session.emailCode = verificationCode;
 
-        return res.status(200).json({statusCode: 200,message: "Verification code sent to your email. Please verify it.",});
+        return res.status(200).json({ statusCode: 200, message: "Verification code sent to your email. Please verify it.", });
     } catch (error) {
-        return res.status(500).json({statusCode: 500,message: "Internal server error",error: error.message,});
+        return res.status(500).json({ statusCode: 500, message: "Internal server error", error: error.message, });
     }
 };
-
 
 // Resend verification code
 const resendVerificationCode = async (req, res) => {
@@ -227,7 +226,7 @@ const logOut = async (req, res) => {
         res.clearCookie("accessToken");
         res.clearCookie("refreshToken")
 
-        return res.status(200).json({ statusCode: 200, status: 200, message: "User logOut Successfully" })
+        return res.status(200).json({ statusCode: 200, message: "User logOut Successfully" })
 
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Error during LogOut the user.", error: error.message });
@@ -265,9 +264,16 @@ const changeAvatar = async (req, res) => {
         const fileUpload = await fileUploadOnCloudinary(avatarPath, folder);
 
         // update in db
-        user.avatar = {
-            avatar_Url: fileUpload.url,
-            public_Id: fileUpload.public_id,
+        if (user.role === "employer") {
+            user.companyInfo.companyAvatar = {
+                avatar_Url: fileUpload.url,
+                public_Id: fileUpload.public_id,
+            }
+        } else {
+            user.avatar = {
+                avatar_Url: fileUpload.url,
+                public_Id: fileUpload.public_id,
+            }
         }
         await user.save();
 
@@ -285,9 +291,20 @@ const editProfile = async (req, res) => {
             return res.status(401).json({ statusCode: 400, message: "Unauthorized user" });
         }
 
-        const { email, fullName, userName } = req.body;
+        // find the current user through id
+        const currentUser = await User.findById(userId).select("-password -refreshToken");
+        if (!currentUser) {
+            return res.status(404).json({ statusCode: 400, message: "User not found" });
+        }
+
+        const { email, fullName, userName, companyName } = req.body;
         if (!email || !fullName || !userName) {
             return res.status(400).json({ statusCode: 400, message: "All fields required" })
+        }
+
+        // companyName is required if role is employer
+        if (currentUser.role === "employer" && (!companyName || companyName.trim() === "" || companyName.length < 3)) {
+            return res.status(400).json({ statusCode: 400, message: "Company name is required min 3 char for employers" });
         }
 
         // validate input 
@@ -306,12 +323,6 @@ const editProfile = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "Username or email is already taken. Please try another." });
         }
 
-        // find the current user through id
-        const currentUser = await User.findById(userId).select("-password -refreshToken");
-        if (!currentUser) {
-            return res.status(404).json({ statusCode: 400, message: "User not found" });
-        }
-
         // Check if email has changed then send the code into email
         if (currentUser.email !== email) {
             // send code to emial 
@@ -322,14 +333,19 @@ const editProfile = async (req, res) => {
             }
             req.session.emailCode = verificationCode;
             req.session.userInfo = req.body;
+            req.session.role = currentUser.role
             return res.status(200).json({ statusCode: 200, message: "Verification code sent to your email. Please verify." });
         }
 
         // if email is not changed then simply update in db
-        currentUser.fullName = fullName;
+        if (currentUser.role === "employer") {
+            currentUser.companyInfo.companyName = companyName
+        } else {
+            currentUser.fullName = fullName;
+        }
         currentUser.userName = userName;
-        await currentUser.save();
 
+        await currentUser.save();
         return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: currentUser });
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the profile.", error: error.message });
@@ -357,16 +373,20 @@ const updateProfile = async (req, res) => {
         }
 
         // get data from session
-        const { emailCode, userInfo } = req.session;
+        const { emailCode, userInfo, role } = req.session;
         const isVerified = verifyEmail(code, emailCode);
         if (!userInfo || !isVerified) {
             return res.status(400).json({ statusCode: 400, message: "User data not found in session or verification incomplete. Please complete the edit profile process again." });
         }
 
-        const { fullName, email, userName } = userInfo;
+        const { fullName, email, userName, companyName } = userInfo;
 
         // Update the user profile
-        user.fullName = fullName;
+        if (role === "employer") {
+            user.companyInfo.companyName = companyName
+        } else {
+            user.fullName = fullName;
+        }
         user.email = email;
         user.userName = userName;
         await user.save();
@@ -374,6 +394,7 @@ const updateProfile = async (req, res) => {
         // Clear session data after update
         req.session.emailCode = null;
         req.session.userInfo = null;
+        req.session.role = null;
 
         return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: user });
     } catch (error) {
@@ -465,7 +486,20 @@ const update_pass = async (req, res) => {
     }
 }
 
+// verify jwt
+const userVerifyJWT = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(400).json({ statusCode: 400, message: "User did not found" })
+        };
+        return res.status(200).json({ statusCode: 200, message: "token is valid", data: true })
+    } catch (error) {
+        return res.status(500).json({ message: "internal server error to verify and edit the shop", error: error })
+    }
+}
+
 export {
     valid_register, resendVerificationCode, register_user, login, logOut, changeAvatar, editProfile,
-    updateProfile, email_for_Pass, update_pass, getUser
+    updateProfile, email_for_Pass, update_pass, getUser, userVerifyJWT
 }

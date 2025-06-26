@@ -1,12 +1,31 @@
-import { createContext, useState,useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 // user auth
-import { register, ResendCode, verify_register, Login, LogOut, getUser,updateAvatar } from "./Api/User/userAuth";
+import { register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT } from "./Api/User/userAuth";
 
 export const Context = createContext();
 
 export const ContextApi = ({ children }) => {
+    const [image, setImage] = useState("");
     const [userData, setUserData] = useState();
     const [isEmployer, setIsEmployer] = useState(false);
+    const [isVerify, setIsVerify] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    // verify jwt
+    const verifyToken = async () => {
+        try {
+            const data = await verifyJWT(setIsVerify);
+            if (data.message == "Token is invalid or expired") {
+                setIsVerify(false)
+                setIsLoggedIn(false)
+                localStorage.removeItem("user_token");
+            } else {
+                setIsVerify(true)
+                setIsLoggedIn(true)
+            }
+        } catch (error) {
+            console.log("Token", error.message)
+        }
+    }
     //fetch user
     const fetchUser = async () => {
         try {
@@ -23,12 +42,14 @@ export const ContextApi = ({ children }) => {
 
     useEffect(() => {
         fetchUser();
+        verifyToken();
     }, []);
 
-
-    const userAuth = { register, ResendCode, verify_register, Login, LogOut, getUser,updateAvatar }
+    const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn }
+    const userAuth = { register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, }
+    const userImage = { image, setImage };
     return (
-        <Context.Provider value={{ userAuth, userData,setUserData,isEmployer }}>
+        <Context.Provider value={{ userAuth, userData, setUserData, isEmployer, userImage, verifyUser }}>
             {children}
         </Context.Provider>
     )

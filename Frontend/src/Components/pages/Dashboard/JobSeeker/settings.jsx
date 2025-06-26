@@ -1,13 +1,11 @@
-import { useContext, useState, useRef } from "react"
+import { useContext, useState} from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
-import { FiSave, FiTrash2, FiEye, FiEyeOff,FiLoader,FiUpload } from "react-icons/fi"
+import { FiSave, FiTrash2, FiEye, FiEyeOff,} from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
 
 const JobSeekerSettings = () => {
-  const { userData, userAuth } = useContext(Context);
-  const { updateAvatar } = userAuth
+  const { userData,} = useContext(Context);
   const user = userData
-  const [isLoading,setLoading] = useState(false)
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -41,28 +39,6 @@ const JobSeekerSettings = () => {
     setShowDeleteModal(false)
   }
 
-  // update avatar
-  const fileInputRef = useRef();
-
-  const handleButtonClick = () => {
-    fileInputRef.current.click(); // Open file picker
-  };
-  const handleFileChange = async (e) => {
-    try {
-      const file = e.target.files[0];
-      setLoading(true)
-      if (!file) {
-        console.log("File is required",);
-      }
-      const data = await updateAvatar(file)
-      console.log(data);
-      setLoading(false)
-    } catch (error) {
-      console.log("upload image", error.message)
-    }finally {
-      setLoading(false)
-    }
-  };
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -208,30 +184,6 @@ const JobSeekerSettings = () => {
       {/* Account Information */}
       <DashboardCard title="Company Information">
         <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
-              {userData?.avatar?.avatar_Url ? (
-                <img
-                  src={userData.avatar.avatar_Url}
-                  alt="User Avatar"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <span className="text-sm text-gray-500 dark:text-gray-300">{userData?.fullName?.charAt(0)?.toUpperCase()}</span>
-              )}
-            </div>
-            <div className="flex-1">
-              <button type="button" onClick={handleButtonClick}
-                className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <FiUpload className="w-4 h-4" />
-                <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
-              </button>
-
-              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>

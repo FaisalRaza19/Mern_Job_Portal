@@ -50,7 +50,6 @@ const Login = ({ setIsLoggedIn }) => {
     setIsLoading(true)
     try {
       const data = await Login({ formData, navigate, setIsLoggedIn })
-      console.log(data);
       setUserData(data.data)
     } catch (error) {
       console.log("Login ", error.message)

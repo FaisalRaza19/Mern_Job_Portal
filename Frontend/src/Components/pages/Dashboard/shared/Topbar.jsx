@@ -1,19 +1,26 @@
 import { useContext, useState } from "react"
 import { Context } from "../../../../Context/context.jsx"
-import {Link} from "react-router-dom"
-import { FiBell, FiSun, FiMoon, FiUser, FiSettings, FiLogOut, FiMenu} from "react-icons/fi"
+import { Link } from "react-router-dom"
+import { FiBell, FiSun, FiMoon, FiUser, FiSettings, FiLogOut, FiMenu } from "react-icons/fi"
 import { useNavigate } from "react-router-dom";
 
 const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, }) => {
-  const { userAuth, userData } = useContext(Context);
+  const { userAuth, userData, userImage, verifyUser } = useContext(Context);
+  const { isVerify, isLoggedIn } = verifyUser
+  const { image } = userImage;
   const { LogOut } = userAuth;
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useState("dark")
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const user = userData;
-
   const unreadCount = notifications.filter((n) => !n.read).length
+  if (!isLoggedIn) {
+    if (!isVerify) {
+      navigate("/");
+      setIsLoggedIn(false)
+    }
+  }
 
   // logout the user
   const logOut = async () => {
@@ -21,7 +28,7 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, }) => {
       const data = await LogOut({ navigate, setIsLoggedIn });
     } catch (error) {
       console.log("logOut", error.message)
-    } 
+    }
   }
 
 
@@ -93,7 +100,7 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, }) => {
             <button onClick={() => setShowProfile(!showProfile)}
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <img src={user?.avatar?.avatar_Url || "/placeholder.svg?height=32&width=32"} alt="" className="w-8 h-8 rounded-full" />
+              <img src={image || user?.companyInfo?.companyAvatar?.avatar_Url || "/placeholder.svg?height=32&width=32"} alt="" className="w-8 h-8 rounded-full" />
             </button>
 
             {showProfile && (
