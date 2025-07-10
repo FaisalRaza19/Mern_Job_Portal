@@ -37,4 +37,126 @@ const validateUserInput = (fullName, email, password, userName) => {
   return { isValid, errors };
 };
 
-export { validateUserInput };
+
+
+// verify company data 
+const isValidURL = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const isNonEmptyString = (val) =>
+  typeof val === 'string' && val.trim().length > 0;
+
+const isCompanySizeValid = (size) => {
+  const validSizes = [
+    '1-10', '11-50', '51-200', '201-500',
+    '501-1000', '1001-5000', '5001-10000', '10000+'
+  ];
+  return validSizes.includes(size);
+};
+
+// Specific platform validators
+const isFacebookLink = (url) =>
+  /^https?:\/\/(www\.)?facebook\.com\/[A-Za-z0-9_.-]+$/.test(url);
+
+const isLinkedInLink = (url) =>
+  /^https?:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_-]+$/.test(url);
+
+const isGithubLink = (url) =>
+  /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+$/.test(url);
+
+const isTwitterLink = (url) =>
+  /^https?:\/\/(www\.)?twitter\.com\/[A-Za-z0-9_]+$/.test(url);
+
+const isInstagramLink = (url) =>
+  /^https?:\/\/(www\.)?instagram\.com\/[A-Za-z0-9_.]+$/.test(url);
+
+const validateSocialLinks = (links) => {
+  const results = {};
+  if (!links || typeof links !== 'object') return results;
+
+  for (const [platform, url] of Object.entries(links)) {
+    if (!isNonEmptyString(url)) continue;
+
+    switch (platform.toLowerCase()) {
+      case 'facebook':
+        results.facebook = isFacebookLink(url);
+        break;
+      case 'linkedin':
+        results.linkedin = isLinkedInLink(url);
+        break;
+      case 'github':
+        results.github = isGithubLink(url);
+        break;
+      case 'twitter':
+        results.twitter = isTwitterLink(url);
+        break;
+      case 'instagram':
+        results.instagram = isInstagramLink(url);
+        break;
+      default:
+        results[platform] = isValidURL(url); // Fallback for unexpected keys
+    }
+  }
+
+  return results;
+};
+
+const socialLinkVerify = (socialLinks) => {
+  const errors = {}
+  const socialErrors = validateSocialLinks(socialLinks || {});
+  for (const [key, isValid] of Object.entries(socialErrors)) {
+    if (!isValid) {
+      errors[`socialLinks.${key}`] = `${key} URL is invalid.`;
+    }
+  }
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  }
+}
+
+const validateCompanyData = (data) => {
+  const errors = {};
+
+  if (!isNonEmptyString(data.companyName)) {
+    errors.companyName = 'Company name is required and must be a string.';
+  }
+
+  if (!isNonEmptyString(data.companyType)) {
+    errors.companyType = 'Company type is required and must be a string.';
+  }
+
+  if (!isCompanySizeValid(data.companySize)) {
+    errors.companySize = 'Company size is invalid. Example: "1-10", "51-200".';
+  }
+
+  if (!isValidURL(data.companyWeb)) {
+    errors.companyWeb = 'Company website must be a valid URL.';
+  }
+
+  if (!isNonEmptyString(data.companyDescription)) {
+    errors.companyDescription = 'Company description is required.';
+  }
+
+  const socialErrors = validateSocialLinks(data.socialLinks || {});
+  for (const [key, isValid] of Object.entries(socialErrors)) {
+    if (!isValid) {
+      errors[`socialLinks.${key}`] = `${key} URL is invalid.`;
+    }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+};
+
+
+
+export { validateUserInput, validateCompanyData,socialLinkVerify};

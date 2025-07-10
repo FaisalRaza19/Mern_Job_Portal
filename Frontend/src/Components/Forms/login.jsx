@@ -5,7 +5,7 @@ import { FaArrowLeft } from "react-icons/fa"
 import { Context } from "../../Context/context"
 
 const Login = ({ setIsLoggedIn }) => {
-  const {userAuth,setUserData} = useContext(Context)
+  const { userAuth, setUserData, setIsEmployer } = useContext(Context)
   const { Login } = userAuth
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -50,6 +50,9 @@ const Login = ({ setIsLoggedIn }) => {
     setIsLoading(true)
     try {
       const data = await Login({ formData, navigate, setIsLoggedIn })
+      if (data.data.role === "employer") {
+        setIsEmployer(true)
+      }
       setUserData(data.data)
     } catch (error) {
       console.log("Login ", error.message)

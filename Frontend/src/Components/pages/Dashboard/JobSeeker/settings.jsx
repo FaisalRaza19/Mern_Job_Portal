@@ -181,34 +181,6 @@ const JobSeekerSettings = () => {
         </DashboardCard>
       </div>
 
-      {/* Account Information */}
-      <DashboardCard title="Company Information">
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-              <input
-                type="fullName"
-                defaultValue={user?.fullName}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-              <input
-                type="email"
-                defaultValue={user?.email}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-          </div>
-
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Update Information
-          </button>
-        </div>
-      </DashboardCard>
-
       {/* Danger Zone */}
       <DashboardCard title="Danger Zone">
         <div className="space-y-4">

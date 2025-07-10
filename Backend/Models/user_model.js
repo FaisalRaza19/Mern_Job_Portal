@@ -1,10 +1,72 @@
 import mongoose from "mongoose";
 
+// social link schema
+const socialLinksSchema = {
+    linkedin: String,
+    facebook: String,
+    twitter: String,
+    instagram: String,
+    github: String,
+}
+
+// company info schema
+const companyInfoSchema = {
+    companyName: {
+        type: String,
+        minlength: 3
+    },
+    companyType: {
+        type: String,
+    },
+    companySize: {
+        type: String,
+        enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5001-10000', '10000+']
+    },
+    companyDescription: {
+        type: String,
+    },
+    companyWeb: {
+        type: String,
+    },
+    socialLinks: socialLinksSchema
+}
+
+// job seeker info schema
+const jobSeekerInfoSchema = {
+    fullName: {
+        type: String,
+    },
+    skills: [{ type: String }],
+    eduaction: {
+        Institute: String,
+        degree: String,
+        fieldOfStudy: String,
+        startYear: Number,
+        endYear: Number,
+    },
+    experience: {
+        jobTitle: String,
+        companyName: String,
+        employmentType: String,
+        location: String,
+        startDate: Date,
+        endDate: Date,
+        current : Boolean,
+        description: String,
+    },
+    bio: {
+        type: String,
+    },
+    resumeUrl: {
+        type: Object,
+        resume_Url: String,
+        resume_publicId: String,
+    },
+    socialLinks: socialLinksSchema
+}
+
 const userSchema = new mongoose.Schema(
     {
-        fullName: {
-            type: String,
-        },
         email: {
             type: String,
             required: true,
@@ -22,43 +84,24 @@ const userSchema = new mongoose.Schema(
         role: {
             type: String,
             default: 'jobseeker',
-            enum : ["jobseeker","employer"]
+            enum: ["jobseeker", "employer"]
         },
         avatar: {
             type: Object,
             avatar_Url: String,
             public_Id: String,
         },
+        companyInfo: {
+            type: companyInfoSchema,
+            default: undefined,
+        },
+        jobSeekerInfo: {
+            type: jobSeekerInfoSchema,
+            default: undefined,
+        },
         refreshToken: {
             type: String,
         },
-
-        // company info
-        companyInfo : {
-            companyName : {
-                type : String,
-            },
-            companyType : {
-                type : String,
-            },
-            socialLinks : {
-                type : Object
-            },
-            companySize : {
-                type : String
-            },
-            companyDescription : {
-                type : String,
-            },
-            companyAvatar : {
-                type : Object,
-                avatar_Url: String,
-                public_Id: String,
-            },
-            companyWeb : {
-                type : String,
-            }
-        }
     },
     {
         timestamps: true,

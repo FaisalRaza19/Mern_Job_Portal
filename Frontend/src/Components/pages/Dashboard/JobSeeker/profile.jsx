@@ -1,14 +1,65 @@
 import { useContext, useState, useRef } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
-import { FiUpload, FiFileText, FiPlus, FiX, FiLoader } from "react-icons/fi"
+import { FiUpload, FiFileText, FiPlus, FiX, FiLoader, FiSave, FiCalendar } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
+import { useNavigate } from "react-router-dom"
 
 const JobSeekerProfile = () => {
-  const { userAuth, userData, userImage } = useContext(Context)
-  const { updateAvatar } = userAuth;
+  const navigate = useNavigate()
+  const { userAuth, userData, userImage, userProfile, } = useContext(Context)
+  const { setIsEditProfile } = userProfile
+  const { updateAvatar, editProfile } = userAuth;
   const { image, setImage } = userImage
   const user = userData;
   const [isLoading, setLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState({
+    fullName: user?.jobSeekerInfo?.fullName || "",
+    email: user?.email || "",
+    userName: user?.userName,
+    bio: user?.jobSeekerInfo?.bio,
+    socialLinks: {
+      facebook: user?.jobSeekerInfo?.socialLinks?.facebook || "",
+      linkedin: user?.jobSeekerInfo?.socialLinks?.linkedin || "",
+      twitter: user?.jobSeekerInfo?.socialLinks?.twitter || "",
+      instagram: user?.jobSeekerInfo?.socialLinks?.instagram || "",
+      github: user?.jobSeekerInfo?.socialLinks?.github || "",
+    }
+  })
+  const handleInputChange = (field, value, nested = null) => {
+    if (nested) {
+      setUserInfo((prev) => ({
+        ...prev,
+        [nested]: {
+          ...prev[nested],
+          [field]: value,
+        },
+      }));
+    } else {
+      setUserInfo((prev) => ({ ...prev, [field]: value }));
+    }
+  };
+  // eduaction and experience
+  const [edu_exp, setEdu_exp] = useState({
+    Institute: user?.jobSeekerInfo?.eduaction?.Institute,
+    degree: user?.jobSeekerInfo?.eduaction?.degree,
+    fieldOfStudy: user?.jobSeekerInfo?.eduaction?.fieldOfStudy,
+    startYear: user?.jobSeekerInfo?.eduaction?.startYear,
+    endYear: user?.jobSeekerInfo?.eduaction?.endYear,
+    // exp
+    jobTitle: user?.jobSeekerInfo?.experience?.jobTitle,
+    companyName: user?.jobSeekerInfo?.experience?.companyName,
+    employmentType: user?.jobSeekerInfo?.experience?.employmentType,
+    location: user?.jobSeekerInfo?.experience?.location,
+    startDate: user?.jobSeekerInfo?.experience?.startDate,
+    endDate: user?.jobSeekerInfo?.experience?.endDate,
+    current: user?.jobSeekerInfo?.experience?.current,
+    description: user?.jobSeekerInfo?.experience?.description,
+  })
+
+  const handleInfoChange = (field, value) => {
+    setEdu_exp((prev) => ({ ...prev, [field]: value }))
+  }
+  //
   const [skills, setSkills] = useState(["React", "JavaScript", "TypeScript", "Node.js", "Python"])
   const [newSkill, setNewSkill] = useState("")
   const [showAddSkill, setShowAddSkill] = useState(false)
@@ -23,6 +74,24 @@ const JobSeekerProfile = () => {
 
   const handleRemoveSkill = (skillToRemove) => {
     setSkills(skills.filter((skill) => skill !== skillToRemove))
+  }
+
+  // update profile
+  const handleSumbit = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+    try {
+      const userData = userInfo
+      const data = await editProfile({ userData, navigate })
+      if (data.statusCode === 201) {
+        setIsEditProfile(true)
+      }
+    }
+    catch (error) {
+      console.log("Error updating profile:", error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // update avatar
@@ -82,167 +151,408 @@ const JobSeekerProfile = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                <input
-                  type="text"
-                  defaultValue={user?.fullName || "User"}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
+            <form action="" onSubmit={handleSumbit}>
+              <div className="grid grid-cols-1 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="user"
+                    onChange={(e) => handleInputChange("fullName", e.target.value)}
+                    value={userInfo.fullName || ""}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                  <input
+                    type="email"
+                    placeholder="example123@gmail.com"
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    value={userInfo.email || ""}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">userName</label>
+                  <input
+                    type="userName"
+                    placeholder="user_123"
+                    onChange={(e) => handleInputChange("userName", e.target.value)}
+                    value={userInfo.userName || ""}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+                  <textarea name="bio" id="bio"
+                    value={userInfo.bio || ""}
+                    placeholder="e.g. Passionate frontend developer with 3+ years of experience"
+                    onChange={(e) => handleInputChange("bio", e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                    rows={4}
+                    minLength={50}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://facebook.com"
+                    value={userInfo.socialLinks.facebook || ""}
+                    onChange={(e) => handleInputChange("facebook", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Linkedin Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://linkedin.com"
+                    value={userInfo.socialLinks.linkedin || ""}
+                    onChange={(e) => handleInputChange("linkedin", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://instagram.com"
+                    value={userInfo.socialLinks.instagram || ""}
+                    onChange={(e) => handleInputChange("instagram", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://twitter.com"
+                    value={userInfo.socialLinks.twitter || ""}
+                    onChange={(e) => handleInputChange("twitter", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Github Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://github.com"
+                    value={userInfo.socialLinks.github || ""}
+                    onChange={(e) => handleInputChange("github", e.target.value, "socialLinks")}
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                <input
-                  type="email"
-                  defaultValue={user?.email || "example123@gmail.com"}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">userName</label>
-                <input
-                  type="userName"
-                  defaultValue={user?.userName || "user_123"}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
-                <input
-                  type="text"
-                  placeholder="San Francisco, CA"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
 
-            <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              Save Changes
-            </button>
+              <button type="sumbit" className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <FiSave className="w-4 h-4" />
+                <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Save Info"}</span>
+              </button>
+            </form>
           </div>
         </DashboardCard>
 
-        {/* Resume Management */}
-        <DashboardCard title="Resume Management">
-          <div className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-              <FiFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Current Resume</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">resume.pdf (2.3 MB)</p>
-              <div className="flex space-x-2 justify-center">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  Preview
-                </button>
-                <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  Download
-                </button>
-              </div>
-            </div>
+        {/* edu and exp Management */}
+        <DashboardCard title="Other Information">
+          <form>
+            <div className="grid grid-cols-1 gap-4">
+              {/* edu management  */}
+              <DashboardCard title="Eduaction">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">Degree/Qualification *</label>
+                    <input
+                      type="text"
+                      value={edu_exp.degree || ""}
+                      onChange={(e) => handleInfoChange("degree", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Bachelor of Science in Computer Science"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">Field of Study *</label>
+                    <input
+                      type="text"
+                      value={edu_exp.fieldOfStudy || ""}
+                      onChange={(e) => handleInfoChange("fieldOfStudy", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Bachelor of Science in Computer Science"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">Institution *</label>
+                    <input
+                      type="text"
+                      value={edu_exp.Institute || ""}
+                      onChange={(e) => handleInfoChange("Institute", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Bachelor of Science in Computer Science"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
+                      <FiCalendar className="inline mr-1" /> Start Year *
+                    </label>
+                    <input
+                      type="month"
+                      value={edu_exp.startYear}
+                      onChange={(e) => handleInfoChange("startYear", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      required
+                    />
+                  </div>
 
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer">
-              <FiUpload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-600 dark:text-gray-400">
-                Drop a new resume here or <span className="text-blue-600">browse files</span>
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, DOC, DOCX up to 5MB</p>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
+                      <FiCalendar className="inline mr-1" /> End Year *
+                    </label>
+                    <input
+                      type="month"
+                      value={edu_exp.endYear}
+                      onChange={(e) => handleInfoChange("endYear", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      required
+                    />
+                  </div>
+                </div>
+              </DashboardCard>
+
+              {/* exp mangament  */}
+              <DashboardCard title="Experience">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Job Title */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-1">Job Title *</label>
+                    <input
+                      type="text"
+                      value={edu_exp.jobTitle}
+                      onChange={(e) => handleInfoChange("jobTitle", e.target.value)}
+                      placeholder="e.g. Software Engineer"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+
+                  {/* Company Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-1">Company *</label>
+                    <input
+                      type="text"
+                      value={edu_exp.companyName}
+                      onChange={(e) => handleInfoChange("companyName", e.target.value)}
+                      placeholder="e.g. TechCorp"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+
+                  {/* Employment Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-1">Employment Type *</label>
+                    <input
+                      type="text"
+                      value={edu_exp.employmentType}
+                      onChange={(e) => handleInfoChange("employmentType", e.target.value)}
+                      placeholder="Full-time / Internship"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-1">Location *</label>
+                    <input
+                      type="text"
+                      value={edu_exp.location}
+                      onChange={(e) => handleInfoChange("location", e.target.value)}
+                      placeholder="e.g. Karachi, Pakistan"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+
+                  {/* Start Date */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-1 flex items-center gap-1">
+                      <FiCalendar /> Start Date *
+                    </label>
+                    <input
+                      type="month"
+                      value={edu_exp.startDate}
+                      onChange={(e) => handleInfoChange("startDate", e.target.value)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+
+                  {/* End Date */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-1 flex items-center gap-1">
+                      <FiCalendar /> End Date *
+                    </label>
+                    <input
+                      type="month"
+                      value={edu_exp.endDate}
+                      onChange={(e) => handleInfoChange("endDate", e.target.value)}
+                      disabled={edu_exp.current}
+                      className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${edu_exp.current ? "opacity-50" : ""}`}
+                    />
+                  </div>
+
+                  {/* Checkbox */}
+                  <div className="md:col-span-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={edu_exp.current}
+                        onChange={(e) => handleInfoChange("current", e.target.checked)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      I currently work here
+                    </label>
+                  </div>
+
+                  {/* Description */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-200 mb-1">Description</label>
+                    <textarea
+                      rows="4"
+                      value={edu_exp.description}
+                      onChange={(e) => handleInfoChange("description", e.target.value)}
+                      placeholder="Describe your role, achievements, and responsibilities..."
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </DashboardCard>
+              <button type="sumbit" className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <FiSave className="w-4 h-4" />
+                <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Save Edu&Exp"}</span>
+              </button>
             </div>
-          </div>
+          </form>
         </DashboardCard>
       </div>
 
       {/* Skills Management */}
-      <DashboardCard title="Skills & Expertise">
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {skills.map((skill) => (
-              <div
-                key={skill}
-                className="flex items-center space-x-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 rounded-full"
-              >
-                <span>{skill}</span>
-                <button
-                  onClick={() => handleRemoveSkill(skill)}
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
-                >
-                  <FiX className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
+      <form action="" >
+        <div className="grid gap-4">
+          <DashboardCard title="Skills & Expertise">
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {skills.map((skill) => (
+                  <div
+                    key={skill}
+                    className="flex items-center space-x-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 rounded-full"
+                  >
+                    <span>{skill}</span>
+                    <button
+                      onClick={() => handleRemoveSkill(skill)}
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                    >
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
 
-            {showAddSkill ? (
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleAddSkill()}
-                  placeholder="Enter skill"
-                  className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  autoFocus
-                />
-                <button
-                  onClick={handleAddSkill}
-                  className="px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-                >
-                  Add
-                </button>
-                <button
-                  onClick={() => {
-                    setShowAddSkill(false)
-                    setNewSkill("")
-                  }}
-                  className="px-2 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
+                {showAddSkill ? (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && handleAddSkill()}
+                      placeholder="Enter skill"
+                      className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleAddSkill}
+                      className="px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                    >
+                      Add
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAddSkill(false)
+                        setNewSkill("")
+                      }}
+                      className="px-2 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowAddSkill(true)}
+                    className="flex items-center space-x-1 px-3 py-1 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-full hover:border-blue-500 transition-colors"
+                  >
+                    <FiPlus className="w-3 h-3" />
+                    <span>Add Skill</span>
+                  </button>
+                )}
               </div>
-            ) : (
-              <button
-                onClick={() => setShowAddSkill(true)}
-                className="flex items-center space-x-1 px-3 py-1 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-full hover:border-blue-500 transition-colors"
-              >
-                <FiPlus className="w-3 h-3" />
-                <span>Add Skill</span>
-              </button>
-            )}
-          </div>
 
-          <div className="mt-4">
-            <h4 className="font-medium text-gray-900 dark:text-white mb-2">Suggested Skills</h4>
-            <div className="flex flex-wrap gap-2">
-              {["CSS", "HTML", "Git", "Docker", "AWS", "MongoDB"].map((skill) => (
-                <button
-                  key={skill}
-                  onClick={() => !skills.includes(skill) && setSkills([...skills, skill])}
-                  disabled={skills.includes(skill)}
-                  className={`px-2 py-1 text-sm rounded ${skills.includes(skill)
-                    ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
-                    }`}
-                >
-                  {skill}
-                </button>
-              ))}
+              <div className="mt-4">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Suggested Skills</h4>
+                <div className="flex flex-wrap gap-2">
+                  {["CSS", "HTML", "Git", "Docker", "AWS", "MongoDB"].map((skill) => (
+                    <button
+                      key={skill}
+                      onClick={() => !skills.includes(skill) && setSkills([...skills, skill])}
+                      disabled={skills.includes(skill)}
+                      className={`px-2 py-1 text-sm rounded ${skills.includes(skill)
+                        ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
+                        }`}
+                    >
+                      {skill}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </DashboardCard>
+          </DashboardCard>
+          <DashboardCard title="Resume Management">
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                <FiFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Current Resume</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">resume.pdf (2.3 MB)</p>
+                <div className="flex space-x-2 justify-center">
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Preview
+                  </button>
+                  <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    Download
+                  </button>
+                </div>
+              </div>
 
-      {/* Professional Summary */}
-      <DashboardCard title="Professional Summary">
-        <div className="space-y-4">
-          <textarea
-            rows={6}
-            placeholder="Write a brief summary of your professional experience, skills, and career objectives..."
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
-            defaultValue="Experienced frontend developer with 5+ years of expertise in React, JavaScript, and modern web technologies. Passionate about creating user-friendly interfaces and optimizing web performance. Seeking opportunities to contribute to innovative projects in a collaborative team environment."
-          />
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Save Summary
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                <FiUpload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600 dark:text-gray-400">
+                  Drop a new resume here or <span className="text-blue-600">browse files</span>
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, DOC, DOCX up to 5MB</p>
+              </div>
+            </div>
+          </DashboardCard>
+          <button type="sumbit" className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <FiSave className="w-4 h-4" />
+            <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Update Resume and Skills"}</span>
           </button>
         </div>
-      </DashboardCard>
+      </form>
+
+
     </div>
   )
 }

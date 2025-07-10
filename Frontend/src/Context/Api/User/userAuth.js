@@ -22,7 +22,6 @@ export const register = async (formData, navigate) => {
     }
 }
 
-
 // Updated CodeVerify Function
 export const verify_register = async ({ code, navigate, setIsLogedIn }) => {
     try {
@@ -209,16 +208,18 @@ export const verifyJWT = async (setIsVerify) => {
 };
 
 // edit profile
-export const editProfile = async ({formData}) => {
+export const editProfile = async ({ userData, navigate }) => {
     try {
         const token = localStorage.getItem("user_token");
 
-        const response = await fetch(userAuth.updateAvatar, {
+        const response = await fetch(userAuth.editProfile, {
             method: "POST",
             headers: {
+                "Content-Type": "application/json",
                 "Authorization": token,
             },
-            body: formData,
+            body: JSON.stringify(userData),
+            credentials : 'include',
         });
 
         if (!response.ok) {
@@ -226,9 +227,39 @@ export const editProfile = async ({formData}) => {
             return { message: errorDetails.message };
         }
         const data = await response.json();
-        console.log(data);
+        if (data.statusCode === 201) {
+            localStorage.setItem("email",userData.email)
+            navigate("/email-verify")
+        }
         return data;
     } catch (error) {
         return error.message;
     }
 };
+
+// verify and update profile 
+export const verifyAndUpdateProfile = async ({code}) => {
+    try {
+        console.log(code)
+        const token = localStorage.getItem("user_token");
+        const response = await fetch(userAuth.verify_edit, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token,
+            },
+            body: JSON.stringify({code}),
+            credentials : 'include',
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails.message };
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error.message;
+    }
+}
+

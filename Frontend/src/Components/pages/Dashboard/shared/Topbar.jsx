@@ -100,7 +100,7 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, }) => {
             <button onClick={() => setShowProfile(!showProfile)}
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <img src={image || user?.companyInfo?.companyAvatar?.avatar_Url || "/placeholder.svg?height=32&width=32"} alt="" className="w-8 h-8 rounded-full" />
+              <img src={image || user?.avatar?.avatar_Url || "/placeholder.svg?height=32&width=32"} alt="" className="w-8 h-8 rounded-full" />
             </button>
 
             {showProfile && (

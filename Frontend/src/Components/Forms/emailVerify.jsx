@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, useContext } from "react"
-import {Link, useNavigate} from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { FiMail, FiRefreshCw, FiCheckCircle } from "react-icons/fi"
 import { FaArrowLeft } from "react-icons/fa"
 import { Context } from "../../Context/context"
 
-const EmailVerify = ({setIsLogedIn})=>{
+const EmailVerify = ({ setIsLogedIn }) => {
   const email = localStorage.getItem("email")
-  const {userAuth,setUserData} = useContext(Context);
-  const {ResendCode,verify_register} = userAuth
+  const { userAuth, setUserData, isEmployer, setIsEmployer, userProfile } = useContext(Context);
+  const { isEditProfile } = userProfile
+  const { ResendCode, verify_register, verifyAndUpdateProfile } = userAuth
   const navigate = useNavigate();
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [activeInput, setActiveInput] = useState(0)
@@ -30,7 +31,7 @@ const EmailVerify = ({setIsLogedIn})=>{
     return () => clearInterval(interval)
   }, [resendTimer])
 
-  const handleChange = (value,index) => {
+  const handleChange = (value, index) => {
     if (!/^\d*$/.test(value)) return
 
     if (value.length === 6) {
@@ -74,26 +75,44 @@ const EmailVerify = ({setIsLogedIn})=>{
     setIsLoading(true);
     try {
       const code = otp.join("");
-      const data = await verify_register({code,navigate,setIsLogedIn})
-      setUserData(data.data)
-      setIsLoading(false)
-      localStorage.removeItem("email");
+      if (isEditProfile) {
+        const data = await verifyAndUpdateProfile({ code })
+        setUserData(data.data)
+        if (data.statusCode === 200) {
+          if (isEmployer) {
+            navigate("/employer-dashboard")
+          } else {
+            navigate("/jobseeker-dashboard")
+          }
+          localStorage.removeItem("email");
+        }
+      } else {
+        const data = await verify_register({ code, navigate, setIsLogedIn })
+        if (data.data.role === "employer") {
+          setIsEmployer(true);
+        } else {
+          setIsEmployer(false);
+        }
+        setUserData(data.data)
+        setIsLoading(false)
+        localStorage.removeItem("email");
+      }
     } catch (error) {
-      console.log("verify email",error.message)
-    }finally{
+      console.log("verify email", error.message)
+    } finally {
       setIsLoading(false)
     }
 
   }
 
-  const handleResend = async() => {
+  const handleResend = async () => {
     setOtp(["", "", "", "", "", ""])
     setActiveInput(0)
     setResendTimer(60)
     try {
       const data = await ResendCode();
     } catch (error) {
-      console.log("resend code",error.message)
+      console.log("resend code", error.message)
     }
   }
 
@@ -101,7 +120,7 @@ const EmailVerify = ({setIsLogedIn})=>{
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Back Arrow - Fixed positioning for better mobile experience */}
       <div className="fixed top-4 left-4 z-10 sm:top-6 sm:left-6">
-        <Link to="/register"
+        <Link to={isEditProfile ? (isEmployer ? "/employer-dashboard" : "/jobseeker-dashboard") : "/register"}
           className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <FaArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-300" />
@@ -140,15 +159,13 @@ const EmailVerify = ({setIsLogedIn})=>{
                   ref={(el) => (inputRefs.current[i] = el)}
                   onChange={(e) => handleChange(e.target.value, i)}
                   onKeyDown={(e) => handleKeyDown(e, i)}
-                  className={`w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 text-center text-lg sm:text-xl md:text-2xl font-semibold border-2 rounded-lg transition-all duration-200 ${
-                    activeInput === i
-                      ? "border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800"
-                      : "border-gray-300 dark:border-gray-600"
-                  } ${
-                    digit
+                  className={`w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 text-center text-lg sm:text-xl md:text-2xl font-semibold border-2 rounded-lg transition-all duration-200 ${activeInput === i
+                    ? "border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800"
+                    : "border-gray-300 dark:border-gray-600"
+                    } ${digit
                       ? "bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600"
                       : "bg-white dark:bg-gray-700"
-                  } text-gray-800 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800`}
+                    } text-gray-800 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800`}
                   onClick={() => setActiveInput(i)}
                 />
               ))}
@@ -190,16 +207,14 @@ const EmailVerify = ({setIsLogedIn})=>{
               type="button"
               onClick={handleResend}
               disabled={resendTimer !== null && resendTimer > 0}
-              className={`inline-flex items-center text-sm font-medium transition-colors ${
-                resendTimer !== null && resendTimer > 0
-                  ? "text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                  : "text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-              }`}
+              className={`inline-flex items-center text-sm font-medium transition-colors ${resendTimer !== null && resendTimer > 0
+                ? "text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                : "text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                }`}
             >
               <FiRefreshCw
-                className={`mr-1 w-4 h-4 ${
-                  resendTimer !== null && resendTimer > 0 ? "" : "hover:rotate-180 transition-transform duration-300"
-                }`}
+                className={`mr-1 w-4 h-4 ${resendTimer !== null && resendTimer > 0 ? "" : "hover:rotate-180 transition-transform duration-300"
+                  }`}
               />
               {resendTimer !== null && resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend Code"}
             </button>

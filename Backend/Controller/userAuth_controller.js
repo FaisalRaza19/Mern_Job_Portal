@@ -1,5 +1,5 @@
 import { User } from "../Models/user_model.js";
-import { validateUserInput } from "../utility/userInput_verifier.js";
+import { validateUserInput, validateCompanyData, socialLinkVerify } from "../utility/userInput_verifier.js";
 import { generate_accessToken, generate_refreshToken, generate_passToken } from "../utility/generateToken.js";
 import { sendEmail, verifyEmail, pas_Email } from "../utility/emailVerification.js";
 import { fileUploadOnCloudinary, removeFileFromCloudinary } from "../utility/fileUpload_remove.js"
@@ -129,7 +129,9 @@ const register_user = async (req, res) => {
             })
         } else {
             user = new User({
-                fullName,
+                jobSeekerInfo: {
+                    fullName,
+                },
                 email,
                 password: hashedPassword,
                 userName,
@@ -150,7 +152,7 @@ const register_user = async (req, res) => {
         await user.save();
 
         // create user object
-        const createdUser = await User.findById(user._id).select("-password -refreshtoken");
+        const createdUser = await User.findById(user._id).select("-password -refreshToken");
         if (!createdUser) {
             return res.status(500).json({ statusCode: 500, message: "Internal server error" });
         }
@@ -201,7 +203,7 @@ const login = async (req, res) => {
         await user.save();
 
         // create user object
-        const logIn_User = await User.findById(user._id).select("-password -refreshtoken");
+        const logIn_User = await User.findById(user._id).select("-password -refreshToken");
         if (!logIn_User) {
             return res.status(500).json({ statusCode: 500, message: "Internal server error" });
         }
@@ -264,16 +266,9 @@ const changeAvatar = async (req, res) => {
         const fileUpload = await fileUploadOnCloudinary(avatarPath, folder);
 
         // update in db
-        if (user.role === "employer") {
-            user.companyInfo.companyAvatar = {
-                avatar_Url: fileUpload.url,
-                public_Id: fileUpload.public_id,
-            }
-        } else {
-            user.avatar = {
-                avatar_Url: fileUpload.url,
-                public_Id: fileUpload.public_id,
-            }
+        user.avatar = {
+            avatar_Url: fileUpload.url,
+            public_Id: fileUpload.public_id,
         }
         await user.save();
 
@@ -286,34 +281,73 @@ const changeAvatar = async (req, res) => {
 // login is required
 const editProfile = async (req, res) => {
     try {
+        // get user id from token
         const userId = req.user?._id;
         if (!userId) {
-            return res.status(401).json({ statusCode: 400, message: "Unauthorized user" });
+            return res.status(401).json({ statusCode: 401, message: "Unauthorized user" });
         }
 
-        // find the current user through id
+        // find the user in db
         const currentUser = await User.findById(userId).select("-password -refreshToken");
         if (!currentUser) {
-            return res.status(404).json({ statusCode: 400, message: "User not found" });
+            return res.status(404).json({ statusCode: 404, message: "User not found" });
+        }
+        const { email, fullName, bio, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks = {} } = req.body;
+
+        const { linkedin = "", facebook = "", twitter = "", instagram = "", github = "" } = socialLinks;
+
+        if (!email || !userName || !fullName) {
+            return res.status(400).json({ statusCode: 400, message: "Email and Username are required" });
         }
 
-        const { email, fullName, userName, companyName } = req.body;
-        if (!email || !fullName || !userName) {
-            return res.status(400).json({ statusCode: 400, message: "All fields required" })
-        }
+        // social link obj
+        let socialLinksObj = { linkedin, facebook, twitter, instagram, github };
 
-        // companyName is required if role is employer
-        if (currentUser.role === "employer" && (!companyName || companyName.trim() === "" || companyName.length < 3)) {
-            return res.status(400).json({ statusCode: 400, message: "Company name is required min 3 char for employers" });
-        }
-
-        // validate input 
+        // Validate basic user input
         const inputVerify = validateUserInput(fullName, email, undefined, userName);
         if (!inputVerify.isValid) {
-            return res.status(400).json({ statusCode: 400, message: inputVerify.errors })
+            return res.status(400).json({ statusCode: 400, message: inputVerify.errors });
         }
 
-        // Check if email or username is already in use by another user, excluding the current user
+        // Validate employer-specific info
+        if (currentUser.role === "employer") {
+            if (!companyName || !isNonEmptyString(companyName)) {
+                return res.status(400).json({ statusCode: 400, message: "Company name is required" });
+            }
+            const optionalFields = {
+                companyType,
+                companySize,
+                companyWeb,
+                companyDescription,
+                socialLinks: { linkedin, facebook, twitter, instagram, github }
+            };
+
+            // Only validate if optional fields are provided
+            const providedFields = {};
+            for (const [key, value] of Object.entries(optionalFields)) {
+                if (isNonEmptyString(value) || typeof value === "object") {
+                    providedFields[key] = value;
+                }
+            }
+            const companyValidation = validateCompanyData({ companyName, ...providedFields });
+            if (!companyValidation.isValid) {
+                return res.status(400).json({
+                    statusCode: 400,
+                    message: "Invalid company information",
+                    errors: companyValidation.errors
+                });
+            }
+        } else {
+            if (typeof bio === 'string' && bio.trim().length > 0 && bio.trim().length < 50) {
+                return res.status(400).json({ statusCode: 400, message: "Bio must be at least 50 characters." });
+            }
+            const verifySocialLink = socialLinkVerify(socialLinksObj);
+            if (!verifySocialLink.isValid) {
+                return res.status(400).json({ statusCode: 400, message: "Invalid social Links", errors: verifySocialLink.errors });
+            }
+        }
+
+        // Check for duplicate username/email
         const checkUser = await User.findOne({
             $or: [{ userName }, { email }],
             _id: { $ne: userId }
@@ -323,32 +357,44 @@ const editProfile = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "Username or email is already taken. Please try another." });
         }
 
-        // Check if email has changed then send the code into email
+        // If email changed, send verification code
         if (currentUser.email !== email) {
-            // send code to emial 
             const verificationCode = await sendEmail(email);
-            console.log(verificationCode)
             if (!verificationCode) {
                 return res.status(500).json({ statusCode: 500, message: "Failed to send verification code" });
             }
+
             req.session.emailCode = verificationCode;
             req.session.userInfo = req.body;
-            req.session.role = currentUser.role
-            return res.status(200).json({ statusCode: 200, message: "Verification code sent to your email. Please verify." });
+            req.session.role = currentUser.role;
+
+            return res.status(201).json({
+                statusCode: 201,
+                message: "Verification code sent to your email. Please verify."
+            });
         }
 
-        // if email is not changed then simply update in db
-        if (currentUser.role === "employer") {
-            currentUser.companyInfo.companyName = companyName
-        } else {
-            currentUser.fullName = fullName;
-        }
+        // Perform update
         currentUser.userName = userName;
 
+        if (currentUser.role === "employer") {
+            currentUser.companyInfo.companyName = companyName;
+            if (companyType) currentUser.companyInfo.companyType = companyType;
+            if (companySize) currentUser.companyInfo.companySize = companySize;
+            if (companyWeb) currentUser.companyInfo.companyWeb = companyWeb;
+            if (companyDescription) currentUser.companyInfo.companyDescription = companyDescription;
+            currentUser.companyInfo.socialLinks = { linkedin, facebook, twitter, instagram, github };
+        } else {
+            currentUser.jobSeekerInfo.fullName = fullName;
+            if (bio) currentUser.jobSeekerInfo.bio = bio;
+            currentUser.jobSeekerInfo.socialLinks = { linkedin, facebook, twitter, instagram, github };
+        }
+
         await currentUser.save();
+
         return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: currentUser });
     } catch (error) {
-        return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the profile.", error: error.message });
+        return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the profile.", error: error });
     }
 };
 
@@ -363,13 +409,13 @@ const updateProfile = async (req, res) => {
         // get user id from token
         const userId = req.user?._id;
         if (!userId) {
-            return res.status(401).json({ statusCode: 400, message: "Unauthorized user" });
+            return res.status(400).json({ statusCode: 400, message: "Unauthorized user" });
         }
 
         // find the user in db
         const user = await User.findById(userId).select("-password -refreshToken");
         if (!user) {
-            return res.status(404).json({ statusCode: 400, message: "User does not exist" });
+            return res.status(400).json({ statusCode: 400, message: "User does not exist" });
         }
 
         // get data from session
@@ -379,13 +425,19 @@ const updateProfile = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "User data not found in session or verification incomplete. Please complete the edit profile process again." });
         }
 
-        const { fullName, email, userName, companyName } = userInfo;
-
+        const { fullName, bio, email, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks } = userInfo;
         // Update the user profile
         if (role === "employer") {
             user.companyInfo.companyName = companyName
+            user.companyInfo.companyType = companyType;
+            user.companyInfo.companySize = companySize;
+            user.companyInfo.companyWeb = companyWeb;
+            user.companyInfo.companyDescription = companyDescription;
+            user.companyInfo.socialLinks = socialLinks;
         } else {
-            user.fullName = fullName;
+            user.jobSeekerInfo.fullName = fullName;
+            user.jobSeekerInfo.bio = bio;
+            user.jobSeekerInfo.socialLinks = socialLinks;
         }
         user.email = email;
         user.userName = userName;

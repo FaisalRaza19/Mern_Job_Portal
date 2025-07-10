@@ -2,11 +2,13 @@ import { useContext, useRef, useState } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiSave, FiTrash2, FiEye, FiEyeOff, FiUpload, FiLoader } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
-import { industryOptions } from "../../../../temp/data.js"
+import { industryOptions, socialLinks } from "../../../../temp/data.js"
+import { useNavigate } from "react-router-dom"
 
 const EmployerSettings = () => {
-  const { userData, userAuth, userImage } = useContext(Context);
-  const { updateAvatar } = userAuth
+  const { userData, userAuth, userImage, userProfile } = useContext(Context);
+  const { setIsEditProfile } = userProfile
+  const { updateAvatar, editProfile } = userAuth
   const { image, setImage } = userImage
   const user = userData
   const [isLoading, setLoading] = useState(false);
@@ -14,6 +16,41 @@ const EmployerSettings = () => {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  // copmay data
+  const [companyData, setCompanyData] = useState({
+    email: user?.email || "",
+    userName: user?.userName || "",
+    companyName: user?.companyInfo?.companyName || "",
+    companyType: user?.companyInfo?.companyType || "",
+    companySize: user?.companyInfo?.companySize || "",
+    companyWeb: user?.companyInfo?.companyWeb || "",
+    companyDescription: user?.companyInfo?.companyDescription || "",
+    socialLinks: {
+      facebook: user?.companyInfo?.socialLinks?.facebook || "",
+      linkedin: user?.companyInfo?.socialLinks?.linkedin || "",
+      twitter: user?.companyInfo?.socialLinks?.twitter || "",
+      instagram: user?.companyInfo?.socialLinks?.instagram || "",
+      github: user?.companyInfo?.socialLinks?.github || "",
+    },
+  })
+
+  const navigate = useNavigate();
+
+  const handleInputChange = (field, value, nested = null) => {
+    if (nested) {
+      setCompanyData((prev) => ({
+        ...prev,
+        [nested]: {
+          ...prev[nested],
+          [field]: value,
+        },
+      }));
+    } else {
+      setCompanyData((prev) => ({ ...prev, [field]: value }));
+    }
+  };
+
+  //
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -21,18 +58,8 @@ const EmployerSettings = () => {
     emailNotifications: true,
     applicationAlerts: true,
     marketingEmails: false,
-    companyName: user?.companyInfo?.companyName || "",
-    industry: "Technology",
-    companySize: "50-100",
-    website: "",
-    description: "",
-    contactNumber: "",
-    socialLinks: {} || "",
   })
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
 
   const handlePasswordChange = () => {
     if (formData.newPassword !== formData.confirmPassword) {
@@ -46,6 +73,26 @@ const EmployerSettings = () => {
     console.log("Account deletion requested")
     setShowDeleteModal(false)
   }
+
+  // handle form submit
+  const handleSumbit = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+    try {
+      const userData = companyData
+      const data = await editProfile({ userData, navigate })
+      if (data.statusCode === 201) {
+        setIsEditProfile(true)
+      }
+      console.log(data);
+    }
+    catch (error) {
+      console.log("Error updating profile:", error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
 
   // update avatar
   const fileInputRef = useRef();
@@ -79,45 +126,62 @@ const EmployerSettings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Company Information */}
         <DashboardCard title="Company Information">
-          <form typeof="sumbit">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
-                  {user?.companyInfo?.companyAvatar?.avatar_Url ? (
-                    <img
-                      src={image || user?.companyInfo?.companyAvatar?.avatar_Url}
-                      alt="User Avatar"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-500 dark:text-gray-300">{user?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <button type="button" onClick={handleButtonClick}
-                    className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <FiUpload className="w-4 h-4" />
-                    <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
-                  </button>
-
-                  <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-                </div>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
+                {user?.companyInfo ? (
+                  <img
+                    src={image || user?.avatar?.avatar_Url}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <span className="text-sm text-gray-500 dark:text-gray-300">{user?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
+                )}
               </div>
+              <div className="flex-1">
+                <button type="button" onClick={handleButtonClick}
+                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <FiUpload className="w-4 h-4" />
+                  <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
+                </button>
 
+                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+              </div>
+            </div>
+            <form typeof="sumbit" onSubmit={handleSumbit}>
               <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                  <input
+                    type="text"
+                    value={companyData.email || ""}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
                   <input
                     type="text"
-                    value={formData.companyName}
+                    value={companyData.companyName || ""}
                     onChange={(e) => handleInputChange("companyName", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User Name</label>
+                  <input
+                    type="text"
+                    value={companyData.userName || ""}
+                    onChange={(e) => handleInputChange("userName", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Industry</label>
-                  <select value={formData.industry} onChange={(e) => handleInputChange("industry", e.target.value)}
+                  <select value={companyData.companyType || ""} onChange={(e) => handleInputChange("companyType", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="">Select Industry</option>
@@ -131,7 +195,7 @@ const EmployerSettings = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Size</label>
                   <select
-                    value={formData.companySize}
+                    value={companyData.companySize || ""}
                     onChange={(e) => handleInputChange("companySize", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
@@ -150,40 +214,80 @@ const EmployerSettings = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
                   <input
                     type="url"
-                    value={formData.website}
-                    onChange={(e) => handleInputChange("website", e.target.value)}
+                    value={companyData.companyWeb || ""}
+                    onChange={(e) => handleInputChange("companyWeb", e.target.value)}
                     placeholder="https://www.company.com"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Social Links</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook Link</label>
                   <input
                     type="text"
                     className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                    placeholder="facebook=https://...,twitter=https://..."
-                    value={formData.socialLinks}
-                    onChange={(e) => handleInputChange("socialLinks", e.target.value)}
+                    placeholder="https://facebook.com"
+                    value={companyData.socialLinks.facebook || ""}
+                    onChange={(e) => handleInputChange("facebook", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Linkedin Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://linkedin.com"
+                    value={companyData.socialLinks.linkedin || ""}
+                    onChange={(e) => handleInputChange("linkedin", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://instagram.com"
+                    value={companyData.socialLinks.instagram || ""}
+                    onChange={(e) => handleInputChange("instagram", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://twitter.com"
+                    value={companyData.socialLinks.twitter || ""}
+                    onChange={(e) => handleInputChange("twitter", e.target.value, "socialLinks")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Github Link</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://github.com"
+                    value={companyData.socialLinks.github || ""}
+                    onChange={(e) => handleInputChange("github", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                   <textarea
                     rows={6}
-                    value={formData.description}
-                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    value={companyData.companyDescription || ""}
+                    onChange={(e) => handleInputChange("companyDescription", e.target.value)}
                     placeholder="Write a brief description of your company, culture, and what makes it a great place to work..."
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
                   />
                 </div>
               </div>
-
-              <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button type="sumbit" className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 <FiSave className="w-4 h-4" />
-                <span>Save Company Info</span>
+                <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Save Company Info"}</span>
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
+
         </DashboardCard>
 
         {/* Change Password */}

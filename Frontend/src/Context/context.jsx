@@ -1,10 +1,13 @@
 import { createContext, useState, useEffect } from "react";
 // user auth
-import { register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT } from "./Api/User/userAuth";
+import {
+    register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT, editProfile, verifyAndUpdateProfile
+} from "./Api/User/userAuth";
 
 export const Context = createContext();
 
 export const ContextApi = ({ children }) => {
+    const [isEditProfile,setIsEditProfile] = useState(false);
     const [image, setImage] = useState("");
     const [userData, setUserData] = useState();
     const [isEmployer, setIsEmployer] = useState(false);
@@ -45,11 +48,12 @@ export const ContextApi = ({ children }) => {
         verifyToken();
     }, []);
 
+    const userProfile = {isEditProfile,setIsEditProfile}
     const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn }
-    const userAuth = { register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, }
+    const userAuth = { register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,verifyJWT,editProfile,verifyAndUpdateProfile,};
     const userImage = { image, setImage };
     return (
-        <Context.Provider value={{ userAuth, userData, setUserData, isEmployer, userImage, verifyUser }}>
+        <Context.Provider value={{ userAuth, userData, setUserData, isEmployer, setIsEmployer, userImage, verifyUser,userProfile}}>
             {children}
         </Context.Provider>
     )
