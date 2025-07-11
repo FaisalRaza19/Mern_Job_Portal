@@ -454,6 +454,66 @@ const updateProfile = async (req, res) => {
     }
 };
 
+// update edu and exp
+const updateJobseekerInfo = async (req, res) => {
+    try {
+        // get user id from token
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(400).json({ statusCode: 400, message: "Unauthorized user" });
+        }
+
+        // find the user in db
+        const user = await User.findById(userId).select("-password -refreshToken");
+        if (!user) {
+            return res.status(400).json({ statusCode: 400, message: "User does not exist" });
+        }
+
+        const { jobTitle, companyName, employmentType, location, startDate, endDate, current, description, degree, Institute, fieldOfStudy, startYear, endYear } = req.body
+
+        // Validation
+        if (startDate && !current && endDate && new Date(endDate) < new Date(startDate)) {
+            return res.status(400).json({ statusCode: 400, message: "End date must be after start date." });
+        }
+
+        if (startYear && endYear && endYear < startYear) {
+            return res.status(400).json({ statusCode: 400, message: "End year must be greater than or equal to start year." });
+        }
+
+        if (description && description.trim().length < 50) {
+            return res.status(400).json({ statusCode: 400, message: "Description must be at least 50 characters long." });
+        }
+
+        // edu update in db 
+        if (degree) user.jobSeekerInfo.eduaction.degree = degree
+        if (Institute) user.jobSeekerInfo.eduaction.Institute = Institute
+        if (fieldOfStudy) user.jobSeekerInfo.eduaction.fieldOfStudy = fieldOfStudy
+        if (startYear) user.jobSeekerInfo.eduaction.startYear = startYear
+        if (endYear) user.jobSeekerInfo.eduaction.endYear = endYear
+        // exp update in db 
+        if (jobTitle) user.jobSeekerInfo.experience.jobTitle = jobTitle
+        if (companyName) user.jobSeekerInfo.experience.companyName = companyName
+        if (employmentType) user.jobSeekerInfo.experience.employmentType = employmentType
+        if (location) user.jobSeekerInfo.experience.location = location
+        if (startDate) user.jobSeekerInfo.experience.startDate = startDate
+        if (current === true || current === "true") {
+            user.jobSeekerInfo.experience.endDate = null
+            user.jobSeekerInfo.experience.current = true
+        } else {
+            if (endDate) user.jobSeekerInfo.experience.endDate = endDate
+            user.jobSeekerInfo.experience.current = false
+        }
+        if (description) user.jobSeekerInfo.experience.description = description
+
+        await user.save()
+
+        return res.status(200).json({ statusCode: 200, message: "Profile update successfully", data: user.jobSeekerInfo })
+
+    } catch (error) {
+        return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the edu and exp.", error: error.message });
+    }
+}
+
 // get user
 const getUser = async (req, res) => {
     try {
@@ -553,5 +613,5 @@ const userVerifyJWT = async (req, res) => {
 
 export {
     valid_register, resendVerificationCode, register_user, login, logOut, changeAvatar, editProfile,
-    updateProfile, email_for_Pass, update_pass, getUser, userVerifyJWT
+    updateProfile, email_for_Pass, update_pass, getUser, userVerifyJWT, updateJobseekerInfo
 }

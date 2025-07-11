@@ -41,8 +41,8 @@ const jobSeekerInfoSchema = {
         Institute: String,
         degree: String,
         fieldOfStudy: String,
-        startYear: Number,
-        endYear: Number,
+        startYear: Date,
+        endYear: Date,
     },
     experience: {
         jobTitle: String,

@@ -1,6 +1,7 @@
-import { useContext, useState, useRef } from "react"
+import { useContext, useState, useRef, useEffect } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiUpload, FiFileText, FiPlus, FiX, FiLoader, FiSave, FiCalendar } from "react-icons/fi"
+import { fetchSuggestedSkills } from "../../../../temp/suggestedSkilss.js"
 import { Context } from "../../../../Context/context.jsx"
 import { useNavigate } from "react-router-dom"
 
@@ -8,10 +9,11 @@ const JobSeekerProfile = () => {
   const navigate = useNavigate()
   const { userAuth, userData, userImage, userProfile, } = useContext(Context)
   const { setIsEditProfile } = userProfile
-  const { updateAvatar, editProfile } = userAuth;
+  const { updateAvatar, editProfile, update_Edu_Exp } = userAuth;
   const { image, setImage } = userImage
   const user = userData;
   const [isLoading, setLoading] = useState(false);
+  // personal info
   const [userInfo, setUserInfo] = useState({
     fullName: user?.jobSeekerInfo?.fullName || "",
     email: user?.email || "",
@@ -38,31 +40,85 @@ const JobSeekerProfile = () => {
       setUserInfo((prev) => ({ ...prev, [field]: value }));
     }
   };
+
   // eduaction and experience
   const [edu_exp, setEdu_exp] = useState({
-    Institute: user?.jobSeekerInfo?.eduaction?.Institute,
-    degree: user?.jobSeekerInfo?.eduaction?.degree,
-    fieldOfStudy: user?.jobSeekerInfo?.eduaction?.fieldOfStudy,
-    startYear: user?.jobSeekerInfo?.eduaction?.startYear,
-    endYear: user?.jobSeekerInfo?.eduaction?.endYear,
+    Institute: user?.jobSeekerInfo?.eduaction?.Institute || "",
+    degree: user?.jobSeekerInfo?.eduaction?.degree || "",
+    fieldOfStudy: user?.jobSeekerInfo?.eduaction?.fieldOfStudy || "",
+    startYear: user?.jobSeekerInfo?.eduaction?.startYear || "",
+    endYear: user?.jobSeekerInfo?.eduaction?.endYear || "",
     // exp
-    jobTitle: user?.jobSeekerInfo?.experience?.jobTitle,
-    companyName: user?.jobSeekerInfo?.experience?.companyName,
-    employmentType: user?.jobSeekerInfo?.experience?.employmentType,
-    location: user?.jobSeekerInfo?.experience?.location,
-    startDate: user?.jobSeekerInfo?.experience?.startDate,
+    jobTitle: user?.jobSeekerInfo?.experience?.jobTitle || "",
+    companyName: user?.jobSeekerInfo?.experience?.companyName || "",
+    employmentType: user?.jobSeekerInfo?.experience?.employmentType || "",
+    location: user?.jobSeekerInfo?.experience?.location || "",
+    startDate: user?.jobSeekerInfo?.experience?.startDate || "",
     endDate: user?.jobSeekerInfo?.experience?.endDate,
-    current: user?.jobSeekerInfo?.experience?.current,
-    description: user?.jobSeekerInfo?.experience?.description,
+    current: user?.jobSeekerInfo?.experience?.current || "",
+    description: user?.jobSeekerInfo?.experience?.description || "",
   })
 
   const handleInfoChange = (field, value) => {
     setEdu_exp((prev) => ({ ...prev, [field]: value }))
   }
-  //
-  const [skills, setSkills] = useState(["React", "JavaScript", "TypeScript", "Node.js", "Python"])
-  const [newSkill, setNewSkill] = useState("")
-  const [showAddSkill, setShowAddSkill] = useState(false)
+
+  const formatDateInput = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    return d.toISOString().split("T")[0]; // "2024-12-04T..." → "2024-12-04"
+  };
+
+  // skills and resume 
+  const [resumeFile, setResumeFile] = useState(null);
+  const [resumeUrl, setResumeUrl] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const handleResumeChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setResumeFile(file);
+      const reader = new FileReader();
+      reader.onload = () => setResumeUrl(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDownload = () => {
+    if (!resumeFile || !resumeUrl) return;
+    const link = document.createElement("a");
+    link.href = resumeUrl;
+    link.download = resumeFile.name;
+    link.click();
+  };
+
+  // skils
+  const [skills, setSkills] = useState([]);
+  const [newSkill, setNewSkill] = useState("");
+  const [suggestedSkills, setSuggestedSkills] = useState([]);
+  const [showAddSkill, setShowAddSkill] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(null);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  useEffect(() => {
+    if (newSkill.trim().length < 2) {
+      setSuggestedSkills([]);
+      return;
+    }
+
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    const timeout = setTimeout(async () => {
+      setIsLoadingSuggestions(true);
+      const suggestions = await fetchSuggestedSkills(bio, newSkill, skills);
+      console.log(suggestions)
+      setSuggestedSkills(suggestions || []);
+      setIsLoadingSuggestions(false);
+    }, 500);
+
+    setTypingTimeout(timeout);
+  }, [newSkill]);
+
 
   const handleAddSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
@@ -74,6 +130,33 @@ const JobSeekerProfile = () => {
 
   const handleRemoveSkill = (skillToRemove) => {
     setSkills(skills.filter((skill) => skill !== skillToRemove))
+  }
+
+  // update resume and skills
+  const handle_resume_skills = async(e)=>{
+    e.preventDefault()
+    setLoading(true)
+    try{
+      const data = {skills,resumeFile}
+      console.log(data)
+    }catch (error) {
+      console.log("Error updating profile:", error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // update edu and exp
+  const handle_Edu_Exp = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+    try {
+      const data = await update_Edu_Exp(edu_exp)
+    }catch (error) {
+      console.log("Error updating profile:", error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // update profile
@@ -124,6 +207,7 @@ const JobSeekerProfile = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
         {/* Personal Information */}
         <DashboardCard title="Personal Information">
           <div className="space-y-4">
@@ -257,7 +341,7 @@ const JobSeekerProfile = () => {
 
         {/* edu and exp Management */}
         <DashboardCard title="Other Information">
-          <form>
+          <form onSubmit={handle_Edu_Exp}>
             <div className="grid grid-cols-1 gap-4">
               {/* edu management  */}
               <DashboardCard title="Eduaction">
@@ -300,8 +384,8 @@ const JobSeekerProfile = () => {
                       <FiCalendar className="inline mr-1" /> Start Year *
                     </label>
                     <input
-                      type="month"
-                      value={edu_exp.startYear}
+                      type="date"
+                      value={formatDateInput(edu_exp.startYear) || ""}
                       onChange={(e) => handleInfoChange("startYear", e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       required
@@ -313,13 +397,14 @@ const JobSeekerProfile = () => {
                       <FiCalendar className="inline mr-1" /> End Year *
                     </label>
                     <input
-                      type="month"
-                      value={edu_exp.endYear}
+                      type="date"
+                      value={formatDateInput(edu_exp.endYear) || ""}
                       onChange={(e) => handleInfoChange("endYear", e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       required
                     />
                   </div>
+
                 </div>
               </DashboardCard>
 
@@ -384,8 +469,8 @@ const JobSeekerProfile = () => {
                       <FiCalendar /> Start Date *
                     </label>
                     <input
-                      type="month"
-                      value={edu_exp.startDate}
+                      type="date"
+                      value={formatDateInput(edu_exp.startDate)}
                       onChange={(e) => handleInfoChange("startDate", e.target.value)}
                       required
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -398,8 +483,8 @@ const JobSeekerProfile = () => {
                       <FiCalendar /> End Date *
                     </label>
                     <input
-                      type="month"
-                      value={edu_exp.endDate}
+                      type="date"
+                      value={formatDateInput(edu_exp.endDate)}
                       onChange={(e) => handleInfoChange("endDate", e.target.value)}
                       disabled={edu_exp.current}
                       className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${edu_exp.current ? "opacity-50" : ""}`}
@@ -442,11 +527,12 @@ const JobSeekerProfile = () => {
       </div>
 
       {/* Skills Management */}
-      <form action="" >
+      <form action="" onSubmit={handle_resume_skills}>
         <div className="grid gap-4">
           <DashboardCard title="Skills & Expertise">
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
+                {/* Existing Skills */}
                 {skills.map((skill) => (
                   <div
                     key={skill}
@@ -462,32 +548,74 @@ const JobSeekerProfile = () => {
                   </div>
                 ))}
 
+                {/* Add Skill Input */}
                 {showAddSkill ? (
-                  <div className="flex items-center space-x-2">
+                  <div className="relative w-64">
                     <input
                       type="text"
                       value={newSkill}
                       onChange={(e) => setNewSkill(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleAddSkill()}
-                      placeholder="Enter skill"
-                      className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      autoFocus
-                    />
-                    <button
-                      onClick={handleAddSkill}
-                      className="px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-                    >
-                      Add
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowAddSkill(false)
-                        setNewSkill("")
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddSkill();
+                        }
                       }}
-                      className="px-2 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
-                    >
-                      Cancel
-                    </button>
+                      placeholder="Enter a skill"
+                      className={`w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${isLoadingSuggestions ? "opacity-50 cursor-wait" : ""
+                        }`}
+                      autoFocus
+                      disabled={isLoadingSuggestions}
+                    />
+
+                    {/* Loading spinner */}
+                    {isLoadingSuggestions && (
+                      <div className="absolute mt-1 text-sm bg-gray-800 text-gray-500 dark:text-gray-300 px-2 py-1">
+                        <FiLoader className="animate-spin inline mr-1" /> Fetching suggestions...
+                      </div>
+                    )}
+
+                    {/* GPT Suggested Skills Dropdown */}
+                    {!isLoadingSuggestions && suggestedSkills.length > 0 && (
+                      <ul className="absolute z-10 w-full mt-1 bg-gray-800 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-lg max-h-40 overflow-y-auto">
+                        {suggestedSkills.map((suggestion) => (
+                          <li
+                            key={suggestion}
+                            onClick={() => {
+                              if (!skills.includes(suggestion)) {
+                                setSkills([...skills, suggestion]);
+                              }
+                              setNewSkill("");
+                              setSuggestedSkills([]);
+                            }}
+                            className="px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer"
+                          >
+                            {suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {/* Add / Cancel Buttons */}
+                    <div className="flex mt-2 space-x-2">
+                      <button
+                        onClick={handleAddSkill}
+                        className="px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                        disabled={isLoadingSuggestions || !newSkill.trim()}
+                      >
+                        Add
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAddSkill(false);
+                          setNewSkill("");
+                          setSuggestedSkills([]);
+                        }}
+                        className="px-2 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <button
@@ -500,50 +628,96 @@ const JobSeekerProfile = () => {
                 )}
               </div>
 
-              <div className="mt-4">
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Suggested Skills</h4>
-                <div className="flex flex-wrap gap-2">
-                  {["CSS", "HTML", "Git", "Docker", "AWS", "MongoDB"].map((skill) => (
-                    <button
-                      key={skill}
-                      onClick={() => !skills.includes(skill) && setSkills([...skills, skill])}
-                      disabled={skills.includes(skill)}
-                      className={`px-2 py-1 text-sm rounded ${skills.includes(skill)
-                        ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
-                        }`}
-                    >
-                      {skill}
-                    </button>
-                  ))}
+              {/* Static Suggested Skills Backup */}
+              {suggestedSkills.length > 0 && !showAddSkill && (
+                <div className="mt-4">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Suggested Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestedSkills.map((skill) => (
+                      <button
+                        key={skill}
+                        onClick={() => !skills.includes(skill) && setSkills([...skills, skill])}
+                        disabled={skills.includes(skill)}
+                        className={`px-2 py-1 text-sm rounded ${skills.includes(skill)
+                          ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
+                          }`}
+                      >
+                        {skill}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </DashboardCard>
+
           <DashboardCard title="Resume Management">
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-                <FiFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Current Resume</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">resume.pdf (2.3 MB)</p>
-                <div className="flex space-x-2 justify-center">
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Preview
+              {/* Resume Upload */}
+              <label htmlFor="resume-upload" className="cursor-pointer">
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                  <FiUpload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Drop a new resume here or <span className="text-blue-600">browse files</span>
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, DOC, DOCX up to 5MB</p>
+                </div>
+              </label>
+              <input
+                id="resume-upload"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className="hidden"
+                onChange={handleResumeChange}
+              />
+
+              {/* Resume Display */}
+              {resumeFile && (
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                  <FiFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Current Resume</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    {resumeFile.name} ({(resumeFile.size / (1024 * 1024)).toFixed(2)} MB)
+                  </p>
+                  <div className="flex space-x-2 justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowPreview(true)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Preview
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDownload}
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Download
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Resume Preview Modal */}
+            {showPreview && resumeUrl && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full relative">
+                  <button
+                    onClick={() => setShowPreview(false)}
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                  >
+                    <FiX size={20} />
                   </button>
-                  <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    Download
-                  </button>
+                  <iframe
+                    src={resumeUrl}
+                    className="w-full h-[500px]"
+                    title="Resume Preview"
+                  />
                 </div>
               </div>
-
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer">
-                <FiUpload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 dark:text-gray-400">
-                  Drop a new resume here or <span className="text-blue-600">browse files</span>
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, DOC, DOCX up to 5MB</p>
-              </div>
-            </div>
+            )}
           </DashboardCard>
           <button type="sumbit" className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <FiSave className="w-4 h-4" />

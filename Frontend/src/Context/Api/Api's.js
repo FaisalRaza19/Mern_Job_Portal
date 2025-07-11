@@ -10,4 +10,6 @@ export const userAuth = {
     verifyJWT : `http://localhost:${port}/user/verify-jwt`,
     editProfile : `http://localhost:${port}/user/edit-profile`,
     verify_edit : `http://localhost:${port}/user/verify-profile`,
+    // update edu and exp
+    update_edu_exp : `http://localhost:${port}/user/update-edu-exp`
 }
