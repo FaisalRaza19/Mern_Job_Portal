@@ -24,7 +24,7 @@ const JobSeekerDashboard = ({setIsLoggedIn})=>{
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
-        return <JobSeekerOverview />
+        return <JobSeekerOverview activeTab={setActiveTab}/>
       case "saved-jobs":
         return <SavedJobs />
       case "applied-jobs":
@@ -66,7 +66,7 @@ const JobSeekerDashboard = ({setIsLoggedIn})=>{
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Topbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} setIsLoggedIn={setIsLoggedIn}/>
+        <Topbar activeTab={setActiveTab} onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} setIsLoggedIn={setIsLoggedIn}/>
 
         <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>
