@@ -9,7 +9,7 @@ const JobSeekerProfile = () => {
   const navigate = useNavigate()
   const { userAuth, userData, userImage, userProfile, } = useContext(Context)
   const { setIsEditProfile } = userProfile
-  const { updateAvatar, editProfile, update_Edu_Exp } = userAuth;
+  const { updateAvatar, editProfile, update_Edu_Exp, update_skills_resume, downloadResume } = userAuth;
   const { image, setImage } = userImage
   const user = userData;
   const [isLoading, setLoading] = useState(false);
@@ -69,90 +69,13 @@ const JobSeekerProfile = () => {
     return d.toISOString().split("T")[0]; // "2024-12-04T..." → "2024-12-04"
   };
 
-  // skills and resume 
-  const [resumeFile, setResumeFile] = useState(null);
-  const [resumeUrl, setResumeUrl] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
-
-  const handleResumeChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setResumeFile(file);
-      const reader = new FileReader();
-      reader.onload = () => setResumeUrl(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDownload = () => {
-    if (!resumeFile || !resumeUrl) return;
-    const link = document.createElement("a");
-    link.href = resumeUrl;
-    link.download = resumeFile.name;
-    link.click();
-  };
-
-  // skils
-  const [skills, setSkills] = useState([]);
-  const [newSkill, setNewSkill] = useState("");
-  const [suggestedSkills, setSuggestedSkills] = useState([]);
-  const [showAddSkill, setShowAddSkill] = useState(false);
-  const [typingTimeout, setTypingTimeout] = useState(null);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-
-  useEffect(() => {
-    if (newSkill.trim().length < 2) {
-      setSuggestedSkills([]);
-      return;
-    }
-
-    if (typingTimeout) clearTimeout(typingTimeout);
-
-    const timeout = setTimeout(async () => {
-      setIsLoadingSuggestions(true);
-      const suggestions = await fetchSuggestedSkills(bio, newSkill, skills);
-      console.log(suggestions)
-      setSuggestedSkills(suggestions || []);
-      setIsLoadingSuggestions(false);
-    }, 500);
-
-    setTypingTimeout(timeout);
-  }, [newSkill]);
-
-
-  const handleAddSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()])
-      setNewSkill("")
-      setShowAddSkill(false)
-    }
-  }
-
-  const handleRemoveSkill = (skillToRemove) => {
-    setSkills(skills.filter((skill) => skill !== skillToRemove))
-  }
-
-  // update resume and skills
-  const handle_resume_skills = async(e)=>{
-    e.preventDefault()
-    setLoading(true)
-    try{
-      const data = {skills,resumeFile}
-      console.log(data)
-    }catch (error) {
-      console.log("Error updating profile:", error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   // update edu and exp
   const handle_Edu_Exp = async (e) => {
     e.preventDefault();
     setLoading(true)
     try {
       const data = await update_Edu_Exp(edu_exp)
-    }catch (error) {
+    } catch (error) {
       console.log("Error updating profile:", error.message)
     } finally {
       setLoading(false)
@@ -179,7 +102,6 @@ const JobSeekerProfile = () => {
 
   // update avatar
   const fileInputRef = useRef();
-
   const handleButtonClick = () => {
     fileInputRef.current.click();
   };
@@ -199,6 +121,75 @@ const JobSeekerProfile = () => {
       setLoading(false)
     }
   };
+
+
+  // skills and resume 
+  const [resumeFile, setResumeFile] = useState(null);
+  const [resumeUrl, setResumeUrl] = useState(user?.jobSeekerInfo?.resumeUrl?.resume_Url || "");
+  const [showPreview, setShowPreview] = useState(false);
+
+  const handleResumeChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setResumeFile(file);
+      setResumeUrl("")
+    }
+  };
+
+  // skils
+  const [skills, setSkills] = useState(user?.jobSeekerInfo?.skills || []);
+  const [newSkill, setNewSkill] = useState("");
+  const [suggestedSkills, setSuggestedSkills] = useState([]);
+  const [showAddSkill, setShowAddSkill] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(null);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  useEffect(() => {
+    if (newSkill.trim().length < 2) {
+      setSuggestedSkills([]);
+      return;
+    }
+
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    const timeout = setTimeout(async () => {
+      setIsLoadingSuggestions(true);
+      const suggestions = await fetchSuggestedSkills(bio, newSkill, skills);
+      setSuggestedSkills(suggestions || []);
+      setIsLoadingSuggestions(false);
+    }, 500);
+
+    setTypingTimeout(timeout);
+  }, [newSkill]);
+
+
+  const handleAddSkill = () => {
+    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
+      setSkills([...skills, newSkill.trim()])
+      setNewSkill("")
+      setShowAddSkill(false)
+    }
+  }
+
+  const handleRemoveSkill = (skillToRemove) => {
+    setSkills(skills.filter((skill) => skill !== skillToRemove))
+  }
+
+  // update resume and skills
+  const handle_resume_skills = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const data = await update_skills_resume({ skills, resumeFile })
+      setResumeUrl(data.data.resumeUrl)
+      setSkills(data.data.Skills)
+    } catch (error) {
+      console.log("Error updating profile:", error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
 
   return (
     <div className="space-y-6">
@@ -673,28 +664,27 @@ const JobSeekerProfile = () => {
               />
 
               {/* Resume Display */}
-              {resumeFile && (
+
+              {(resumeFile || resumeUrl) && (
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
                   <FiFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Current Resume</h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    {resumeFile.name} ({(resumeFile.size / (1024 * 1024)).toFixed(2)} MB)
+                    {resumeFile ? resumeFile?.name : user?.jobSeekerInfo?.resumeUrl?.file_name || "Uploaded Resume "}
+                    <span className="ml-4">
+                      {resumeFile ? resumeFile?.size/1024 + "Kb" : user?.jobSeekerInfo?.resumeUrl?.size || ""}
+                    </span>
                   </p>
                   <div className="flex space-x-2 justify-center">
-                    <button
-                      type="button"
-                      onClick={() => setShowPreview(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Preview
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleDownload}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Download
-                    </button>
+                    {resumeUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setShowPreview(true)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Preview
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
@@ -712,8 +702,10 @@ const JobSeekerProfile = () => {
                   </button>
                   <iframe
                     src={resumeUrl}
-                    className="w-full h-[500px]"
                     title="Resume Preview"
+                    className="w-full h-[600px] rounded border"
+                    allow="fullscreen"
+                    frameBorder="0"
                   />
                 </div>
               </div>

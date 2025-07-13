@@ -43,6 +43,7 @@ Don't repeat existing skills. Just list the names — one per line.
         });
 
         const result = completion.choices[0].message.content;
+        console.log("result",result)
 
         // Convert into clean array
         const skillsArray = result

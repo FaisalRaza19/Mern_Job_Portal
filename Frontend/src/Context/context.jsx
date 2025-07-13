@@ -2,7 +2,7 @@ import { createContext, useState, useEffect } from "react";
 // user auth
 import {
     register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT,
-    editProfile, verifyAndUpdateProfile, update_Edu_Exp
+    editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
 } from "./Api/User/userAuth";
 
 export const Context = createContext();
@@ -53,7 +53,7 @@ export const ContextApi = ({ children }) => {
     const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn }
     const userAuth = {
         register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,
-        verifyJWT, editProfile, verifyAndUpdateProfile,update_Edu_Exp
+        verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
     };
     const userImage = { image, setImage };
     return (

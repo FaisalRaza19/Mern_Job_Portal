@@ -3,10 +3,14 @@ import { validateUserInput, validateCompanyData, socialLinkVerify } from "../uti
 import { generate_accessToken, generate_refreshToken, generate_passToken } from "../utility/generateToken.js";
 import { sendEmail, verifyEmail, pas_Email } from "../utility/emailVerification.js";
 import { fileUploadOnCloudinary, removeFileFromCloudinary } from "../utility/fileUpload_remove.js"
+import { fileSizeFormatter } from "../utility/fileSizeFormater.js"
 import jwt from "jsonwebtoken"
 import { generateUsername } from "../utility/userNameGenerator.js"
 import bcrypt from "bcryptjs";
-
+import stream from "stream";
+import { promisify } from "util";
+import axios from "axios";
+const pipeline = promisify(stream.pipeline);
 
 // register user
 const valid_register = async (req, res) => {
@@ -258,12 +262,14 @@ const changeAvatar = async (req, res) => {
 
         // If user has an existing avatar, clear it
         if (user.avatar?.public_Id) {
-            await removeFileFromCloudinary(user.avatar.public_Id);
+            const resourceType = "image"
+            await removeFileFromCloudinary(user.avatar.public_Id,resourceType);
         }
 
         // upload avatar to Cloudinary
         const folder = "Job Portal/User Avatar"
-        const fileUpload = await fileUploadOnCloudinary(avatarPath, folder);
+        const resourceType = "image"
+        const fileUpload = await fileUploadOnCloudinary(avatarPath, folder,resourceType);
 
         // update in db
         user.avatar = {
@@ -514,7 +520,79 @@ const updateJobseekerInfo = async (req, res) => {
     }
 }
 
-// get user
+// update skills and resume
+const update_Skills_Resume = async (req, res) => {
+    try {
+        // Get user ID from token
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(400).json({ statusCode: 400, message: "Unauthorized user" });
+        }
+
+        // Find user in DB
+        const user = await User.findById(userId).select("-password -refreshToken");
+        if (!user) {
+            return res.status(400).json({ statusCode: 400, message: "User does not exist" });
+        }
+
+        // Get resume file path and skills
+        const resume = req?.files?.resume?.[0]?.path;
+        let { skills } = req.body;
+
+        // Delete existing resume from Cloudinary if needed
+        if (resume && user.jobSeekerInfo.resumeUrl?.resume_publicId) {
+            const resourceType = "raw"
+            await removeFileFromCloudinary(user.jobSeekerInfo.resumeUrl.resume_publicId,resourceType);
+        }
+
+        // Upload new resume to Cloudinary
+        let fileUpload = null;
+        if (resume) {
+            const folder = "Job Portal/User Resume";
+            const resourceType = "raw"
+            fileUpload = await fileUploadOnCloudinary(resume, folder,resourceType);
+        }
+
+        // Save resume URL if uploaded
+        if (fileUpload?.url) {
+            user.jobSeekerInfo.resumeUrl = {
+                resume_Url: fileUpload.url,
+                file_name: fileUpload.original_filename,
+                resume_publicId: fileUpload.public_id,
+                size: fileSizeFormatter(fileUpload.bytes, 2)
+            };
+        }
+
+        // Parse and validate skills
+        if (skills) {
+            try {
+                if (typeof skills === 'string') {
+                    skills = JSON.parse(skills);
+                }
+
+                // Ensure skills is an array of strings
+                if (Array.isArray(skills)) {
+                    user.jobSeekerInfo.skills = skills.map(skill => String(skill));
+                } else {
+                    return res.status(400).json({ message: "Skills must be a valid array of strings." });
+                }
+            } catch (err) {
+                return res.status(400).json({ message: "Invalid Skills format. Must be a valid JSON array." });
+            }
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            statusCode: 200, message: "Profile updated successfully",
+            data: { Skills: user.jobSeekerInfo.skills, resumeUrl: user.jobSeekerInfo.resumeUrl?.resume_Url }
+        });
+
+    } catch (error) {
+        return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the skills and resume.", error: error.message });
+    }
+};
+
 const getUser = async (req, res) => {
     try {
         // get id from token
@@ -613,5 +691,6 @@ const userVerifyJWT = async (req, res) => {
 
 export {
     valid_register, resendVerificationCode, register_user, login, logOut, changeAvatar, editProfile,
-    updateProfile, email_for_Pass, update_pass, getUser, userVerifyJWT, updateJobseekerInfo
+    updateProfile, email_for_Pass, update_pass, getUser, userVerifyJWT, updateJobseekerInfo,
+    update_Skills_Resume
 }

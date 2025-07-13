@@ -287,3 +287,36 @@ export const update_Edu_Exp = async (formData) => {
         return error.message;
     }
 }
+
+
+// update skills and resume 
+export const update_skills_resume = async ({ skills, resumeFile }) => {
+    try {
+        const token = localStorage.getItem("user_token");
+        const formData = new FormData();
+        formData.append("skills", JSON.stringify(skills));
+        if (resumeFile) {
+            formData.append("resume", resumeFile);
+        }
+        const response = await fetch(userAuth.update_skills_resume, {
+            method: "POST",
+            headers: {
+                "Authorization": token,
+            },
+            body: formData,
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to update resume and skills");
+        }
+
+        return data
+    } catch (error) {
+        console.error("Update failed:", error.message);
+        alert(error.message);
+    }
+};
+

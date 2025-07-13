@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
     valid_register, resendVerificationCode, register_user, login, logOut, changeAvatar, editProfile,
-    updateProfile, email_for_Pass, update_pass, getUser, userVerifyJWT, updateJobseekerInfo
+    updateProfile, email_for_Pass, update_pass, getUser, userVerifyJWT, updateJobseekerInfo, update_Skills_Resume,
 } from "../Controller/userAuth_controller.js";
 
 import { upload } from "../Middleware/Multer.js";
@@ -24,3 +24,4 @@ router.route("/verify-jwt").post(upload.none(), verify_token, userVerifyJWT);
 
 // change job seeker info
 router.route("/update-edu-exp").post(upload.none(), verify_token, updateJobseekerInfo);
+router.route("/update-skills-resume").post(upload.fields([{ name: "resume", maxCount: 1 }]), verify_token, update_Skills_Resume)

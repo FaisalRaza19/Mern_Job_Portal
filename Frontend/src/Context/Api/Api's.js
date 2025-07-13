@@ -11,5 +11,6 @@ export const userAuth = {
     editProfile : `http://localhost:${port}/user/edit-profile`,
     verify_edit : `http://localhost:${port}/user/verify-profile`,
     // update edu and exp
-    update_edu_exp : `http://localhost:${port}/user/update-edu-exp`
+    update_edu_exp : `http://localhost:${port}/user/update-edu-exp`,
+    update_skills_resume : `http://localhost:${port}/user/update-skills-resume`,
 }

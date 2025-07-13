@@ -1,18 +1,23 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
+import dotenv from "dotenv"
+dotenv.config({
+    path : "./.env"
+})
 
 cloudinary.config({
-    cloud_name: "faisalraza",
-    api_key: "615757737347819",
-    api_secret: "YGm49A7doHVOqM0YYL-P2lgkcDI",
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET,
 });
 
-export const fileUploadOnCloudinary = async (filePath, folder) => {
+export const fileUploadOnCloudinary = async (filePath, folder,resourceType) => {
     try {
         if (!filePath) return null;
         const uploadFile = await cloudinary.uploader.upload(filePath, {
             folder: folder,
-            resource_type : 'image',
+            resource_type : resourceType,
+            type : 'upload'
         });
 
         fs.unlinkSync(filePath);
@@ -23,9 +28,9 @@ export const fileUploadOnCloudinary = async (filePath, folder) => {
     }
 };
 
-export const removeFileFromCloudinary = async (publicId) => {
+export const removeFileFromCloudinary = async (publicId,resourceType) => {
     try {
-        const result = await cloudinary.uploader.destroy(publicId);
+        const result = await cloudinary.uploader.destroy(publicId,{resource_type : resourceType});
         if (result.result !== 'ok') {
             throw new Error(`Failed to delete image with publicId: ${publicId}`);
         }
@@ -34,4 +39,4 @@ export const removeFileFromCloudinary = async (publicId) => {
         console.error('Error deleting file from Cloudinary:', error);
         throw new Error('Error deleting file from Cloudinary');
     }
-};
+}

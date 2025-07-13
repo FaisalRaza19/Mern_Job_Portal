@@ -51,7 +51,7 @@ const jobSeekerInfoSchema = {
         location: String,
         startDate: Date,
         endDate: Date,
-        current : Boolean,
+        current: Boolean,
         description: String,
     },
     bio: {
@@ -60,7 +60,9 @@ const jobSeekerInfoSchema = {
     resumeUrl: {
         type: Object,
         resume_Url: String,
+        file_name: String,
         resume_publicId: String,
+        size: String,
     },
     socialLinks: socialLinksSchema
 }
