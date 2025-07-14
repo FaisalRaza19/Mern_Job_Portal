@@ -4,6 +4,7 @@ import connectToDb from "./DataBase/db.js"
 import cors from 'cors';
 import dotenv from "dotenv"
 import {router} from "./Routes/user.route.js"
+import {route} from "./Routes/jobs.routes.js"
 
 const app = express();
 dotenv.config({path : ".env"});
@@ -41,6 +42,7 @@ app.get(`/change-password/:token`, (req, res) => {
 });
 
 app.use("/user",router);
+app.use("/jobs",route)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

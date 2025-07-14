@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
+import Admin from "./Components/pages/admin/Admin.jsx"
 import Navbar from "./Components/pages/Fixed Pages/Navbar.jsx";
 import Footer from "./Components/pages/Fixed Pages/Footer.jsx";
+import About from "./Components/pages/Fixed Pages/About.jsx";
+import Contact from "./Components/pages/Fixed Pages/Contact.jsx";
 import HomePage from "./Components/pages/Home/HomePage.jsx";
 import Login from "./Components/Forms/login.jsx"
 import Register from "./Components/Forms/Register.jsx"
@@ -16,7 +19,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false)
   const navigate = useNavigate();
   const authPage = useLocation()
-  const isAuthPage = ["/login", "/register", "/email-verify", "/jobseeker-dashboard", "/employer-dashboard"].includes(authPage.pathname)
+  const isAuthPage = ["/login", "/register", "/email-verify", "/jobseeker-dashboard","/admin", "/employer-dashboard"].includes(authPage.pathname)
  
   useEffect(() => {
     const savedDarkMode = localStorage.getItem("darkMode");
@@ -44,6 +47,9 @@ function App() {
         {!isAuthPage && <Navbar isEmployer={isEmployer} darkMode={darkMode} setDarkMode={setDarkMode} isLoggedIn={isLoggedIn} />}
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<About/>}/>
+          <Route path="/contact" element={<Contact/>}/>
+          <Route path="/admin" element={<Admin/>}/>
           <Route path="/jobseeker-dashboard" element={isLoggedIn ? <JobSeekerDashboard setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/" replace />} />
           <Route path="/employer-dashboard" element={isLoggedIn ? <EmployerDashboard setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/" replace />} />
           <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
