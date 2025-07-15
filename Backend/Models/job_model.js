@@ -13,12 +13,12 @@ const jobSchema = new mongoose.Schema(
     },
     company: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
     },
     location: {
       type: String,
-      required : true,
+      required: true,
     },
     salary: {
       min_salary: {
@@ -45,8 +45,8 @@ const jobSchema = new mongoose.Schema(
       default: "Entry",
     },
     skillsRequired: {
-      type: [String],
-      default: [],
+      type: Array,
+      required: true,
     },
     openings: {
       type: Number,
