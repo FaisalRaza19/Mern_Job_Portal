@@ -316,7 +316,6 @@ export const update_skills_resume = async ({ skills, resumeFile }) => {
         return data
     } catch (error) {
         console.error("Update failed:", error.message);
-        alert(error.message);
     }
 };
 

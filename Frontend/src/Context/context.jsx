@@ -4,6 +4,7 @@ import {
     register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT,
     editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
 } from "./Api/User/userAuth";
+import { postJob } from "./Api/User/Jobs.js";
 
 export const Context = createContext();
 
@@ -55,9 +56,13 @@ export const ContextApi = ({ children }) => {
         register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,
         verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
     };
+    const Jobs = { postJob }
     const userImage = { image, setImage };
     return (
-        <Context.Provider value={{ userAuth, userData, setUserData, isEmployer, setIsEmployer, userImage, verifyUser, userProfile }}>
+        <Context.Provider value={{
+            userAuth, userData, setUserData, isEmployer, setIsEmployer,
+            userImage, verifyUser, userProfile, Jobs
+        }}>
             {children}
         </Context.Provider>
     )

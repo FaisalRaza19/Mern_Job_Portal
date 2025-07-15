@@ -14,3 +14,11 @@ export const userAuth = {
     update_edu_exp : `http://localhost:${port}/user/update-edu-exp`,
     update_skills_resume : `http://localhost:${port}/user/update-skills-resume`,
 }
+
+export const job = {
+    postJob : `http://localhost:${port}/jobs/postJob`,
+    editJob : `http://localhost:${port}/jobs/editJob`,
+    delJob : `http://localhost:${port}/jobs/delJob`,
+    getJob : `http://localhost:${port}/jobs/getJob/jobId=:jobId`,
+    getAllJob : `http://localhost:${port}/jobs/getAllJob`
+}

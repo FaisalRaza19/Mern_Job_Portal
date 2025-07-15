@@ -17,7 +17,7 @@ const postJob = async (req, res) => {
         }
 
         // get the data from req.body
-        const { title, description, location, salary, employmentType, experienceLevel, skillsRequired, openings, applicationDeadline, isRemote } = req.body
+        const { title, description, location, salary, employmentType, experienceLevel,Requirements,skillsRequired, openings, applicationDeadline, isRemote } = req.body
         const { min_salary, max_salary, currency } = salary || {}
 
         // validate job data
@@ -29,6 +29,7 @@ const postJob = async (req, res) => {
         // create the job and push it in db
         const job = await Job.create({
             title,
+            Requirements,
             description,
             company: user._id,
             location: isRemote === true ? null : location,

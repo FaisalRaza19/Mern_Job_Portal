@@ -44,6 +44,10 @@ const jobSchema = new mongoose.Schema(
       enum: ["Entry", "Mid", "Senior", "Lead"],
       default: "Entry",
     },
+    Requirements : {
+      type : String,
+      required : true,
+    },
     skillsRequired: {
       type: Array,
       required: true,

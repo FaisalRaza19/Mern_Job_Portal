@@ -1,14 +1,18 @@
-"use client"
-
 import { useState } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiEye, FiSave, FiSend } from "react-icons/fi"
+import CurrencyDropdown from "./currencyDropDown.jsx"
+import SelectSkills from "../shared/selectSkills.jsx"
 
-const PostJob = ()=>{
+const PostJob = () => {
   const [formData, setFormData] = useState({
     title: "",
     location: "",
-    salary: "",
+    salary: {
+      min_salary: "",
+      max_salary: "",
+      currency: "USD",
+    },
     category: "",
     experience: "",
     type: "Full-time",
@@ -19,7 +23,7 @@ const PostJob = ()=>{
 
   const [showPreview, setShowPreview] = useState(false)
 
-  const handleInputChange = (field,value) => {
+  const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -73,31 +77,52 @@ const PostJob = ()=>{
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Salary Range</label>
-                <input
-                  type="text"
-                  value={formData.salary}
-                  onChange={(e) => handleInputChange("salary", e.target.value)}
-                  placeholder="e.g. $80,000 - $120,000"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Salary Range
+                </label>
+
+                <div className="flex gap-2">
+                  {/* Currency */}
+                  <CurrencyDropdown
+                    value={formData.salary.currency || "USD"}
+                    onChange={(currencyCode) =>
+                      handleInputChange("salary", {
+                        ...formData.salary,
+                        currency: currencyCode,
+                      })
+                    }
+                  />
+
+                  {/* Min Salary */}
+                  <input
+                    type="number"
+                    value={formData.salary?.min_salary || ""}
+                    onChange={(e) =>
+                      handleInputChange("salary", {
+                        ...formData.salary,
+                        min_salary: Number(e.target.value),
+                      })
+                    }
+                    placeholder="Min"
+                    className="w-1/3 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+
+                  {/* Max Salary */}
+                  <input
+                    type="number"
+                    value={formData.salary?.max_salary || ""}
+                    onChange={(e) =>
+                      handleInputChange("salary", {
+                        ...formData.salary,
+                        max_salary: Number(e.target.value),
+                      })
+                    }
+                    placeholder="Max"
+                    className="w-1/3 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category *</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => handleInputChange("category", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  <option value="engineering">Engineering</option>
-                  <option value="design">Design</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="sales">Sales</option>
-                  <option value="hr">Human Resources</option>
-                </select>
-              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Experience Level *
@@ -166,20 +191,8 @@ const PostJob = ()=>{
               />
             </div>
 
-            {/* Benefits */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Benefits & Perks
-              </label>
-              <textarea
-                rows={3}
-                value={formData.benefits}
-                onChange={(e) => handleInputChange("benefits", e.target.value)}
-                placeholder="Health insurance, flexible hours, remote work, etc..."
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
-              />
-            </div>
-
+            {/* skills required  */}
+            <SelectSkills defaultSkills={[]} />
             {/* Action Buttons */}
             <div className="flex space-x-4">
               <button

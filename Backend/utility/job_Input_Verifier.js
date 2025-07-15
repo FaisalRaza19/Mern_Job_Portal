@@ -6,6 +6,10 @@ export const validateJobPostData = (data) => {
         errors.push("Job title is required and must be at least 3 characters long.");
     }
 
+    if (!data.Requirements || typeof data.Requirements !== "string" || data.Requirements.trim().length < 10) {
+        errors.push("Requirements is required and must be at least 10 characters long.");
+    }
+
     if (!data.description || typeof data.description !== "string" || data.description.trim().length < 20) {
         errors.push("Job description is required and must be at least 20 characters long.");
     }
