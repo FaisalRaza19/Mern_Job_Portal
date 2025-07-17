@@ -71,7 +71,7 @@ const editJob = async (req, res) => {
         }
 
         // get the data from req.body
-        const { jobId, title, description, location, salary, employmentType, experienceLevel, skillsRequired, openings, applicationDeadline, isRemote } = req.body
+        const { jobId, title, description, location, salary, employmentType, experienceLevel, skillsRequired, openings, applicationDeadline, isRemote,status } = req.body
         const { min_salary, max_salary, currency } = salary || {}
 
         // find the job is exist
@@ -99,6 +99,7 @@ const editJob = async (req, res) => {
             job.openings = openings;
             job.applicationDeadline = applicationDeadline;
             job.isRemote = isRemote;
+            job.status = status
         }
         await job.save()
 
@@ -172,7 +173,7 @@ const getAllJobs = async (req, res) => {
         const job = await Job.find({company :user.id}).sort({createdAt : -1})
 
         if (!job || job.length === 0) {
-            return res.status(404).json({ statusCode: 404, message: "No jobs found for this company." });
+            return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
         }
 
         return res.status(200).json({ statusCode: 200, message: "all Job get successfully", data: job })

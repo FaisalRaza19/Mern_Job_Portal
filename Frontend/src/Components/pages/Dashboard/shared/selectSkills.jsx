@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { fetchSuggestedSkills } from "../../../../temp/suggestedSkilss.js"
-import {FiPlus, FiX, FiLoader,} from "react-icons/fi"
+import { FiPlus, FiX, FiLoader, } from "react-icons/fi"
 import DashboardCard from "./dashboardCard.jsx"
 
-const selectSkills = ({bio,userSkills}) => {
+const selectSkills = ({ bio, userSkills, setUserSkills }) => {
     const [skills, setSkills] = useState(userSkills || []);
     const [newSkill, setNewSkill] = useState("");
     const [suggestedSkills, setSuggestedSkills] = useState([]);
@@ -32,7 +32,9 @@ const selectSkills = ({bio,userSkills}) => {
 
     const handleAddSkill = () => {
         if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-            setSkills([...skills, newSkill.trim()])
+            const updated = [...skills, newSkill.trim()];
+            setSkills(updated);
+            setUserSkills(updated);
             setNewSkill("")
             setShowAddSkill(false)
         }

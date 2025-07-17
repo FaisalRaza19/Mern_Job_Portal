@@ -1,58 +1,43 @@
-"use client"
-
-import { useState } from "react"
+import React, { useContext, useState, useEffect } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
-import { FiSearch, FiEdit, FiTrash2, FiEye, FiUsers, FiCalendar, FiMoreVertical } from "react-icons/fi"
+import { FiSearch, FiEdit, FiTrash2, FiEye, FiUsers, FiCalendar, FiMoreVertical, FiLoader } from "react-icons/fi"
+import JobPreviewModal from "./jobPreview.jsx"
+import JobEditFormModal from "./editJobs.jsx"
+import { Context } from "../../../../Context/context.jsx"
 
-const mockJobs = [
-  {
-    id: "1",
-    title: "Frontend Developer",
-    location: "San Francisco, CA",
-    postedOn: "2024-01-15",
-    totalApplicants: 45,
-    status: "Active",
-    salary: "$80,000 - $120,000",
-    type: "Full-time",
-  },
-  {
-    id: "2",
-    title: "UI/UX Designer",
-    location: "New York, NY",
-    postedOn: "2024-01-14",
-    totalApplicants: 32,
-    status: "Active",
-    salary: "$70,000 - $100,000",
-    type: "Full-time",
-  },
-  {
-    id: "3",
-    title: "Backend Developer",
-    location: "Remote",
-    postedOn: "2024-01-13",
-    totalApplicants: 28,
-    status: "Paused",
-    salary: "$90,000 - $130,000",
-    type: "Contract",
-  },
-  {
-    id: "4",
-    title: "Product Manager",
-    location: "Austin, TX",
-    postedOn: "2024-01-12",
-    totalApplicants: 0,
-    status: "Draft",
-    salary: "$100,000 - $150,000",
-    type: "Full-time",
-  },
-]
 
-const ManageJobs = ()=>{
-  const [jobs, setJobs] = useState(mockJobs)
+const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
+  const { Jobs } = useContext(Context)
+  const { getAllJobs, delJob } = Jobs
+  const [jobs, setJobs] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [showDeleteModal, setShowDeleteModal] = useState(null)
   const [showActionMenu, setShowActionMenu] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPreviewModal, setShowPreviewModal] = useState(null)
+  const [showEditModal, setShowEditModal] = useState(null)
+
+  // get all jobs of user
+  const JobsData = async () => {
+    try {
+      setIsLoading(true)
+      const data = await getAllJobs()
+      const allJobs = data?.data || [];
+      const activeJobs = allJobs.filter((e) => e.status === "Active").length
+      setActiveJobs(activeJobs)
+      console.log(data)
+      setJobs(data.data)
+    } catch (error) {
+      console.log("Error of get all jobs of user", error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    JobsData()
+  }, [setActiveJobs])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -75,21 +60,35 @@ const ManageJobs = ()=>{
     return matchesSearch && matchesStatus
   })
 
-  const handleDeleteJob = (jobId) => {
-    setJobs(jobs.filter((job) => job.id !== jobId))
-    setShowDeleteModal(null)
+  const handleDeleteJob = async (jobId) => {
+    try {
+      setIsLoading(true)
+      const data = await delJob(jobId);
+      setJobs(jobs.filter((job) => job._id !== jobId))
+      setShowDeleteModal(null)
+    } catch (error) {
+      console.log("Error to del the job", error.message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleStatusChange = (jobId,newStatus) => {
-    setJobs(jobs.map((job) => (job.id === jobId ? { ...job, status: newStatus } : job)))
+  const handleStatusChange = (jobId, newStatus) => {
+    setJobs(jobs.map((job) => (job._id === jobId ? { ...job, status: newStatus } : job)))
     setShowActionMenu(null)
   }
 
+  const jobToPreview = showPreviewModal ? jobs.find((job) => job._id === showPreviewModal) : null
+  const jobToEdit = showEditModal ? jobs.find((job) => job._id === showEditModal) : null
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Manage Jobs</h1>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button
+          onClick={() => setActiveTab("post-job")}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto"
+        >
           Post New Job
         </button>
       </div>
@@ -107,141 +106,197 @@ const ManageJobs = ()=>{
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="all">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Draft">Draft</option>
-            <option value="Paused">Paused</option>
-            <option value="Closed">Closed</option>
-          </select>
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full md:w-[180px] pr-8"
+            >
+              <option value="all">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Draft">Draft</option>
+              <option value="Paused">Paused</option>
+              <option value="Closed">Closed</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
+          </div>
         </div>
       </DashboardCard>
 
       {/* Jobs Table */}
       <DashboardCard>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Job Title</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Location</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Posted On</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Applicants</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Status</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Actions</th>
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Job Title
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Location
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Posted On
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Applicants
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
-            <tbody>
-              {filteredJobs.map((job) => (
-                <tr
-                  key={job.id}
-                  className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                >
-                  <td className="py-4 px-4">
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-white">{job.title}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {job.salary} • {job.type}
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {isLoading ? (
+                <tr>
+                  <td colSpan="6" className="py-8 text-center">
+                    <FiLoader className="animate-spin h-8 w-8 text-blue-500 mx-auto" />
+                    <p className="mt-2 text-gray-500 dark:text-gray-400">Loading jobs...</p>
+                  </td>
+                </tr>
+              ) : filteredJobs.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="py-8 text-center">
+                    <p className="text-gray-500 dark:text-gray-400">No jobs found matching your criteria.</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredJobs.map((job) => (
+                  <tr key={job._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">{job.title}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          {job.salary.currency + " " + job.salary.min_salary + "-" + job.salary.max_salary} •{" "}
+                          {job.employmentType}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="text-gray-600 dark:text-gray-400">{job.location}</div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-400">
-                      <FiCalendar className="w-4 h-4" />
-                      <span>{new Date(job.postedOn).toLocaleDateString()}</span>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center space-x-1">
-                      <FiUsers className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium text-gray-900 dark:text-white">{job.totalApplicants}</span>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
-                      {job.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center space-x-2">
-                      <button title="View Details" className="p-1 text-gray-500 hover:text-blue-600 transition-colors">
-                        <FiEye className="w-4 h-4" />
-                      </button>
-                      <button title="Edit Job" className="p-1 text-gray-500 hover:text-green-600 transition-colors">
-                        <FiEdit className="w-4 h-4" />
-                      </button>
-                      <button
-                        title="Delete Job"
-                        onClick={() => setShowDeleteModal(job.id)}
-                        className="p-1 text-gray-500 hover:text-red-600 transition-colors"
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{job.isRemote === true ? "Remote" : job.location}</div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
+                        <FiCalendar className="w-4 h-4" />
+                        <span>{new Date(job.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-1 text-sm">
+                        <FiUsers className="w-4 h-4 text-gray-500" />
+                        <span className="font-medium text-gray-900 dark:text-white">{job.totalApplicants || 0}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(job.status)}`}
                       >
-                        <FiTrash2 className="w-4 h-4" />
-                      </button>
-                      <div className="relative">
+                        {job.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => setShowActionMenu(showActionMenu === job.id ? null : job.id)}
-                          className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                          className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 transition-colors"
+                          onClick={() => setShowPreviewModal(job._id)}
+                          title="View Details"
                         >
-                          <FiMoreVertical className="w-4 h-4" />
+                          <FiEye className="w-4 h-4" />
+                          <span className="sr-only">View Details</span>
                         </button>
-                        {showActionMenu === job.id && (
-                          <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
-                            <div className="p-1">
+                        <button
+                          className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-green-600 transition-colors"
+                          onClick={() => setShowEditModal(job._id)}
+                          title="Edit Job"
+                        >
+                          <FiEdit className="w-4 h-4" />
+                          <span className="sr-only">Edit Job</span>
+                        </button>
+                        <button
+                          className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-600 transition-colors"
+                          onClick={() => setShowDeleteModal(job._id)}
+                          title="Delete Job"
+                        >
+                          <FiTrash2 className="w-4 h-4" />
+                          <span className="sr-only">Delete Job</span>
+                        </button>
+                        <div className="relative">
+                          <button
+                            className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                            onClick={() => setShowActionMenu(showActionMenu === job._id ? null : job._id)}
+                            title="More Actions"
+                          >
+                            <FiMoreVertical className="w-4 h-4" />
+                            <span className="sr-only">More Actions</span>
+                          </button>
+                          {showActionMenu === job._id && (
+                            <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10 py-1">
                               {job.status !== "Active" && (
                                 <button
-                                  onClick={() => handleStatusChange(job.id, "Active")}
-                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                  onClick={() => handleStatusChange(job._id, "Active")}
+                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
                                 >
                                   Activate
                                 </button>
                               )}
                               {job.status !== "Paused" && (
                                 <button
-                                  onClick={() => handleStatusChange(job.id, "Paused")}
-                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                  onClick={() => handleStatusChange(job._id, "Paused")}
+                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
                                 >
                                   Pause
                                 </button>
                               )}
                               {job.status !== "Closed" && (
                                 <button
-                                  onClick={() => handleStatusChange(job.id, "Closed")}
-                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                  onClick={() => handleStatusChange(job._id, "Closed")}
+                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
                                 >
                                   Close
                                 </button>
                               )}
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-
-        {filteredJobs.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">No jobs found matching your criteria.</p>
-          </div>
-        )}
       </DashboardCard>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+      {!!showDeleteModal && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-xl animate-fade-in-up">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Delete Job Posting</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Are you sure you want to delete this job posting? This action cannot be undone.
@@ -257,12 +312,18 @@ const ManageJobs = ()=>{
                 onClick={() => handleDeleteJob(showDeleteModal)}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                Delete
+                {isLoading ? <FiLoader className="animate-spin h-8 w-8 text-blue-500 mx-auto" /> : "Delete"}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Job Preview Modal */}
+      {jobToPreview && <JobPreviewModal job={jobToPreview} onClose={() => setShowPreviewModal(null)} />}
+
+      {/* Job Edit Form Modal */}
+      {jobToEdit && <JobEditFormModal job={jobToEdit} onClose={() => setShowEditModal(null)} />}
     </div>
   )
 }

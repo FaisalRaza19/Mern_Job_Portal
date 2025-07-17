@@ -18,7 +18,6 @@ const jobSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: true,
     },
     salary: {
       min_salary: {
@@ -83,8 +82,8 @@ const jobSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["Open", "Closed"],
-      default: "Open",
+      enum: ["Active", "Closed", "Pause"],
+      default: "Active",
     },
   },
   {

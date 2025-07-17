@@ -3,7 +3,7 @@ import { Context } from "../../../../Context/context.jsx"
 import { FiBell, FiSun, FiMoon, FiUser, FiSettings, FiLogOut, FiMenu } from "react-icons/fi"
 import { useNavigate } from "react-router-dom";
 
-const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab }) => {
+const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab, isEmployer }) => {
   const { userAuth, userData, userImage, verifyUser } = useContext(Context);
   const { isVerify, isLoggedIn } = verifyUser
   const { image } = userImage;
@@ -105,12 +105,14 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab }) =
             {showProfile && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                 <div className="p-2">
-                  <button onClick={() => activeTab("profile")}
-                    className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <FiUser className="w-4 h-4" />
-                    <span>Profile</span>
-                  </button>
-                  <button onClick={() => activeTab("setting")}
+                  {!isEmployer &&
+                    <button onClick={() => activeTab("profile")}
+                      className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                      <FiUser className="w-4 h-4" />
+                      <span>Profile</span>
+                    </button>
+                  }
+                  <button onClick={() => { (isEmployer ? activeTab("settings") : activeTab("setting")),setShowProfile(false) }}
                     className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <FiSettings className="w-4 h-4" />
                     <span>Settings</span>

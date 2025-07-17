@@ -1,17 +1,14 @@
-"use client"
-
-import { useState } from "react"
-// import { useAuth } from "../../contexts/AuthContext"
+import { useState,useContext } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
-// FiBuilding
 import { FiBriefcase, FiUsers, FiCalendar, FiTrendingUp, FiEdit} from "react-icons/fi"
+import { Context } from "../../../../Context/context.jsx";
 
-const EmployerOverview = ()=>{
-  const { user } = useState(null)
-  const [showEditModal, setShowEditModal] = useState(false)
+const EmployerOverview = ({setActiveTab,activeJobs})=>{
+  const { userData } = useContext(Context);
+  const user = userData;
 
   const stats = [
-    { label: "Active Jobs", value: "8", icon: FiBriefcase, color: "text-blue-600" },
+    { label: "Active Jobs", value: activeJobs, icon: FiBriefcase, color: "text-blue-600" },
     { label: "Total Applications", value: "156", icon: FiUsers, color: "text-green-600" },
     { label: "Interviews Scheduled", value: "12", icon: FiCalendar, color: "text-purple-600" },
     { label: "Hires This Month", value: "3", icon: FiTrendingUp, color: "text-orange-600" },
@@ -27,7 +24,7 @@ const EmployerOverview = ()=>{
     <div className="space-y-6">
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
-        <h1 className="text-2xl font-bold mb-2">Welcome back, {user?.name}!</h1>
+        <h1 className="text-2xl font-bold mb-2">Welcome back, {user?.companyInfo?.companyName || ""}!</h1>
         <p className="opacity-90">Manage your job postings and find the best candidates.</p>
       </div>
 
@@ -55,7 +52,7 @@ const EmployerOverview = ()=>{
           title="Company Profile"
           action={
             <button
-              onClick={() => setShowEditModal(true)}
+              onClick={() => setActiveTab("settings")}
               className="flex items-center space-x-2 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <FiEdit className="w-4 h-4" />
@@ -68,8 +65,8 @@ const EmployerOverview = ()=>{
               <FiEdit className="w-8 h-8 text-blue-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{user?.name}</h3>
-              <p className="text-gray-600 dark:text-gray-400">Technology Company</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{user?.companyInfo?.companyName || ""}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{user?.companyInfo?.companyType || "Technology Company"}</p>
               <div className="mt-2">
                 <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-xs rounded-full">
                   Verified Employer
@@ -77,7 +74,7 @@ const EmployerOverview = ()=>{
               </div>
               <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                 <p>San Francisco, CA</p>
-                <p>Founded 2020 • 50-100 employees</p>
+                <p>{user?.companyInfo?.companySize + " Employes" || "0 Employes"}</p>
               </div>
             </div>
           </div>
@@ -142,56 +139,6 @@ const EmployerOverview = ()=>{
           View All Applications
         </button>
       </DashboardCard>
-
-      {/* Edit Company Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Edit Company Profile</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
-                <input
-                  type="text"
-                  defaultValue={user?.name}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Industry</label>
-                <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                  <option>Technology</option>
-                  <option>Healthcare</option>
-                  <option>Finance</option>
-                  <option>Education</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
-                <input
-                  type="text"
-                  defaultValue="San Francisco, CA"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-            <div className="flex space-x-3 mt-6">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

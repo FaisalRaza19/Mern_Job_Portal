@@ -22,15 +22,16 @@ const EmployerDashboard = ({setIsLoggedIn})=>{
   const [activeTab, setActiveTab] = useState("overview")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [activeJobs,setActiveJobs] = useState(0)
 
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
-        return <EmployerOverview />
+        return <EmployerOverview setActiveTab={setActiveTab} activeJobs={activeJobs}/>
       case "post-job":
         return <PostJob />
       case "manage-jobs":
-        return <ManageJobs />
+        return <ManageJobs setActiveTab={setActiveTab} setActiveJobs={setActiveJobs}/>
       case "applicants":
         return <ApplicantManagement />
       case "messages":
@@ -72,7 +73,7 @@ const EmployerDashboard = ({setIsLoggedIn})=>{
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Topbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} setIsLoggedIn={setIsLoggedIn} />
+        <Topbar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} notifications={mockNotifications} activeTab={setActiveTab} isEmployer={true} setIsLoggedIn={setIsLoggedIn} />
 
         <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>

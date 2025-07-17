@@ -124,7 +124,7 @@ const JobSeekerProfile = () => {
 
 
   // skills and resume 
-  const [skills,setSkills] = useState(user?.jobSeekerInfo?.skills || [])
+  const [skills, setSkills] = useState(user?.jobSeekerInfo?.skills || [])
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeUrl, setResumeUrl] = useState(user?.jobSeekerInfo?.resumeUrl?.resume_Url || "");
   const [showPreview, setShowPreview] = useState(false);
@@ -143,6 +143,7 @@ const JobSeekerProfile = () => {
     setLoading(true)
     try {
       const data = await update_skills_resume({ skills, resumeFile })
+      console.log(data)
       setResumeUrl(data.data.resumeUrl)
       setSkills(data.data.Skills)
     } catch (error) {
@@ -482,7 +483,7 @@ const JobSeekerProfile = () => {
       {/* Skills Management */}
       <form action="" onSubmit={handle_resume_skills}>
         <div className="grid gap-4">
-          <SelectSkills bio = {userInfo?.bio || ""} userSkills={skills}/>
+          <SelectSkills bio={userInfo?.bio || ""} userSkills={skills} setUserSkills={setSkills} />
 
           <DashboardCard title="Resume Management">
             <div className="space-y-4">
