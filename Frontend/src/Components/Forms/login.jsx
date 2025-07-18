@@ -49,7 +49,10 @@ const Login = ({ setIsLoggedIn }) => {
     if (!validateForm()) return
     setIsLoading(true)
     try {
-      const data = await Login({ formData, navigate, setIsLoggedIn })
+      const data = await Login({ formData, navigate})
+      if(data.statusCode === 200){
+        setIsLoggedIn(true)
+      }
       if (data.data.role === "employer") {
         setIsEmployer(true)
       }

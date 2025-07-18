@@ -59,7 +59,7 @@ export const editJob = async ({ updatedJob }) => {
                 'Content-Type': 'application/json',
                 "Authorization": token,
             },
-            body : JSON.stringify(updatedJob),
+            body: JSON.stringify(updatedJob),
             credentials: "include"
         });
 
@@ -75,7 +75,7 @@ export const editJob = async ({ updatedJob }) => {
 }
 
 // delete job 
-export const delJob = async(jobId)=>{
+export const delJob = async (jobId) => {
     try {
         const token = localStorage.getItem("user_token")
         const response = await fetch(job.delJob, {
@@ -84,7 +84,7 @@ export const delJob = async(jobId)=>{
                 'Content-Type': 'application/json',
                 "Authorization": token,
             },
-            body : JSON.stringify({jobId}),
+            body: JSON.stringify({ jobId }),
             credentials: "include"
         });
 
@@ -98,3 +98,26 @@ export const delJob = async(jobId)=>{
         return error.message
     }
 }
+
+// all jobs present in db
+export const allJob = async () => {
+    try {
+        const response = await fetch(job.allJob, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails };
+        }
+        const data = await response.json();
+        return data
+    } catch (error) {
+        return error.message
+    }
+}
+

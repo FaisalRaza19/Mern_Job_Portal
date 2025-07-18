@@ -17,7 +17,7 @@ const postJob = async (req, res) => {
         }
 
         // get the data from req.body
-        const { title, description, location, salary, employmentType, experienceLevel,Requirements,skillsRequired, openings, applicationDeadline, isRemote } = req.body
+        const { title, description, location, salary, employmentType, experienceLevel, Requirements, skillsRequired, openings, applicationDeadline, isRemote } = req.body
         const { min_salary, max_salary, currency } = salary || {}
 
         // validate job data
@@ -71,7 +71,7 @@ const editJob = async (req, res) => {
         }
 
         // get the data from req.body
-        const { jobId, title, description, location, salary, employmentType, experienceLevel, skillsRequired, openings, applicationDeadline, isRemote,status } = req.body
+        const { jobId, title, description, location, salary, employmentType, experienceLevel, skillsRequired, openings, applicationDeadline, isRemote, status } = req.body
         const { min_salary, max_salary, currency } = salary || {}
 
         // find the job is exist
@@ -155,7 +155,7 @@ const getJob = async (req, res) => {
     }
 }
 
-// get all job of user post
+// get all job of user post token required
 const getAllJobs = async (req, res) => {
     try {
         const userId = req.user?._id;
@@ -170,7 +170,7 @@ const getAllJobs = async (req, res) => {
         }
 
         // find the job is exist
-        const job = await Job.find({company :user.id}).sort({createdAt : -1})
+        const job = await Job.find({ company: user.id }).sort({ createdAt: -1 })
 
         if (!job || job.length === 0) {
             return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
@@ -182,4 +182,17 @@ const getAllJobs = async (req, res) => {
     }
 }
 
-export { postJob, editJob, deleteJob, getJob,getAllJobs }
+const allJob = async (req, res) => {
+    try {
+        const job = await Job.find()
+
+        if (!job || job.length === 0) {
+            return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
+        }
+
+        return res.status(200).json({ statusCode: 200, message: "all Job get successfully", data: job })
+    } catch (error) {
+        return res.status(500).json({ statusCode: 500, message: "Something went wrong to get the job", error: error.message })
+    }
+}
+export { postJob, editJob, deleteJob, getJob, getAllJobs,allJob }

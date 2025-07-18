@@ -87,7 +87,10 @@ const EmailVerify = ({ setIsLogedIn }) => {
           localStorage.removeItem("email");
         }
       } else {
-        const data = await verify_register({ code, navigate, setIsLogedIn })
+        const data = await verify_register({ code, navigate })
+        if (data.statusCode === 200) {
+          setIsLogedIn(true)
+        }
         if (data.data.role === "employer") {
           setIsEmployer(true);
         } else {

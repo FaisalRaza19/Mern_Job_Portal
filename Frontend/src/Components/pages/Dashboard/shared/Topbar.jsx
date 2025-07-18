@@ -24,7 +24,11 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab, isE
   // logout the user
   const logOut = async () => {
     try {
-      const data = await LogOut({ navigate, setIsLoggedIn });
+      const data = await LogOut({ navigate, });
+      if (data.statusCode === 200) {
+        setIsLoggedIn(false)
+      }
+
     } catch (error) {
       console.log("logOut", error.message)
     }
@@ -112,7 +116,7 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab, isE
                       <span>Profile</span>
                     </button>
                   }
-                  <button onClick={() => { (isEmployer ? activeTab("settings") : activeTab("setting")),setShowProfile(false) }}
+                  <button onClick={() => { (isEmployer ? activeTab("settings") : activeTab("setting")), setShowProfile(false) }}
                     className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                     <FiSettings className="w-4 h-4" />
                     <span>Settings</span>

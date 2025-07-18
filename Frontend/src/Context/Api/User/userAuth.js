@@ -23,7 +23,7 @@ export const register = async (formData, navigate) => {
 }
 
 // Updated CodeVerify Function
-export const verify_register = async ({ code, navigate, setIsLogedIn }) => {
+export const verify_register = async ({ code, navigate}) => {
     try {
         const response = await fetch(userAuth.verify_register, {
             method: "POST",
@@ -44,7 +44,6 @@ export const verify_register = async ({ code, navigate, setIsLogedIn }) => {
         } else {
             navigate("/employer-dashboard");
         }
-        setIsLogedIn(true);
         return data;
     } catch (error) {
         return error.message;
@@ -73,7 +72,7 @@ export const ResendCode = async () => {
 };
 
 // login user
-export const Login = async ({ formData, navigate, setIsLoggedIn }) => {
+export const Login = async ({ formData, navigate,}) => {
     try {
         const response = await fetch(userAuth.login, {
             method: "POST",
@@ -88,7 +87,6 @@ export const Login = async ({ formData, navigate, setIsLoggedIn }) => {
 
         const data = await response.json();
         localStorage.setItem("user_token", data.accesstoken)
-        setIsLoggedIn(true);
         if (data.data.role === "jobseeker") {
             navigate("/jobseeker-dashboard");
         } else {
@@ -102,7 +100,7 @@ export const Login = async ({ formData, navigate, setIsLoggedIn }) => {
 };
 
 // LogOut User
-export const LogOut = async ({ navigate, setIsLoggedIn }) => {
+export const LogOut = async ({ navigate}) => {
     try {
         const token = localStorage.getItem("user_token");
 
@@ -119,7 +117,6 @@ export const LogOut = async ({ navigate, setIsLoggedIn }) => {
             return { message: errorDetails.message };
         }
         const data = await response.json();
-        setIsLoggedIn(false);
         localStorage.removeItem("user_token");
         navigate("/login")
         return data;
