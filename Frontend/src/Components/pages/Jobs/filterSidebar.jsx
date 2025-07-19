@@ -1,5 +1,5 @@
 import React from "react"
-import {FaSearch,FaMapMarkerAlt,FaDollarSign,FaGraduationCap,FaTag,FaTimes,} from "react-icons/fa"
+import { FaSearch, FaMapMarkerAlt, FaDollarSign, FaGraduationCap, FaTag, FaTimes, } from "react-icons/fa"
 
 const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
   const handleInputChange = (e) => {
@@ -42,15 +42,14 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
         <div>
           <label className="block text-sm font-medium mb-2">Job Type</label>
           <div className="flex flex-wrap gap-2">
-            {["Full-time", "Part-time", "Contract", "Internship", "Remote"].map((type) => (
+            {["Full-Time", "Part-Time", "Contract", "Internship", "Freelance"].map((type) => (
               <button
                 key={type}
                 onClick={() => handleJobTypeChange(type)}
-                className={`px-3 py-1 rounded-full text-sm transition-all ${
-                  filters.jobType === type
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                }`}
+                className={`px-3 py-1 rounded-full text-sm transition-all ${filters.jobType === type
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                  }`}
               >
                 {type}
               </button>
@@ -58,24 +57,36 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
           </div>
         </div>
 
-        {/* Location */}
+        {/* Location & Remote */}
         <div>
-          <label htmlFor="location" className="block text-sm font-medium mb-2">
-            Location
-          </label>
+          <label htmlFor="location" className="block text-sm font-medium mb-2">Location</label>
           <div className="relative">
             <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               id="location"
               name="location"
-              placeholder="City, state, or zip"
+              placeholder="City,Country"
               value={filters.location}
-              onChange={handleInputChange}
+              onChange={(e) => onFilterChange({ ...filters, location: e.target.value })}
+              disabled={filters.isRemote}
               className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
             />
           </div>
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="isRemote"
+              name="isRemote"
+              checked={filters.isRemote}
+              onChange={(e) => onFilterChange({ ...filters, isRemote: e.target.checked })}
+              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="isRemote" className="text-sm">Remote only</label>
+          </div>
         </div>
+
+
 
         {/* Experience */}
         <div>

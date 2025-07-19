@@ -19,7 +19,7 @@ export const job = {
     postJob : `http://localhost:${port}/jobs/postJob`,
     editJob : `http://localhost:${port}/jobs/editJob`,
     delJob : `http://localhost:${port}/jobs/delJob`,
-    getJob : `http://localhost:${port}/jobs/getJob/jobId=:jobId`,
+    getJob : `http://localhost:${port}/jobs/getJob/jobId=`,
     getAllJob : `http://localhost:${port}/jobs/getAllJob`,
     allJob : `http://localhost:${port}/jobs/allJob`,
 }

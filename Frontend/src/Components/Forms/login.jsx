@@ -52,11 +52,11 @@ const Login = ({ setIsLoggedIn }) => {
       const data = await Login({ formData, navigate})
       if(data.statusCode === 200){
         setIsLoggedIn(true)
+        setUserData(data.data)
       }
       if (data.data.role === "employer") {
         setIsEmployer(true)
       }
-      setUserData(data.data)
     } catch (error) {
       console.log("Login ", error.message)
     } finally {

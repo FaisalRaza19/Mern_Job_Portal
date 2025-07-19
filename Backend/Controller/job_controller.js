@@ -142,7 +142,7 @@ const getJob = async (req, res) => {
         // find the job is exist
         const job = await Job.findById(jobId).populate({
             path: "company",
-            select: "companyInfo.companyName companyInfo.companyDescription companyInfo.companyType companyInfo.companyWeb"
+            select: "avatar companyInfo.companyName companyInfo.companyDescription companyInfo.companyType companyInfo.companyWeb"
         });
 
         if (!job) {
@@ -184,7 +184,10 @@ const getAllJobs = async (req, res) => {
 
 const allJob = async (req, res) => {
     try {
-        const job = await Job.find()
+        const job = await Job.find().populate({
+            path: "company",
+            select: "companyInfo.companyName companyInfo.companyDescription companyInfo.companyType companyInfo.companyWeb"
+        })
 
         if (!job || job.length === 0) {
             return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
@@ -195,4 +198,5 @@ const allJob = async (req, res) => {
         return res.status(500).json({ statusCode: 500, message: "Something went wrong to get the job", error: error.message })
     }
 }
-export { postJob, editJob, deleteJob, getJob, getAllJobs,allJob }
+
+export { postJob, editJob, deleteJob, getJob, getAllJobs, allJob }

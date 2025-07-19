@@ -48,6 +48,30 @@ export const getAllJobs = async () => {
     }
 }
 
+// get job through id
+export const getJobFromId = async ({ jobId }) => {
+    try {
+        const api = `${job.getJob}${jobId}`
+        const response = await fetch(api, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: "include"
+        });
+
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails };
+        }
+        const data = await response.json();
+        return data
+    } catch (error) {
+        return error.message
+    }
+}
+
 // edit the job 
 export const editJob = async ({ updatedJob }) => {
     try {

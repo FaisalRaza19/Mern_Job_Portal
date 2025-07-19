@@ -4,7 +4,7 @@ import { FiBell, FiSun, FiMoon, FiUser, FiSettings, FiLogOut, FiMenu } from "rea
 import { useNavigate } from "react-router-dom";
 
 const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab, isEmployer }) => {
-  const { userAuth, userData, userImage, verifyUser } = useContext(Context);
+  const { userAuth, userData, setUserData, userImage, verifyUser } = useContext(Context);
   const { isVerify, isLoggedIn } = verifyUser
   const { image } = userImage;
   const { LogOut } = userAuth;
@@ -27,6 +27,7 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab, isE
       const data = await LogOut({ navigate, });
       if (data.statusCode === 200) {
         setIsLoggedIn(false)
+        setUserData("")
       }
 
     } catch (error) {

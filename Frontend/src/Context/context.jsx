@@ -5,7 +5,7 @@ import {
     editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
 } from "./Api/User/userAuth";
 
-import { postJobs, getAllJobs, editJob, delJob, allJob } from "./Api/User/Jobs.js";
+import { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId } from "./Api/User/Jobs.js";
 
 export const Context = createContext();
 
@@ -16,8 +16,6 @@ export const ContextApi = ({ children }) => {
     const [isEmployer, setIsEmployer] = useState(false);
     const [isVerify, setIsVerify] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [allJobList, setAllJobList] = useState([]);
-    const [filteredJobs, setFilteredJobs] = useState([] || "");
 
     // verify jwt
     const verifyToken = async () => {
@@ -40,8 +38,10 @@ export const ContextApi = ({ children }) => {
     const fetchUser = async () => {
         try {
             const data = await getUser();
-            setUserData(data.data);
-            setIsLoggedIn(true);
+            if (data.statusCode === 200) {
+                setUserData(data.data);
+                setIsLoggedIn(true);
+            }
             if (data.data?.role === "employer") {
                 setIsEmployer(true);
             }
@@ -50,47 +50,13 @@ export const ContextApi = ({ children }) => {
         }
     };
 
-    // fetch all jobs and filter by skills
-    const fetchAndFilterJobs = async () => {
-        try {
-            const data = await allJob();
-            const jobs = data.data;
-            console.log(jobs)
-            setAllJobList(jobs);
-
-            // Filter jobs by skills if userData and skills are available
-            if (userData?.role === "jobseeker" || userData?.jobSeekerInfo?.skills?.length > 0) {
-                const userSkills = userData?.jobSeekerInfo?.skills?.map(skill => skill.toLowerCase());
-                console.log(userSkills)
-                const matchedJobs = jobs?.filter((e) => {
-                    e?.skillsRequired?.some((e) => {
-                        userSkills?.includes(e?.toLowerCase())
-                    })
-                })
-
-                console.log("Matched Jobs:", matchedJobs);
-                setFilteredJobs(matchedJobs);
-            }
-
-        } catch (error) {
-            console.log("Error getting all jobs:", error.message);
-        }
-    };
-
     // Sequentially run after fetching user
     useEffect(() => {
         verifyToken();
-        if (setIsLoggedIn) {
+        if (isLoggedIn === true) {
             fetchUser();
         }
-    }, []);
-
-    // Fetch jobs after userData is available
-    useEffect(() => {
-        if (userData) {
-            fetchAndFilterJobs();
-        }
-    }, [userData]);
+    }, [isLoggedIn]);
 
     const userProfile = { isEditProfile, setIsEditProfile };
     const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn };
@@ -98,13 +64,12 @@ export const ContextApi = ({ children }) => {
         register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,
         verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
     };
-    const Jobs = { postJobs, getAllJobs, editJob, delJob };
+    const Jobs = { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId };
     const userImage = { image, setImage };
 
     return (
         <Context.Provider value={{
             userAuth, userData, setUserData, isEmployer, setIsEmployer, userImage, verifyUser, userProfile, Jobs,
-            allJobList, filteredJobs
         }}>
             {children}
         </Context.Provider>

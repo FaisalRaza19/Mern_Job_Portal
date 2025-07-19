@@ -10,18 +10,18 @@ import HomePage from "./Components/pages/Home/HomePage.jsx";
 import Login from "./Components/Forms/login.jsx"
 import Register from "./Components/Forms/Register.jsx"
 import EmailVerify from "./Components/Forms/emailVerify.jsx"
-import { Routes, Route, useLocation, Navigate, useNavigate} from "react-router-dom"
+import { Routes, Route, useLocation, Navigate,} from "react-router-dom"
 import JobSeekerDashboard from "./Components/pages/Dashboard/JobSeeker/dashboard.jsx"
 import EmployerDashboard from "./Components/pages/Dashboard/employer/employerDashboard.jsx"
 import { Context } from "./Context/context.jsx";
 
 function App() {
-  const { isEmployer,verifyUser} = useContext(Context);
-  const {isLoggedIn,setIsLoggedIn} = verifyUser
+  const { isEmployer, verifyUser } = useContext(Context);
+  const { isLoggedIn, setIsLoggedIn } = verifyUser
   const [darkMode, setDarkMode] = useState(false)
   const authPage = useLocation()
-  const isAuthPage = ["/login", "/register", "/email-verify", "/jobseeker-dashboard","/admin", "/employer-dashboard"].includes(authPage.pathname)
- 
+  const isAuthPage = ["/login", "/register", "/email-verify", "/jobseeker-dashboard", "/admin", "/employer-dashboard"].includes(authPage.pathname)
+
   useEffect(() => {
     const savedDarkMode = localStorage.getItem("darkMode");
     if (savedDarkMode !== null) {
@@ -44,11 +44,11 @@ function App() {
         {!isAuthPage && <Navbar isEmployer={isEmployer} darkMode={darkMode} setDarkMode={setDarkMode} isLoggedIn={isLoggedIn} />}
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/jobs" element={<JobContent/>}/>
-          <Route path="/job/:jobId" element = {<JobDetails />}/>
-          <Route path="/about" element={<About/>}/>
-          <Route path="/contact" element={<Contact/>}/>
-          <Route path="/admin" element={<Admin/>}/>
+          <Route path="/jobs" element={<JobContent />} />
+          <Route path="/jobs/:jobId" element={<JobDetails />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/jobseeker-dashboard" element={isLoggedIn ? <JobSeekerDashboard setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/" replace />} />
           <Route path="/employer-dashboard" element={isLoggedIn ? <EmployerDashboard setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/" replace />} />
           <Route path="/register" element={<Register />} />
