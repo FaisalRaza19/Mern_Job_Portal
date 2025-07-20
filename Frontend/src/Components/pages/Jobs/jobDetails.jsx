@@ -226,6 +226,7 @@ const JobDetails = () => {
                             companyLogo={job?.company?.avatar?.avatar_Url}
                             onApplySuccess={() => setHasApplied(true)}
                             onBack={() => setShowApplyForm(false)}
+                            currency = {job?.salary?.currency || "USD"}
                         />
                     </div>
                 )}

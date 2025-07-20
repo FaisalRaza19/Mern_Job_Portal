@@ -77,8 +77,9 @@ const EmailVerify = ({ setIsLogedIn }) => {
       const code = otp.join("");
       if (isEditProfile) {
         const data = await verifyAndUpdateProfile({ code })
-        setUserData(data.data)
         if (data.statusCode === 200) {
+          setUserData(data.data)
+          setIsLogedIn(true)
           if (isEmployer) {
             navigate("/employer-dashboard")
           } else {

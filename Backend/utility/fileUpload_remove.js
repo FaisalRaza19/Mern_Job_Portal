@@ -11,12 +11,12 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_SECRET,
 });
 
-export const fileUploadOnCloudinary = async (filePath, folder,resourceType) => {
+export const fileUploadOnCloudinary = async (filePath, folder) => {
     try {
         if (!filePath) return null;
         const uploadFile = await cloudinary.uploader.upload(filePath, {
             folder: folder,
-            resource_type : resourceType,
+            resource_type : "auto",
             type : 'upload'
         });
 
@@ -28,9 +28,9 @@ export const fileUploadOnCloudinary = async (filePath, folder,resourceType) => {
     }
 };
 
-export const removeFileFromCloudinary = async (publicId,resourceType) => {
+export const removeFileFromCloudinary = async (publicId) => {
     try {
-        const result = await cloudinary.uploader.destroy(publicId,{resource_type : resourceType});
+        const result = await cloudinary.uploader.destroy(publicId,);
         if (result.result !== 'ok') {
             throw new Error(`Failed to delete image with publicId: ${publicId}`);
         }

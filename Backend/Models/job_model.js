@@ -43,9 +43,9 @@ const jobSchema = new mongoose.Schema(
       enum: ["Entry", "Mid", "Senior", "Lead"],
       default: "Entry",
     },
-    Requirements : {
-      type : String,
-      required : true,
+    Requirements: {
+      type: String,
+      required: true,
     },
     skillsRequired: {
       type: Array,
@@ -64,14 +64,26 @@ const jobSchema = new mongoose.Schema(
     },
     applicants: [
       {
-        user: {
+        User: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+          ref: "user",
+          required: true,
         },
-        resumeUrl: String,
+        resumeUrl: {
+          resume_Url: String,
+          resume_PublicId: String,
+          file_name: String,
+        },
         appliedAt: {
           type: Date,
           default: Date.now,
+        },
+        coverLetter: {
+          type: String,
+          required: true,
+        },
+        expectedSalary: {
+          type: Number,
         },
         status: {
           type: String,

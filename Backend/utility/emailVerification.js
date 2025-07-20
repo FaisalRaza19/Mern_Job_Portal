@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { verificationEmailHTML,changePasswordEmail} from "./emailHTML.js";
+import { verificationEmailHTML, changePasswordEmail, applicationStatusEmailHTML } from "./emailHTML.js";
 
 // generate verification code
 const generateCode = () => {
@@ -20,7 +20,7 @@ const sendEmail = async (email) => {
 
         // create verification code 
         const code = generateCode();
-        console.log("email code",code)
+        console.log("email code", code)
 
         // send email 
         await transporter.sendMail({
@@ -37,7 +37,7 @@ const sendEmail = async (email) => {
 }
 
 // email for change password
-const pas_Email = async (email,id) => {
+const pas_Email = async (email, id) => {
     try {
         // create transpoter
         const transporter = nodemailer.createTransport({
@@ -52,7 +52,7 @@ const pas_Email = async (email,id) => {
         console.log(link)
         // send email 
         await transporter.sendMail({
-            from: process.env.GMAIL_EMAIL,
+            from: `"JobPortal Pro" <${process.env.GMAIL_EMAIL}>`,
             to: email,
             subject: "Verify your email",
             html: changePasswordEmail(link),
@@ -64,7 +64,33 @@ const pas_Email = async (email,id) => {
     }
 }
 
-const verifyEmail = (userCode,emailCode)=>{
+// email for notify for application
+const application_Notification = async ({emailData}) => {
+    try {
+        // create transpoter
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_EMAIL,
+                pass: process.env.GMAIL_PASSWORD,
+            },
+        });
+
+        // send email 
+        await transporter.sendMail({
+            from: process.env.GMAIL_EMAIL,
+            to: emailData.email,
+            subject: `Your application for ${emailData.jobTitle} at ${emailData.companyName}`,
+            html: applicationStatusEmailHTML({emailData}),
+        })
+
+        return "";
+    } catch (error) {
+        return new Error("Failed to send application email");
+    }
+}
+
+const verifyEmail = (userCode, emailCode) => {
     if (!userCode || !emailCode) {
         throw new Error("Verification code is required.");
     }
@@ -74,4 +100,4 @@ const verifyEmail = (userCode,emailCode)=>{
     return true;
 }
 
-export {sendEmail,pas_Email,verifyEmail}
+export { sendEmail, pas_Email, verifyEmail, application_Notification }

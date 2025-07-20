@@ -1,5 +1,20 @@
 import mongoose from "mongoose";
 
+// appliedJobs
+const appliedJobs = {
+    jobId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Job",
+        required: true,
+    },
+    isSaved: {
+        type: Boolean
+    },
+    isApplied: {
+        type: Boolean
+    },
+}
+
 // social link schema
 const socialLinksSchema = {
     linkedin: String,
@@ -64,7 +79,9 @@ const jobSeekerInfoSchema = {
         resume_publicId: String,
         size: String,
     },
-    socialLinks: socialLinksSchema
+    socialLinks: socialLinksSchema,
+    appliedJobs: [appliedJobs],
+    savedJobs: [appliedJobs],
 }
 
 const userSchema = new mongoose.Schema(
