@@ -3,8 +3,10 @@ import { FaCloudUploadAlt, FaFileAlt, FaCheckCircle, FaTimesCircle, FaDollarSign
 import { FaX } from "react-icons/fa6";
 import { Context } from "../../../Context/context";
 
-const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onApplySuccess, onBack, currency, }) => {
-    const { userData } = useContext(Context);
+const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onBack, currency, }) => {
+    const { userData, Jobs, JobsAction } = useContext(Context);
+    const { setAppliedJobIds } = JobsAction
+    const { applyJob } = Jobs
     const existingResume = userData?.jobSeekerInfo?.resumeUrl || null;
 
     const [formData, setFormData] = useState({
@@ -50,23 +52,26 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onApplySucces
         setStatus(null);
         if (!validateForm()) return;
         setIsLoading(true);
-
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulated API call
-
-            console.log("Submitted Application:", {
+            const formdata = {
                 jobId,
                 expectedSalary: formData.expectedSalary,
                 currency,
                 coverLetter: formData.coverLetter,
-                resume: formData.resumeChanged
-                    ? formData.resume?.name
-                    : existingResume?.resume_Url,
-            });
-
-            setStatus("success");
-            onApplySuccess();
-
+                resume: formData.resumeChanged ? formData.resume : "",
+                existResume: existingResume?.resume_Url,
+            };
+            const res = await applyJob({ formdata });
+            console.log(res);
+            if (res.statusCode === 200) {
+                setAppliedJobIds((prev) => [...prev, jobId]);
+                setStatus("success");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setStatus("error");
+        } finally {
+            setIsLoading(false);
             setFormData({
                 expectedSalary: "",
                 coverLetter: "",
@@ -74,11 +79,6 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onApplySucces
                 resumeChanged: false,
             });
             setShowPreview(false);
-        } catch (error) {
-            console.error("Error:", error);
-            setStatus("error");
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -135,6 +135,7 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onApplySucces
                 </div>
 
                 {/* Resume Upload or Preview */}
+                {/* Resume Upload or Preview */}
                 <div>
                     <label className="block text-sm font-medium mb-2">
                         Resume <span className="text-red-500">*</span>
@@ -156,14 +157,19 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onApplySucces
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setFormData((prev) => ({ ...prev, resumeChanged: true }))}
+                                        onClick={() =>
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                resumeChanged: true,
+                                                resume: null,
+                                            }))
+                                        }
                                         className="text-sm text-yellow-600 hover:underline"
                                     >
-                                        Change
+                                        Change Resume
                                     </button>
                                 </div>
                             </div>
-
                             {showPreview && (
                                 <div className="mt-4">
                                     <iframe
@@ -175,23 +181,61 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onApplySucces
                         </>
                     ) : (
                         <>
-                            <div className="relative border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                <input
-                                    type="file"
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={(e) => handleResumeChange(e.target.files[0])}
-                                    className="absolute inset-0 opacity-0 cursor-pointer"
-                                />
-                                <FaCloudUploadAlt className="mx-auto text-3xl text-gray-400 dark:text-gray-500 mb-2" />
-                                <p className="text-sm">
-                                    {formData.resume
-                                        ? formData.resume.name
-                                        : "Click or drag your resume file here"}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    PDF, DOC, DOCX up to 5MB
-                                </p>
-                            </div>
+                            {formData.resume && (
+                                <div className="flex justify-between items-center bg-gray-100 dark:bg-gray-700/30 p-3 rounded-md mb-2">
+                                    <span className="text-sm truncate">{formData.resume.name}</span>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPreview((prev) => !prev)}
+                                            className="text-sm text-blue-600 hover:underline"
+                                        >
+                                            {showPreview ? "Hide Preview" : "Preview"}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    resume: null,
+                                                    resumeChanged: false,
+                                                }))
+                                            }
+                                            className="text-sm text-red-500 hover:underline"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {!formData.resume && (
+                                <div className="relative border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={(e) => handleResumeChange(e.target.files[0])}
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                    />
+                                    <FaCloudUploadAlt className="mx-auto text-3xl text-gray-400 dark:text-gray-500 mb-2" />
+                                    <p className="text-sm">
+                                        Click or drag your resume file here
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        PDF, DOC, DOCX up to 5MB
+                                    </p>
+                                </div>
+                            )}
+
+                            {showPreview && formData.resume && (
+                                <div className="mt-4">
+                                    <iframe
+                                        src={URL.createObjectURL(formData.resume)}
+                                        className="w-full h-[500px] border border-gray-300 dark:border-gray-600 rounded"
+                                    />
+                                </div>
+                            )}
+
                             {errors.resume && (
                                 <p className="text-red-500 text-sm mt-1">{errors.resume}</p>
                             )}

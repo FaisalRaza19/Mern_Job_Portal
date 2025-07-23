@@ -13,6 +13,10 @@ const appliedJobs = {
     isApplied: {
         type: Boolean
     },
+    date : {
+        type : Date,
+        default : Date.now()
+    }
 }
 
 // social link schema

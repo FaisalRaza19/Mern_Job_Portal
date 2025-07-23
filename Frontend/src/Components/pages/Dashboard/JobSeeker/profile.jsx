@@ -534,7 +534,7 @@ const JobSeekerProfile = () => {
 
             {/* Resume Preview Modal */}
             {showPreview && resumeUrl && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full relative">
                   <button
                     onClick={() => setShowPreview(false)}

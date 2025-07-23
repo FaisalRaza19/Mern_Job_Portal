@@ -8,7 +8,10 @@ import JobCard from "./jobCard.jsx";
 import { Context } from "../../../Context/context.jsx";
 
 const JobDetails = () => {
-    const { Jobs, userData } = useContext(Context);
+    const { Jobs, userData, JobsAction } = useContext(Context);
+    const { appliedJobIds } = JobsAction
+    const isApplied = appliedJobIds
+    const user = userData
     const { getJobFromId, allJob } = Jobs;
     const { jobId } = useParams();
     const navigate = useNavigate();
@@ -16,7 +19,6 @@ const JobDetails = () => {
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
     const [showApplyForm, setShowApplyForm] = useState(false);
-    const [hasApplied, setHasApplied] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState([]);
     const [suggestedSkills, setSuggestedSkills] = useState([]);
 
@@ -24,13 +26,14 @@ const JobDetails = () => {
         setLoading(true);
         setNotFound(false);
         setShowApplyForm(false);
-        setHasApplied(false);
+
         try {
             const data = await getJobFromId({ jobId });
-            if (data.statusCode === 400 || !data.data) {
-                setNotFound(true);
+            if (data.statusCode === 200) {
+                const jobData = data.data;
+                setJob(jobData);
             } else {
-                setJob(data.data);
+                setNotFound(true);
             }
         } catch (error) {
             console.error("Error fetching job:", error.message);
@@ -157,13 +160,24 @@ const JobDetails = () => {
                             {job?.company?.companyInfo?.companyName || ""}
                         </p>
                     </div>
-                    <button
-                        onClick={() => setShowApplyForm(true)}
-                        disabled={hasApplied}
-                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                    >
-                        {userData ? (hasApplied ? "Applied!" : "Apply Now") : <Link to="/login">Login</Link>}
-                    </button>
+                    {userData ? (
+                        <button disabled={isApplied}
+                            onClick={() => setShowApplyForm(true)}
+                            className={`mt-2 px-4 py-2 rounded-md text-white text-sm font-medium ${isApplied
+                                ? "bg-green-500 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-700"
+                                }`}
+                        >
+                            {isApplied ? "Applied!" : "Apply Now"}
+                        </button>
+                    ) : (
+                        <Link
+                            to="/login"
+                            className="mt-2 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium rounded-md"
+                        >
+                            Login to Apply
+                        </Link>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 text-sm text-gray-700 dark:text-gray-300">
@@ -224,9 +238,8 @@ const JobDetails = () => {
                             jobTitle={job?.title || ""}
                             companyName={job?.company?.companyInfo?.companyName || ""}
                             companyLogo={job?.company?.avatar?.avatar_Url}
-                            onApplySuccess={() => setHasApplied(true)}
                             onBack={() => setShowApplyForm(false)}
-                            currency = {job?.salary?.currency || "USD"}
+                            currency={job?.salary?.currency || "USD"}
                         />
                     </div>
                 )}
@@ -236,9 +249,25 @@ const JobDetails = () => {
             {suggestedJobs.length > 0 && (
                 <Section title="Suggested Jobs">
                     <div className="grid gap-4 m-5 md:grid-cols-2 lg:grid-cols-3">
-                        {suggestedJobs.map((job, index) => (
-                            <JobCard key={index} job={job} />
-                        ))}
+                        {suggestedJobs.map((job) => {
+                            const appliedInAppliedJobs = userData && user?.jobSeekerInfo?.appliedJobs?.some(
+                                (e) => e?.jobId === job?._id && e?.isApplied === true
+                            ) || false;
+
+                            const appliedInSavedJobs = userData && user?.jobSeekerInfo?.savedJobs?.some(
+                                (e) => e?.jobId === job?._id && e?.isApplied === true
+                            ) || false;
+
+                            const isApplied = appliedInAppliedJobs || appliedInSavedJobs;
+
+                            return (
+                                <JobCard
+                                    key={job._id}
+                                    job={job}
+                                    isApplied={isApplied}
+                                />
+                            );
+                        })}
                     </div>
                 </Section>
             )}

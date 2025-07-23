@@ -1,48 +1,42 @@
-"use client"
-
-import { useState } from "react"
+import React, { useContext, useState } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
-import { FiMapPin, FiCalendar, FiBookmark, FiTrash2 } from "react-icons/fi"
+import {
+  FiMapPin, FiCalendar, FiBookmark, FiTrash2, FiX, FiDollarSign, FiBriefcase, FiUsers, FiTrendingUp, FiClock, FiGlobe,
+} from "react-icons/fi"
+import { Link } from "react-router-dom"
+import { Context } from "../../../../Context/context.jsx"
 
-
-const mockSavedJobs = [
-  {
-    id: "1",
-    title: "Frontend Developer",
-    company: "TechCorp",
-    location: "San Francisco, CA",
-    dateSaved: "2024-01-15",
-    salary: "$80,000 - $120,000",
-    type: "Full-time",
-  },
-  {
-    id: "2",
-    title: "UI/UX Designer",
-    company: "DesignStudio",
-    location: "New York, NY",
-    dateSaved: "2024-01-14",
-    salary: "$70,000 - $100,000",
-    type: "Full-time",
-  },
-  {
-    id: "3",
-    title: "React Developer",
-    company: "StartupXYZ",
-    location: "Remote",
-    dateSaved: "2024-01-13",
-    salary: "$90,000 - $130,000",
-    type: "Contract",
-  },
-]
-
-const SavedJobs = ()=>{
-  const [savedJobs, setSavedJobs] = useState(mockSavedJobs)
+const SavedJobs = ({ jobs }) => {
+  const { Jobs, JobsAction } = useContext(Context)
+  const { setSavedJobIds, } = JobsAction;
+  const { saveJob } = Jobs
+  const [savedJobs, setSavedJobs] = useState(jobs || [])
   const [showConfirmModal, setShowConfirmModal] = useState(null)
+  const [previewJob, setPreviewJob] = useState(null)
 
-  const handleUnsaveJob = (jobId) => {
-    setSavedJobs(savedJobs.filter((job) => job.id !== jobId))
-    setShowConfirmModal(null)
+  let parsedSkills = [];
+  try {
+    parsedSkills = JSON.parse(
+      previewJob.jobId.skillsRequired[0]?.replace(/'/g, '"')
+    );
+  } catch (e) {
+    parsedSkills = [];
   }
+  const handleUnsaveJob = async (jobId) => {
+    try {
+      const res = await saveJob({ jobId });
+      if (res.statusCode === 200) {
+        setSavedJobIds((prev) => prev.filter((id) => id !== jobId));
+        setSavedJobs((prev) => prev.filter((job) => job.jobId?._id !== jobId));
+      }
+    } catch (error) {
+      console.error("Failed to unsave job:", error);
+      alert(error.message);
+    } finally {
+      setShowConfirmModal(null);
+    }
+  };
+
 
   return (
     <div className="space-y-6">
@@ -53,15 +47,17 @@ const SavedJobs = ()=>{
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {savedJobs.map((job) => (
-          <DashboardCard key={job.id} className="hover:shadow-md transition-shadow">
+          <DashboardCard key={job._id} className="hover:shadow-md transition-shadow">
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{job.title}</h3>
-                  <p className="text-blue-600 dark:text-blue-400 font-medium">{job.company}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{job.jobId?.title || ''}</h3>
+                  <p className="text-blue-600 dark:text-blue-400 font-medium">
+                    {job.jobId?.company?.companyInfo?.companyName || ''}
+                  </p>
                 </div>
                 <button
-                  onClick={() => setShowConfirmModal(job.id)}
+                  onClick={() => setShowConfirmModal(job.jobId?._id)}
                   className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                   title="Remove from saved"
                 >
@@ -72,18 +68,20 @@ const SavedJobs = ()=>{
               <div className="space-y-2">
                 <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                   <FiMapPin className="w-4 h-4" />
-                  <span>{job.location}</span>
+                  <span>{job.jobId?.isRemote ? "Remote" : job.jobId?.location || "World"}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                   <FiCalendar className="w-4 h-4" />
-                  <span>Saved on {new Date(job.dateSaved).toLocaleDateString()}</span>
+                  <span>Saved on {new Date(job.date).toLocaleDateString()}</span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">{job.salary}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{job.type}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    {job.jobId?.salary?.currency} {job.jobId?.salary?.min_salary} - {job.jobId?.salary?.max_salary}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{job.jobId?.employmentType}</p>
                 </div>
                 <span className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-xs rounded-full">
                   <FiBookmark className="w-3 h-3 inline mr-1" />
@@ -92,11 +90,17 @@ const SavedJobs = ()=>{
               </div>
 
               <div className="flex space-x-2">
-                <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  Apply Now
-                </button>
-                <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  View Details
+                <Link
+                  to={`/jobs/${job.jobId?._id}`}
+                  className="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  {job.isApplied === true ? "Applied!" : "Apply Now"}
+                </Link>
+                <button
+                  onClick={() => setPreviewJob(job)}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Preview
                 </button>
               </div>
             </div>
@@ -118,7 +122,7 @@ const SavedJobs = ()=>{
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Remove Saved Job</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -138,6 +142,97 @@ const SavedJobs = ()=>{
                 Remove
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewJob && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6">
+            <button
+              onClick={() => setPreviewJob(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              aria-label="Close"
+            >
+              <FiX className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              {previewJob.jobId?.title}
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-gray-700 dark:text-gray-300">
+              <div className="flex items-center gap-2">
+                <FiDollarSign />
+                <span>
+                  {previewJob.jobId?.salary?.currency} {previewJob.jobId?.salary?.min_salary} - {previewJob.jobId?.salary?.max_salary}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiMapPin />
+                <span>{previewJob.jobId?.location || "World"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiBriefcase />
+                <span>{previewJob.jobId?.employmentType || "N/A"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiCalendar />
+                <span>Posted: {new Date(previewJob.jobId?.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiUsers />
+                <span>Applicants: {previewJob.jobId?.applicants.length || 0}</span>
+              </div>
+              {previewJob.jobId?.experienceLevel && (
+                <div className="flex items-center gap-2">
+                  <FiTrendingUp />
+                  <span>Experience: {previewJob.jobId.experienceLevel}</span>
+                </div>
+              )}
+              {previewJob.jobId?.openings && (
+                <div className="flex items-center gap-2">
+                  <FiUsers />
+                  <span>Openings: {previewJob.jobId.openings}</span>
+                </div>
+              )}
+              {previewJob.jobId?.applicationDeadline && (
+                <div className="flex items-center gap-2">
+                  <FiClock />
+                  <span>Deadline: {new Date(previewJob.jobId.applicationDeadline).toLocaleDateString()}</span>
+                </div>
+              )}
+              {typeof previewJob.jobId?.isRemote === "boolean" && (
+                <div className="flex items-center gap-2">
+                  <FiGlobe />
+                  <span>{previewJob.jobId.isRemote ? "Remote Job" : "On-site Job"}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="text-gray-800 dark:text-gray-200 mb-6">
+              <h3 className="text-xl font-semibold mb-2">Job Description</h3>
+              <p className="whitespace-pre-wrap">{previewJob.jobId?.description || "No description provided."}</p>
+            </div>
+
+            {previewJob.jobId?.Requirements && (
+              <div className="text-gray-800 dark:text-gray-200 mb-6">
+                <h3 className="text-xl font-semibold mb-2">Requirements</h3>
+                <p className="whitespace-pre-wrap">{previewJob.jobId.Requirements}</p>
+              </div>
+            )}
+
+            {previewJob.jobId?.skillsRequired?.length > 0 && (
+              <div className="text-gray-800 dark:text-gray-200">
+                <h3 className="text-xl font-semibold mb-2">Skills</h3>
+                <ul className="list-disc pl-5">
+                  {parsedSkills.map((skill, index) => (
+                    <li key={index}>{skill}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -4,12 +4,13 @@ import { FiFileText, FiBookmark, FiTrendingUp, FiEdit, FiUpload, FiX } from "rea
 import { Context } from "../../../../Context/context.jsx"
 
 const JobSeekerOverview = ({ activeTab }) => {
-  const { userData } = useContext(Context);
+  const { userData,JobsAction} = useContext(Context);
+  const {savedJobIds,appliedJobIds} = JobsAction
   const [preview, setPreview] = useState(false)
 
   const stats = [
-    { label: "Applications Sent", value: "12", icon: FiFileText, color: "text-blue-600" },
-    { label: "Saved Jobs", value: "8", icon: FiBookmark, color: "text-green-600" },
+    { label: "Applications Sent", value: appliedJobIds.length || 0, icon: FiFileText, color: "text-blue-600" },
+    { label: "Saved Jobs", value: savedJobIds.length || 0, icon: FiBookmark, color: "text-green-600" },
     { label: "Profile Views", value: "24", icon: FiTrendingUp, color: "text-purple-600" },
   ]
 
@@ -140,26 +141,22 @@ const JobSeekerOverview = ({ activeTab }) => {
       </div>
 
       {/* Recent Activity */}
-      <DashboardCard title="Recent Activity">
+      {/* <DashboardCard title="Recent Activity">
         <div className="space-y-3">
-          {[
-            { action: "Applied to Frontend Developer at TechCorp", time: "2 hours ago" },
-            { action: "Saved UI/UX Designer position at DesignStudio", time: "1 day ago" },
-            { action: "Updated profile skills", time: "3 days ago" },
-          ].map((activity, index) => (
+          {userData.jobSeekerInfo.appliedJobs.map((e) => (
             <div
-              key={index}
+              key={e?._id}
               className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
             >
-              <p className="text-gray-900 dark:text-white">{activity.action}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{activity.time}</p>
+              <p className="text-gray-900 dark:text-white">{e?.title || ""}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{e?.time || null}</p>
             </div>
           ))}
         </div>
-      </DashboardCard>
+      </DashboardCard> */}
 
       {preview && (
-        <div div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full relative">
             <button
               onClick={() => setPreview(false)}

@@ -8,15 +8,15 @@ import { Context } from "../../../Context/context.jsx"
 const JOBS_PER_PAGE = 5
 
 const JobContent = () => {
-    const { Jobs} = useContext(Context)
+    const { Jobs, userData } = useContext(Context)
     const { allJob } = Jobs
     const [jobs, setJobs] = useState([])
     const [loading, setLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [totalFilteredJobsCount, setTotalFilteredJobsCount] = useState(0)
-
     const [allJobs, setAllJobs] = useState([]);
+    const user = userData
 
     const fetchAndFilterJobs = async () => {
         try {
@@ -174,9 +174,12 @@ const JobContent = () => {
                         <p className="text-sm mt-2">Try adjusting your filters.</p>
                     </div>
                 ) : (
-                    <div className="grid gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {jobs.map((job) => (
-                            <JobCard key={job._id} job={job} />
+                            <JobCard
+                                key={job._id}
+                                job={job}
+                            />
                         ))}
                     </div>
                 )}

@@ -5,7 +5,7 @@ import {
     editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
 } from "./Api/User/userAuth";
 
-import { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId } from "./Api/User/Jobs.js";
+import { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId, applyJob, saveJob, saved_applied_jobs } from "./Api/User/Jobs.js";
 
 export const Context = createContext();
 
@@ -16,6 +16,8 @@ export const ContextApi = ({ children }) => {
     const [isEmployer, setIsEmployer] = useState(false);
     const [isVerify, setIsVerify] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [savedJobIds, setSavedJobIds] = useState([]);
+    const [appliedJobIds, setAppliedJobIds] = useState([]);
 
     // verify jwt
     const verifyToken = async () => {
@@ -58,18 +60,33 @@ export const ContextApi = ({ children }) => {
         }
     }, [isLoggedIn]);
 
+    useEffect(() => {
+        if (userData?.jobSeekerInfo?.appliedJobs) {
+            const ids = userData.jobSeekerInfo.appliedJobs
+                .filter((j) => j.isApplied === true)
+                .map((j) => j.jobId);
+            setAppliedJobIds(ids);
+        }
+        if (userData?.jobSeekerInfo?.savedJobs) {
+            const ids = userData.jobSeekerInfo.savedJobs.map((j) => j.jobId);
+            setSavedJobIds(ids);
+        }
+    }, [userData]);
+
     const userProfile = { isEditProfile, setIsEditProfile };
     const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn };
     const userAuth = {
         register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,
         verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
     };
-    const Jobs = { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId };
+    const Jobs = { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId, applyJob, saveJob, saved_applied_jobs };
     const userImage = { image, setImage };
+    const JobsAction = {savedJobIds, setSavedJobIds,appliedJobIds, setAppliedJobIds}
 
     return (
         <Context.Provider value={{
             userAuth, userData, setUserData, isEmployer, setIsEmployer, userImage, verifyUser, userProfile, Jobs,
+            JobsAction
         }}>
             {children}
         </Context.Provider>

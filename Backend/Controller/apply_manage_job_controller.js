@@ -40,14 +40,15 @@ const applyJob = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "You already apliead for the job" })
         }
 
+        const isAlreadySaved = user.jobSeekerInfo.savedJobs.find((e) => e.jobId.equals(job.id))
         if (!existResume) {
-            const resume = req.files.resume[0].path
+            const resume = req.files?.resume?.[0]?.path
             if (!resume) {
                 return res.status(400).json({ statusCode: 400, message: "resume is required" })
             }
 
             // upload on cloudinary
-            const folder = "Job Portal/User Resume";
+            const folder = "Job Portal/Application Resume";
             const fileUpload = await fileUploadOnCloudinary(resume, folder);
             console.log(fileUpload.url)
             job.applicants.push({
@@ -63,9 +64,12 @@ const applyJob = async (req, res) => {
             await job.save()
             user.jobSeekerInfo.appliedJobs.push({
                 jobId: job.id,
-                isSaved: false,
+                isSaved: isAlreadySaved.isSaved === true ? true : false,
                 isApplied: true,
             })
+            if (isAlreadySaved.isSaved === true) {
+                isAlreadySaved.isApplied = true
+            }
             await user.save()
             return res.status(200).json({ statusCode: 200, message: "Application send successfully" })
         }
@@ -81,9 +85,12 @@ const applyJob = async (req, res) => {
         await job.save()
         user.jobSeekerInfo.appliedJobs.push({
             jobId: job.id,
-            isSaved: false,
+            isSaved: isAlreadySaved.isSaved === true ? true : false,
             isApplied: true,
         })
+        if (isAlreadySaved.isSaved === true) {
+            isAlreadySaved.isApplied = true
+        }
         await user.save()
         return res.status(200).json({ statusCode: 200, message: "Application send successfully" })
     } catch (error) {
@@ -116,11 +123,11 @@ const saveJob = async (req, res) => {
         }
 
         // check if job present in saved job
-        const savedJob = user.jobSeekerInfo.savedJobs.find((e) => e?.jobId && e.jobId.equals(job.id))
+        const savedJob = user.jobSeekerInfo.savedJobs.find((e) => e.jobId && e.jobId.equals(job.id))
         const isAppliedJob = user.jobSeekerInfo.appliedJobs.find((e) => e?.jobId && e.jobId.equals(job.id))
-        if (savedJob) {
+        if (savedJob?.isSaved === true) {
             savedJob.deleteOne({ "jobId": job.id })
-            if (isAppliedJob) {
+            if (isAppliedJob?.isApplied === true) {
                 isAppliedJob.isSaved = false
             }
             await user.save()
@@ -130,9 +137,12 @@ const saveJob = async (req, res) => {
         user.jobSeekerInfo.savedJobs.push({
             jobId: job.id,
             isSaved: true,
-            isApplied: isAppliedJob ? true : false
+            isApplied: isAppliedJob?.isApplied === true ? true : false
         })
-        if (isAppliedJob) isAppliedJob.isSaved = true
+        if (isAppliedJob?.isApplied === true) {
+            isAppliedJob.isSaved = true
+        }
+
         await user.save();
 
         return res.status(200).json({ statusCode: 200, message: "Job Saved Successfully", })
@@ -227,7 +237,7 @@ const changeApplicationStatus = async (req, res) => {
             return res.status(500).json({ statusCode: 500, message: "Something went wrong to send email" })
         }
 
-        return res.status(200).json({ statusCode: 200, message: "status update successfully"})
+        return res.status(200).json({ statusCode: 200, message: "status update successfully" })
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Something went wrong while change the application status", error: error.message });
     }
