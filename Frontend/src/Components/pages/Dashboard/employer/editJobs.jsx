@@ -4,9 +4,9 @@ import CurrencyDropdown from "./currencyDropDown.jsx";
 import SelectSkills from "../shared/selectSkills.jsx";
 import { Context } from "../../../../Context/context.jsx";
 
-const EditJobs = ({ job, onClose}) => {
-    const {Jobs} = useContext(Context)
-    const {editJob} = Jobs;
+const EditJobs = ({ job, onClose }) => {
+    const { Jobs } = useContext(Context)
+    const { editJob } = Jobs;
 
     const formatJobData = (job) => ({
         jobId: job._id,
@@ -62,7 +62,7 @@ const EditJobs = ({ job, onClose}) => {
         }));
     };
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         // setIsLoading(true);
         try {
@@ -75,10 +75,11 @@ const EditJobs = ({ job, onClose}) => {
                 },
             };
 
-            const data = await editJob({updatedJob});
+            const data = await editJob({ updatedJob });
+            console.log(data)
         } catch (error) {
             console.log("Error of edit the job", error.message)
-        }finally{
+        } finally {
             onClose()
         }
         // You can now send updatedJob to the backend here

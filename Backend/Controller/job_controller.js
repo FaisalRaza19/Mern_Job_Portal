@@ -109,6 +109,41 @@ const editJob = async (req, res) => {
     }
 }
 
+// change status of job
+const changeJobStatus = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(400).json({ statusCode: 400, message: "User did not found" })
+        };
+
+        // find the user 
+        const user = await User.findById(userId).select("-password -refreshToken")
+        if (!user || user.role === "jobseeker") {
+            return res.status(400).json({ statusCode: 400, message: "User not found and You are not elligeable to post the job" })
+        }
+
+        // get the data from req.body
+        const { status, jobId } = req.body
+
+        // find the job is exist
+        const job = await Job.findById(jobId)
+        if (!job) {
+            return res.status(400).json({ statusCode: 400, message: "Job is not exist" })
+        }
+
+        if(job.company.equals(user.id)){
+            job.status = status
+        }
+
+        await job.save()
+
+        return res.status(200).json({ statusCode: 200, message: "Job status change successfully",})
+    } catch (error) {
+        return res.status(500).json({ statusCode: 500, message: "Something went wrong to change the status", error: error.message })
+    }
+}
+
 // delete job 
 const deleteJob = async (req, res) => {
     try {
@@ -199,4 +234,4 @@ const allJob = async (req, res) => {
     }
 }
 
-export { postJob, editJob, deleteJob, getJob, getAllJobs, allJob }
+export { postJob, editJob,changeJobStatus,deleteJob, getJob, getAllJobs, allJob }

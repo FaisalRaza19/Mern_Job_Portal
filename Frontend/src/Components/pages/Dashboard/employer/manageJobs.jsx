@@ -8,7 +8,7 @@ import { Context } from "../../../../Context/context.jsx"
 
 const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
   const { Jobs } = useContext(Context)
-  const { getAllJobs, delJob } = Jobs
+  const { getAllJobs, delJob, changeStatus } = Jobs
   const [jobs, setJobs] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -26,7 +26,6 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
       const allJobs = data?.data || [];
       const activeJobs = allJobs.filter((e) => e.status === "Active").length
       setActiveJobs(activeJobs)
-      console.log(data)
       setJobs(data.data)
     } catch (error) {
       console.log("Error of get all jobs of user", error.message)
@@ -73,9 +72,17 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
     }
   }
 
-  const handleStatusChange = (jobId, newStatus) => {
-    setJobs(jobs.map((job) => (job._id === jobId ? { ...job, status: newStatus } : job)))
-    setShowActionMenu(null)
+  const handleStatusChange = async (jobId, newStatus) => {
+    try {
+      const Data = { status: newStatus, jobId }
+      const data = await changeStatus({ Data })
+      if (data.statusCode === 200) {
+        setJobs(jobs.map((job) => (job._id === jobId ? { ...job, status: newStatus } : job)))
+        setShowActionMenu(null)
+      }
+    } catch (error) {
+      console.log("error during change status", error.message)
+    }
   }
 
   const jobToPreview = showPreviewModal ? jobs.find((job) => job._id === showPreviewModal) : null
@@ -114,8 +121,7 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
             >
               <option value="all">All Status</option>
               <option value="Active">Active</option>
-              <option value="Draft">Draft</option>
-              <option value="Paused">Paused</option>
+              <option value="Pause">Paused</option>
               <option value="Closed">Closed</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
@@ -190,10 +196,10 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
                   <tr key={job._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">{job.title}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">{job?.title || ""}</div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">
-                          {job.salary.currency + " " + job.salary.min_salary + "-" + job.salary.max_salary} •{" "}
-                          {job.employmentType}
+                          {job?.salary?.currency + " " + job?.salary?.min_salary + "-" + job?.salary?.max_salary} •{" "}
+                          {job?.employmentType}
                         </div>
                       </div>
                     </td>
@@ -209,21 +215,21 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-1 text-sm">
                         <FiUsers className="w-4 h-4 text-gray-500" />
-                        <span className="font-medium text-gray-900 dark:text-white">{job.totalApplicants || 0}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{job?.applicants.length || 0}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(job.status)}`}
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(job?.status)}`}
                       >
-                        {job.status}
+                        {job?.status}
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center space-x-2">
                         <button
                           className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 transition-colors"
-                          onClick={() => setShowPreviewModal(job._id)}
+                          onClick={() => setShowPreviewModal(job?._id)}
                           title="View Details"
                         >
                           <FiEye className="w-4 h-4" />
@@ -231,7 +237,7 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
                         </button>
                         <button
                           className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-green-600 transition-colors"
-                          onClick={() => setShowEditModal(job._id)}
+                          onClick={() => setShowEditModal(job?._id)}
                           title="Edit Job"
                         >
                           <FiEdit className="w-4 h-4" />
@@ -239,7 +245,7 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
                         </button>
                         <button
                           className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-600 transition-colors"
-                          onClick={() => setShowDeleteModal(job._id)}
+                          onClick={() => setShowDeleteModal(job?._id)}
                           title="Delete Job"
                         >
                           <FiTrash2 className="w-4 h-4" />
@@ -255,32 +261,38 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
                             <span className="sr-only">More Actions</span>
                           </button>
                           {showActionMenu === job._id && (
-                            <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10 py-1">
+                            <ul className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10 py-1">
                               {job.status !== "Active" && (
-                                <button
-                                  onClick={() => handleStatusChange(job._id, "Active")}
-                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                >
-                                  Activate
-                                </button>
+                                <li>
+                                  <button
+                                    onClick={() => handleStatusChange(job._id, "Active")}
+                                    className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                                  >
+                                    Activate
+                                  </button>
+                                </li>
                               )}
-                              {job.status !== "Paused" && (
-                                <button
-                                  onClick={() => handleStatusChange(job._id, "Paused")}
-                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                >
-                                  Pause
-                                </button>
+                              {job.status !== "Pause" && (
+                                <li>
+                                  <button
+                                    onClick={() => handleStatusChange(job._id, "Pause")}
+                                    className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                                  >
+                                    Pause
+                                  </button>
+                                </li>
                               )}
                               {job.status !== "Closed" && (
-                                <button
-                                  onClick={() => handleStatusChange(job._id, "Closed")}
-                                  className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                >
-                                  Close
-                                </button>
+                                <li>
+                                  <button
+                                    onClick={() => handleStatusChange(job._id, "Closed")}
+                                    className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                                  >
+                                    Close
+                                  </button>
+                                </li>
                               )}
-                            </div>
+                            </ul>
                           )}
                         </div>
                       </div>

@@ -10,7 +10,6 @@ import { Context } from "../../../Context/context.jsx";
 const JobDetails = () => {
     const { Jobs, userData, JobsAction } = useContext(Context);
     const { appliedJobIds } = JobsAction
-    const isApplied = appliedJobIds
     const user = userData
     const { getJobFromId, allJob } = Jobs;
     const { jobId } = useParams();
@@ -21,6 +20,7 @@ const JobDetails = () => {
     const [showApplyForm, setShowApplyForm] = useState(false);
     const [suggestedJobs, setSuggestedJobs] = useState([]);
     const [suggestedSkills, setSuggestedSkills] = useState([]);
+    const isApplied = appliedJobIds.includes(jobId)
 
     const jobData = async () => {
         setLoading(true);

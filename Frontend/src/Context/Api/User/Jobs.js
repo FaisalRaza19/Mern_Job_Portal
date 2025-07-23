@@ -75,7 +75,6 @@ export const getJobFromId = async ({ jobId }) => {
 // edit the job 
 export const editJob = async ({ updatedJob }) => {
     try {
-        console.log(updatedJob)
         const token = localStorage.getItem("user_token")
         const response = await fetch(job.editJob, {
             method: "POST",
@@ -84,6 +83,31 @@ export const editJob = async ({ updatedJob }) => {
                 "Authorization": token,
             },
             body: JSON.stringify(updatedJob),
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails };
+        }
+        const data = await response.json();
+        return data
+    } catch (error) {
+        return error.message
+    }
+}
+
+// change the job status
+export const changeStatus = async ({Data}) => {
+    try {
+        const token = localStorage.getItem("user_token")
+        const response = await fetch(job.changeStatus, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": token,
+            },
+            body: JSON.stringify(Data),
             credentials: "include"
         });
 
@@ -148,7 +172,6 @@ export const allJob = async () => {
 // apply job
 export const applyJob = async ({ formdata }) => {
     try {
-        console.log(formdata)
         const form = new FormData();
 
         form.append("jobId", formdata.jobId);
@@ -162,7 +185,6 @@ export const applyJob = async ({ formdata }) => {
             form.append("existResume", formdata.existResume);
         }
 
-        console.log(form)
         const token = localStorage.getItem("user_token");
 
         const response = await fetch(job.applyJob, {

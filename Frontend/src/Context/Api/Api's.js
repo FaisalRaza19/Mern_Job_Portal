@@ -18,6 +18,7 @@ export const userAuth = {
 export const job = {
     postJob: `http://localhost:${port}/jobs/postJob`,
     editJob: `http://localhost:${port}/jobs/editJob`,
+    changeStatus: `http://localhost:${port}/jobs/changeStatus`,
     delJob: `http://localhost:${port}/jobs/delJob`,
     getJob: `http://localhost:${port}/jobs/getJob/jobId=`,
     getAllJob: `http://localhost:${port}/jobs/getAllJob`,

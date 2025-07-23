@@ -5,7 +5,10 @@ import {
     editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
 } from "./Api/User/userAuth";
 
-import { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId, applyJob, saveJob, saved_applied_jobs } from "./Api/User/Jobs.js";
+import {
+    postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId,
+    applyJob, saveJob, saved_applied_jobs
+} from "./Api/User/Jobs.js";
 
 export const Context = createContext();
 
@@ -60,14 +63,15 @@ export const ContextApi = ({ children }) => {
         }
     }, [isLoggedIn]);
 
+
     useEffect(() => {
-        if (userData?.jobSeekerInfo?.appliedJobs) {
+        if (userData?.role === "jobseeker" && userData?.jobSeekerInfo?.appliedJobs) {
             const ids = userData.jobSeekerInfo.appliedJobs
                 .filter((j) => j.isApplied === true)
                 .map((j) => j.jobId);
             setAppliedJobIds(ids);
         }
-        if (userData?.jobSeekerInfo?.savedJobs) {
+        if (userData?.role === "jobseeker" && userData?.jobSeekerInfo?.savedJobs) {
             const ids = userData.jobSeekerInfo.savedJobs.map((j) => j.jobId);
             setSavedJobIds(ids);
         }
@@ -79,9 +83,9 @@ export const ContextApi = ({ children }) => {
         register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,
         verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
     };
-    const Jobs = { postJobs, getAllJobs, editJob, delJob, allJob, getJobFromId, applyJob, saveJob, saved_applied_jobs };
+    const Jobs = { postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob, saved_applied_jobs };
     const userImage = { image, setImage };
-    const JobsAction = {savedJobIds, setSavedJobIds,appliedJobIds, setAppliedJobIds}
+    const JobsAction = { savedJobIds, setSavedJobIds, appliedJobIds, setAppliedJobIds }
 
     return (
         <Context.Provider value={{

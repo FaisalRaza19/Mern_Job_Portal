@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiSearch, FiDownload, FiMessageCircle, FiCheck, FiX, FiEye, FiUsers } from "react-icons/fi"
