@@ -3,14 +3,6 @@ import { FiX, FiDollarSign, FiMapPin, FiBriefcase, FiCalendar, FiUsers, FiTrendi
 
 const JobPreview = ({ job, onClose }) => {
   if (!job) return null
-  let parsedSkills = [];
-  try {
-    parsedSkills = JSON.parse(
-      job?.skillsRequired[0]?.replace(/'/g, '"')
-    );
-  } catch (e) {
-    parsedSkills = [];
-  }
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 animate-fade-in-up">
@@ -92,7 +84,7 @@ const JobPreview = ({ job, onClose }) => {
             <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
               <h3 className="text-xl font-semibold mb-3">Skills</h3>
               <ul className="list-disc pl-5">
-                {parsedSkills.map((skill, index) => (
+                {job?.skillsRequired.map((skill, index) => (
                   <li key={index}>{skill}</li>
                 ))}
               </ul>

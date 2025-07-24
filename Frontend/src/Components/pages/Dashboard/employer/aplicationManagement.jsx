@@ -29,7 +29,7 @@ const ApplicantManagement = () => {
     }
   }
 
-
+  // change status
   const handleStatusChange = async (jobId, applicationId, status) => {
     try {
       const Data = { jobId, applicationId, status }
@@ -55,7 +55,8 @@ const ApplicantManagement = () => {
     const diffInMilliseconds = end - start;
     const diffInYears = diffInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
 
-    return Math.floor(diffInYears);
+    const expYears = Math.floor(diffInYears)
+    return expYears  + " Year";
   };
 
   // get download resume url

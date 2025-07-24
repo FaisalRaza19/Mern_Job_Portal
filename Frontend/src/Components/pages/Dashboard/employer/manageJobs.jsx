@@ -69,6 +69,7 @@ const ManageJobs = ({ setActiveTab}) => {
     }
   }
 
+  // change application status
   const handleStatusChange = async (jobId, newStatus) => {
     try {
       const Data = { status: newStatus, jobId }

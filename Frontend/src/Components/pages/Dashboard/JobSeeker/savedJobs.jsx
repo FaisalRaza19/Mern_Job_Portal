@@ -14,14 +14,6 @@ const SavedJobs = ({ jobs }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(null)
   const [previewJob, setPreviewJob] = useState(null)
 
-  let parsedSkills = [];
-  try {
-    parsedSkills = JSON.parse(
-      previewJob.jobId.skillsRequired[0]?.replace(/'/g, '"')
-    );
-  } catch (e) {
-    parsedSkills = [];
-  }
   const handleUnsaveJob = async (jobId) => {
     try {
       const res = await saveJob({ jobId });
@@ -227,7 +219,7 @@ const SavedJobs = ({ jobs }) => {
               <div className="text-gray-800 dark:text-gray-200">
                 <h3 className="text-xl font-semibold mb-2">Skills</h3>
                 <ul className="list-disc pl-5">
-                  {parsedSkills.map((skill, index) => (
+                  {previewJob.jobId?.skillsRequired?.map((skill, index) => (
                     <li key={index}>{skill}</li>
                   ))}
                 </ul>

@@ -218,6 +218,7 @@ const changeApplicationStatus = async (req, res) => {
         // find the application in job
         const application = job.applicants.find((e) => e._id.equals(applicationId))
         application.status = status
+        await job.save()
         // get email
         const email = await User.findById(application.User).select("-password -refreshToken")
 
@@ -234,8 +235,6 @@ const changeApplicationStatus = async (req, res) => {
         if (!sendEmail) {
             return res.status(500).json({ statusCode: 500, message: "Something went wrong to send email" })
         }
-
-        await job.save()
         return res.status(200).json({ statusCode: 200, message: "status update successfully" })
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Something went wrong while change the application status", error: error.message });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React,{ useState } from "react";
 import DashboardCard from "../shared/dashboardCard.jsx";
 import {
   FiSearch, FiCalendar, FiMapPin, FiX, FiDollarSign,
@@ -11,15 +11,6 @@ const AppliedJobs = ({ jobs, userId }) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [selectedJob, setSelectedJob] = useState(null);
-
-  let parsedSkills = [];
-  try {
-    parsedSkills = JSON.parse(
-      selectedJob.skillsRequired[0]?.replace(/'/g, '"')
-    );
-  } catch (e) {
-    parsedSkills = [];
-  }
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -36,25 +27,23 @@ const AppliedJobs = ({ jobs, userId }) => {
     }
   };
 
-  const filteredJobs = jobs
-    .filter((job) => {
-      const titleMatch = job?.jobId?.title?.toLowerCase().includes(searchTerm.toLowerCase());
-      const companyMatch = job?.jobId?.company?.companyInfo?.companyName?.toLowerCase().includes(searchTerm.toLowerCase());
-      const statusMatch = statusFilter === "all" || job?.jobId?.status === statusFilter;
-      return (titleMatch || companyMatch) && statusMatch;
-    })
-    .sort((a, b) => {
-      if (sortBy === "date") {
-        return new Date(b.appliedDate) - new Date(a.appliedDate);
-      }
-      if (sortBy === "company") {
-        return a.jobId.company.companyInfo.companyName.localeCompare(b.jobId.company.companyInfo.companyName);
-      }
-      if (sortBy === "status") {
-        return a.jobId.status.localeCompare(b.jobId.status);
-      }
-      return 0;
-    });
+  const filteredJobs = jobs.filter((job) => {
+    const titleMatch = job?.jobId?.title?.toLowerCase().includes(searchTerm.toLowerCase());
+    const companyMatch = job?.jobId?.company?.companyInfo?.companyName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const statusMatch = statusFilter === "all" || (job?.jobId?.applicants?.find((e)=> e?.User === userId).status) === statusFilter;
+    return (titleMatch || companyMatch) && statusMatch;
+  }).sort((a, b) => {
+    if (sortBy === "date") {
+      return new Date(b.appliedDate) - new Date(a.appliedDate);
+    }
+    if (sortBy === "company") {
+      return a.jobId.company.companyInfo.companyName.localeCompare(b.jobId.company.companyInfo.companyName);
+    }
+    if (sortBy === "status") {
+      return a.jobId.status.localeCompare(b.jobId.status);
+    }
+    return 0;
+  });
 
   return (
     <div className="space-y-6">
@@ -83,8 +72,9 @@ const AppliedJobs = ({ jobs, userId }) => {
               <option value="all">All Status</option>
               <option value="Pending">Pending</option>
               <option value="Shortlisted">Shortlisted</option>
-              <option value="Hired">Hired</option>
               <option value="Rejected">Rejected</option>
+              <option value="Interview">Interview</option>
+              <option value="Hired">Hired</option>
             </select>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
@@ -112,31 +102,31 @@ const AppliedJobs = ({ jobs, userId }) => {
             </thead>
             <tbody>
               {filteredJobs.map((job) => {
-                const applicant = job.jobId.applicants.find((e) => e.User === userId);
+                const applicant = job?.jobId?.applicants.find((e) => e?.User === userId);
                 return (
                   <tr key={job.jobId._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/40">
-                    <Link to={`/jobs/${job.jobId._id}`} className="hover:underline">
-                      <td className="py-4 px-4 text-gray-900 dark:text-white font-medium">{job.jobId.title}</td>
+                    <Link to={`/jobs/${job?.jobId?._id}`} className="hover:underline">
+                      <td className="py-4 px-4 text-gray-900 dark:text-white font-medium">{job?.jobId?.title}</td>
                     </Link>
                     <td className="py-4 px-4 text-blue-600 dark:text-blue-400 font-medium">
-                      {job.jobId.company.companyInfo.companyName}
+                      {job?.jobId?.company?.companyInfo?.companyName}
                     </td>
                     <td className="py-4 px-4 text-gray-600 dark:text-gray-400">
                       <FiMapPin className="inline w-4 h-4 mr-1" />
-                      {job.jobId.isRemote ? "Remote" : job.jobId.location}
+                      {job?.jobId?.isRemote ? "Remote" : job?.jobId?.location}
                     </td>
                     <td className="py-4 px-4 text-gray-600 dark:text-gray-400">
                       <FiCalendar className="inline w-4 h-4 mr-1" />
                       {new Date(applicant?.appliedAt).toLocaleDateString()}
                     </td>
                     <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded-full ${getStatusColor(job.jobId.status)}`}>
-                        {job.jobId.status}
+                      <span className={`px-2 py-1 rounded-full ${getStatusColor((job?.jobId?.applicants?.find((e)=> e?.User === userId).status))}`}>
+                        {(job?.jobId?.applicants?.find((e)=> e?.User === userId).status) || ""}
                       </span>
                     </td>
                     <td className="py-4 px-4">
                       <button
-                        onClick={() => setSelectedJob(job.jobId)}
+                        onClick={() => setSelectedJob(job?.jobId)}
                         className="text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium"
                       >
                         View Details
@@ -169,7 +159,7 @@ const AppliedJobs = ({ jobs, userId }) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300 mb-6">
               <div className="flex items-center gap-2"><FiDollarSign /> {selectedJob?.salary?.currency} {selectedJob?.salary?.min_salary} - {selectedJob?.salary?.max_salary}</div>
-              <div className="flex items-center gap-2"><FiMapPin /> {selectedJob?.location}</div>
+              <div className="flex items-center gap-2"><FiMapPin /> {selectedJob?.isRemote ? "Remote" : selectedJob?.location}</div>
               <div className="flex items-center gap-2"><FiBriefcase /> {selectedJob?.employmentType}</div>
               <div className="flex items-center gap-2"><FiUsers /> Applicants: {selectedJob?.applicants?.length || 0}</div>
               {selectedJob?.experienceLevel && <div className="flex items-center gap-2"><FiTrendingUp /> {selectedJob?.experienceLevel}</div>}
@@ -193,7 +183,7 @@ const AppliedJobs = ({ jobs, userId }) => {
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Skills</h3>
                 <ul className="list-disc pl-6 space-y-1 text-gray-800 dark:text-gray-200">
-                  {parsedSkills.map((skill, index) => (
+                  {selectedJob?.skillsRequired?.map((skill, index) => (
                     <li key={index}>{skill}</li>
                   ))}
                 </ul>

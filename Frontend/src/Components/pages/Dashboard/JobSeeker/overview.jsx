@@ -1,4 +1,4 @@
-import { useState, useContext } from "react"
+import React,{ useState, useContext } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiFileText, FiBookmark, FiTrendingUp, FiEdit, FiUpload, FiX } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
@@ -36,7 +36,6 @@ const JobSeekerOverview = ({ activeTab }) => {
 
     return `${years} year${years > 1 ? 's' : ''} ago`;
   }
-
 
   const user = userData;
 
@@ -139,21 +138,6 @@ const JobSeekerOverview = ({ activeTab }) => {
           </div>
         </DashboardCard>
       </div>
-
-      {/* Recent Activity */}
-      {/* <DashboardCard title="Recent Activity">
-        <div className="space-y-3">
-          {userData.jobSeekerInfo.appliedJobs.map((e) => (
-            <div
-              key={e?._id}
-              className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
-            >
-              <p className="text-gray-900 dark:text-white">{e?.title || ""}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{e?.time || null}</p>
-            </div>
-          ))}
-        </div>
-      </DashboardCard> */}
 
       {preview && (
         <div div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">

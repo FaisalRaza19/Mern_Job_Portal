@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React,{ useContext, useState } from "react";
 import DashboardCard from "../shared/dashboardCard.jsx";
 import { FiEye, FiSave, FiSend, FiLoader } from "react-icons/fi";
 import CurrencyDropdown from "./currencyDropDown.jsx";

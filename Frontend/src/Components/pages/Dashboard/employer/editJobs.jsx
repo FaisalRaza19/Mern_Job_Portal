@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import React,{ useState, useEffect, useContext } from "react";
 import { FiX } from "react-icons/fi";
 import CurrencyDropdown from "./currencyDropDown.jsx";
 import SelectSkills from "../shared/selectSkills.jsx";
@@ -64,7 +64,6 @@ const EditJobs = ({ job, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // setIsLoading(true);
         try {
             const updatedJob = {
                 ...formData,
@@ -82,7 +81,6 @@ const EditJobs = ({ job, onClose }) => {
         } finally {
             onClose()
         }
-        // You can now send updatedJob to the backend here
     };
 
     return (

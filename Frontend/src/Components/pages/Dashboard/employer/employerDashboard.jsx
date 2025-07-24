@@ -1,6 +1,4 @@
-"use client"
-
-import { useState } from "react"
+import React,{ useState } from "react"
 import Topbar from "../shared/Topbar.jsx"
 import EmployerSidebar from "./employerSidebar.jsx"
 import EmployerOverview from "./employerOverview.jsx"
@@ -8,7 +6,7 @@ import PostJob from "./postJobs.jsx"
 import ManageJobs from "./manageJobs.jsx"
 import ApplicantManagement from "./aplicationManagement.jsx"
 import EmployerMessages from "./EmployerMessages.jsx"
-import EmployerAnalytics from "./EmployerAnalytics.jsx"
+import EmployerAnalytics from "./employerAnalytics.jsx"
 import AdminRequests from "./adminRequest.jsx"
 import EmployerSettings from "./EmployerSettings.jsx"
 

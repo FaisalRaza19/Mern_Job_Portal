@@ -1,6 +1,4 @@
-"use client"
-
-import { useContext, useEffect, useState } from "react"
+import React,{ useContext, useEffect, useState } from "react"
 import Topbar from "../shared/Topbar.jsx"
 import JobSeekerSidebar from "./sidebar.jsx"
 import JobSeekerOverview from "./overview.jsx"
