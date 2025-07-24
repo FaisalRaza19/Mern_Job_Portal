@@ -1,15 +1,18 @@
-import { useState,useContext } from "react"
+import React,{useContext } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiBriefcase, FiUsers, FiCalendar, FiTrendingUp, FiEdit} from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx";
 
-const EmployerOverview = ({setActiveTab,activeJobs})=>{
-  const { userData } = useContext(Context);
+const EmployerOverview = ({setActiveTab,})=>{
+  const { userData,Jobs } = useContext(Context);
+  const {jobData} = Jobs
+  const activeJobs = jobData.filter((e) => e.status === "Active").length
+  const totalAplication = jobData.map((e)=>e.applicants.length)
   const user = userData;
 
   const stats = [
     { label: "Active Jobs", value: activeJobs, icon: FiBriefcase, color: "text-blue-600" },
-    { label: "Total Applications", value: "156", icon: FiUsers, color: "text-green-600" },
+    { label: "Total Applications", value: totalAplication.reduce((e,i)=>e+i,0), icon: FiUsers, color: "text-green-600" },
     { label: "Interviews Scheduled", value: "12", icon: FiCalendar, color: "text-purple-600" },
     { label: "Hires This Month", value: "3", icon: FiTrendingUp, color: "text-orange-600" },
   ]
@@ -83,7 +86,7 @@ const EmployerOverview = ({setActiveTab,activeJobs})=>{
         {/* Quick Actions */}
         <DashboardCard title="Quick Actions">
           <div className="space-y-3">
-            <button className="w-full flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+            <button onClick={()=>setActiveTab("post-job")} className="w-full flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
               <FiBriefcase className="w-5 h-5" />
               <span className="font-medium">Post New Job</span>
             </button>

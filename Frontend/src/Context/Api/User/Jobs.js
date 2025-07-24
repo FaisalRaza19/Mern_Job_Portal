@@ -98,7 +98,7 @@ export const editJob = async ({ updatedJob }) => {
 }
 
 // change the job status
-export const changeStatus = async ({Data}) => {
+export const changeStatus = async ({ Data }) => {
     try {
         const token = localStorage.getItem("user_token")
         const response = await fetch(job.changeStatus, {
@@ -196,15 +196,12 @@ export const applyJob = async ({ formdata }) => {
             credentials: "include",
         });
 
-        console.log(response)
-
         if (!response.ok) {
             const errorDetails = await response.json();
             return { message: errorDetails };
         }
 
         const data = await response.json();
-        console.log(data)
 
         return data;
     } catch (error) {
@@ -247,6 +244,31 @@ export const saved_applied_jobs = async () => {
                 'Content-Type': 'application/json',
                 "Authorization": token,
             },
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails };
+        }
+        const data = await response.json();
+        return data
+    } catch (error) {
+        return error.message
+    }
+}
+
+// change application statsu
+export const changeApplicationStatus = async ({ Data }) => {
+    try {
+        const token = localStorage.getItem("user_token")
+        const response = await fetch(job.changeApplicationStatus, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": token,
+            },
+            body: JSON.stringify(Data),
             credentials: "include"
         });
 

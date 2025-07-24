@@ -22,16 +22,15 @@ const EmployerDashboard = ({setIsLoggedIn})=>{
   const [activeTab, setActiveTab] = useState("overview")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [activeJobs,setActiveJobs] = useState(0)
 
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
-        return <EmployerOverview setActiveTab={setActiveTab} activeJobs={activeJobs}/>
+        return <EmployerOverview setActiveTab={setActiveTab} />
       case "post-job":
         return <PostJob />
       case "manage-jobs":
-        return <ManageJobs setActiveTab={setActiveTab} setActiveJobs={setActiveJobs}/>
+        return <ManageJobs setActiveTab={setActiveTab}/>
       case "applicants":
         return <ApplicantManagement />
       case "messages":

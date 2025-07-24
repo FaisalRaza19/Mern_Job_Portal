@@ -9,7 +9,7 @@ const JobSeekerProfile = () => {
   const navigate = useNavigate()
   const { userAuth, userData, userImage, userProfile, } = useContext(Context)
   const { setIsEditProfile } = userProfile
-  const { updateAvatar, editProfile, update_Edu_Exp, update_skills_resume, downloadResume } = userAuth;
+  const { updateAvatar, editProfile, update_Edu_Exp, update_skills_resume, } = userAuth;
   const { image, setImage } = userImage
   const user = userData;
   const [isLoading, setLoading] = useState(false);
@@ -143,9 +143,10 @@ const JobSeekerProfile = () => {
     setLoading(true)
     try {
       const data = await update_skills_resume({ skills, resumeFile })
-      console.log(data)
-      setResumeUrl(data.data.resumeUrl)
-      setSkills(data.data.Skills)
+      if (data.statusCode === 200) {
+        setResumeUrl(data.data.resumeUrl)
+        setSkills(data.data.Skills)
+      }
     } catch (error) {
       console.log("Error updating profile:", error.message)
     } finally {

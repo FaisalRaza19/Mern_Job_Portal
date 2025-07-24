@@ -6,9 +6,9 @@ import JobEditFormModal from "./editJobs.jsx"
 import { Context } from "../../../../Context/context.jsx"
 
 
-const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
+const ManageJobs = ({ setActiveTab}) => {
   const { Jobs } = useContext(Context)
-  const { getAllJobs, delJob, changeStatus } = Jobs
+  const { jobData, delJob, changeStatus } = Jobs
   const [jobs, setJobs] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -19,14 +19,11 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
   const [showEditModal, setShowEditModal] = useState(null)
 
   // get all jobs of user
-  const JobsData = async () => {
+  const JobsData = () => {
     try {
       setIsLoading(true)
-      const data = await getAllJobs()
-      const allJobs = data?.data || [];
-      const activeJobs = allJobs.filter((e) => e.status === "Active").length
-      setActiveJobs(activeJobs)
-      setJobs(data.data)
+      const data = jobData
+      setJobs(data)
     } catch (error) {
       console.log("Error of get all jobs of user", error.message)
     } finally {
@@ -36,7 +33,7 @@ const ManageJobs = ({ setActiveTab, setActiveJobs }) => {
 
   useEffect(() => {
     JobsData()
-  }, [setActiveJobs])
+  }, [jobData])
 
   const getStatusColor = (status) => {
     switch (status) {

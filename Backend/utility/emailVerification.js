@@ -77,14 +77,14 @@ const application_Notification = async ({emailData}) => {
         });
 
         // send email 
-        await transporter.sendMail({
+        const data = await transporter.sendMail({
             from: process.env.GMAIL_EMAIL,
             to: emailData.email,
             subject: `Your application for ${emailData.jobTitle} at ${emailData.companyName}`,
             html: applicationStatusEmailHTML({emailData}),
         })
 
-        return "";
+        return data;
     } catch (error) {
         return new Error("Failed to send application email");
     }

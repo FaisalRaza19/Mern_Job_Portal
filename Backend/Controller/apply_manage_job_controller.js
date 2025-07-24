@@ -49,7 +49,8 @@ const applyJob = async (req, res) => {
 
             // upload on cloudinary
             const folder = "Job Portal/Application Resume";
-            const fileUpload = await fileUploadOnCloudinary(resume, folder);
+            const resourceType = "raw"
+            const fileUpload = await fileUploadOnCloudinary(resume, folder, resourceType);
             console.log(fileUpload.url)
             job.applicants.push({
                 User: user.id,
@@ -217,13 +218,10 @@ const changeApplicationStatus = async (req, res) => {
         // find the application in job
         const application = job.applicants.find((e) => e._id.equals(applicationId))
         application.status = status
-        await job.save()
-
         // get email
         const email = await User.findById(application.User).select("-password -refreshToken")
 
         // send notification email
-        // email, name, status, jobTitle, companyName, companyLogo
         const emailData = {
             email: email.email,
             name: email.jobSeekerInfo.fullName,
@@ -237,6 +235,7 @@ const changeApplicationStatus = async (req, res) => {
             return res.status(500).json({ statusCode: 500, message: "Something went wrong to send email" })
         }
 
+        await job.save()
         return res.status(200).json({ statusCode: 200, message: "status update successfully" })
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Something went wrong while change the application status", error: error.message });

@@ -18,6 +18,7 @@ export const userAuth = {
 export const job = {
     postJob: `http://localhost:${port}/jobs/postJob`,
     editJob: `http://localhost:${port}/jobs/editJob`,
+    // chnage job status
     changeStatus: `http://localhost:${port}/jobs/changeStatus`,
     delJob: `http://localhost:${port}/jobs/delJob`,
     getJob: `http://localhost:${port}/jobs/getJob/jobId=`,
@@ -26,4 +27,5 @@ export const job = {
     applyJob: `http://localhost:${port}/jobs/applyJob`,
     saveJob: `http://localhost:${port}/jobs/saveJob`,
     getSaved_Applied_Jobs: `http://localhost:${port}/jobs/get-Saved-applied-Jobs`,
+    changeApplicationStatus : `http://localhost:${port}/jobs/change-status`
 }

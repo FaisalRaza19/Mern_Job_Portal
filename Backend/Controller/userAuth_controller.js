@@ -262,14 +262,14 @@ const changeAvatar = async (req, res) => {
 
         // If user has an existing avatar, clear it
         if (user.avatar?.public_Id) {
-            // const resourceType = "image"
-            await removeFileFromCloudinary(user.avatar.public_Id);
+            const resourceType = "image"
+            await removeFileFromCloudinary(user.avatar.public_Id,resourceType);
         }
 
         // upload avatar to Cloudinary
         const folder = "Job Portal/User Avatar"
-        // const resourceType = "image"
-        const fileUpload = await fileUploadOnCloudinary(avatarPath, folder);
+        const resourceType = "image"
+        const fileUpload = await fileUploadOnCloudinary(avatarPath, folder,resourceType);
 
         // update in db
         user.avatar = {
@@ -541,16 +541,16 @@ const update_Skills_Resume = async (req, res) => {
 
         // Delete existing resume from Cloudinary if needed
         if (resume && user.jobSeekerInfo.resumeUrl?.resume_publicId) {
-            // const resourceType = "raw"
-            await removeFileFromCloudinary(user.jobSeekerInfo.resumeUrl.resume_publicId);
+            const resourceType = "raw"
+            await removeFileFromCloudinary(user.jobSeekerInfo.resumeUrl.resume_publicId,resourceType);
         }
 
         // Upload new resume to Cloudinary
         let fileUpload = null;
         if (resume) {
             const folder = "Job Portal/User Resume";
-            // const resourceType = ""
-            fileUpload = await fileUploadOnCloudinary(resume, folder);
+            const resourceType = "raw"
+            fileUpload = await fileUploadOnCloudinary(resume, folder,resourceType);
         }
 
         // Save resume URL if uploaded

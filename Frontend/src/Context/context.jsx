@@ -7,7 +7,7 @@ import {
 
 import {
     postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId,
-    applyJob, saveJob, saved_applied_jobs
+    applyJob, saveJob, saved_applied_jobs, changeApplicationStatus
 } from "./Api/User/Jobs.js";
 
 export const Context = createContext();
@@ -21,6 +21,7 @@ export const ContextApi = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [savedJobIds, setSavedJobIds] = useState([]);
     const [appliedJobIds, setAppliedJobIds] = useState([]);
+    const [jobData, setJobData] = useState([])
 
     // verify jwt
     const verifyToken = async () => {
@@ -63,7 +64,6 @@ export const ContextApi = ({ children }) => {
         }
     }, [isLoggedIn]);
 
-
     useEffect(() => {
         if (userData?.role === "jobseeker" && userData?.jobSeekerInfo?.appliedJobs) {
             const ids = userData.jobSeekerInfo.appliedJobs
@@ -77,13 +77,32 @@ export const ContextApi = ({ children }) => {
         }
     }, [userData]);
 
+    // get all jobs 
+    const JobsData = async () => {
+        try {
+            const data = await getAllJobs()
+            setJobData(data.data)
+        } catch (error) {
+            console.log("Error of get all jobs of user", error.message)
+        }
+    }
+
+    useEffect(() => {
+        if (userData && userData?.role === 'employer') {
+            JobsData()
+        }
+    }, [userData])
+
     const userProfile = { isEditProfile, setIsEditProfile };
     const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn };
     const userAuth = {
         register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,
         verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
     };
-    const Jobs = { postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob, saved_applied_jobs };
+    const Jobs = {
+        postJobs, jobData, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob,
+        saved_applied_jobs, changeApplicationStatus
+    };
     const userImage = { image, setImage };
     const JobsAction = { savedJobIds, setSavedJobIds, appliedJobIds, setAppliedJobIds }
 

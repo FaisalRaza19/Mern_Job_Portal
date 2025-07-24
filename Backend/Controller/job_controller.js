@@ -205,7 +205,7 @@ const getAllJobs = async (req, res) => {
         }
 
         // find the job is exist
-        const job = await Job.find({ company: user.id }).sort({ createdAt: -1 })
+        const job = await Job.find({ company: user.id }).sort({ createdAt: -1 }).populate({path:"applicants.User",select:"-password -refreshToken -jobSeekerInfo.appliedJobs -jobSeekerInfo.savedJobs"})
 
         if (!job || job.length === 0) {
             return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
