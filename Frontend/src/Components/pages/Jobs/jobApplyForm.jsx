@@ -3,8 +3,9 @@ import { FaCloudUploadAlt, FaFileAlt, FaCheckCircle, FaTimesCircle, FaDollarSign
 import { FaX } from "react-icons/fa6";
 import { Context } from "../../../Context/context";
 
+// props come from job detail page
 const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onBack, currency, }) => {
-    const { userData, Jobs, JobsAction } = useContext(Context);
+    const { userData, Jobs, JobsAction, showAlert } = useContext(Context);
     const { setAppliedJobIds } = JobsAction
     const { applyJob } = Jobs
     const existingResume = userData?.jobSeekerInfo?.resumeUrl || null;
@@ -62,6 +63,7 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onBack, curre
                 existResume: existingResume?.resume_Url,
             };
             const res = await applyJob({ formdata });
+            showAlert(res)
             if (res.statusCode === 200) {
                 setAppliedJobIds((prev) => [...prev, jobId]);
                 setStatus("success");
@@ -78,6 +80,7 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onBack, curre
                 resumeChanged: false,
             });
             setShowPreview(false);
+            onBack()
         }
     };
 

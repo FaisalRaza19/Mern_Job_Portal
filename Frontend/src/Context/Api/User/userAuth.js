@@ -1,6 +1,6 @@
 import { userAuth } from "../Api's.js"
 
-export const register = async (formData, navigate) => {
+export const register = async (formData) => {
     try {
         localStorage.setItem("email", formData.email)
         const response = await fetch(userAuth.register, {
@@ -15,7 +15,6 @@ export const register = async (formData, navigate) => {
             return { message: errorDetails.message.message || errorDetails.message };
         }
         const data = await response.json();
-        navigate("/email-verify")
         return data
     } catch (error) {
         return error.message
@@ -23,7 +22,7 @@ export const register = async (formData, navigate) => {
 }
 
 // Updated CodeVerify Function
-export const verify_register = async ({ code, navigate}) => {
+export const verify_register = async ({ code, navigate }) => {
     try {
         const response = await fetch(userAuth.verify_register, {
             method: "POST",
@@ -36,6 +35,8 @@ export const verify_register = async ({ code, navigate}) => {
             const errorDetails = await response.json();
             return { message: errorDetails.message };
         }
+
+        console.log(response)
 
         const data = await response.json();
         localStorage.setItem("user_token", data.accesstoken);
@@ -61,7 +62,7 @@ export const ResendCode = async () => {
 
         if (!response.ok) {
             const errorDetails = await response.json();
-            return errorDetails.message;
+            return errorDetails;
         }
 
         const data = await response.json();
@@ -72,27 +73,27 @@ export const ResendCode = async () => {
 };
 
 // login user
-export const Login = async ({ formData, navigate,}) => {
+export const Login = async ({ formData, navigate, }) => {
     try {
         const response = await fetch(userAuth.login, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData),
+            credentials : "include"
         });
 
         if (!response.ok) {
             const errorDetails = await response.json();
-            return errorDetails.message;
+            return errorDetails;
         }
 
         const data = await response.json();
-        localStorage.setItem("user_token", data.accesstoken)
-        if (data.data.role === "jobseeker") {
+        localStorage.setItem("user_token", data?.accesstoken)
+        if (data?.data?.role === "jobseeker") {
             navigate("/jobseeker-dashboard");
         } else {
             navigate("/employer-dashboard");
         }
-        // FetchUser();
         return data;
     } catch (error) {
         return error.message;
@@ -100,7 +101,7 @@ export const Login = async ({ formData, navigate,}) => {
 };
 
 // LogOut User
-export const LogOut = async ({ navigate}) => {
+export const LogOut = async ({ navigate }) => {
     try {
         const token = localStorage.getItem("user_token");
 
@@ -237,7 +238,6 @@ export const editProfile = async ({ userData, navigate }) => {
 // verify and update profile 
 export const verifyAndUpdateProfile = async ({ code }) => {
     try {
-        console.log(code)
         const token = localStorage.getItem("user_token");
         const response = await fetch(userAuth.verify_edit, {
             method: "POST",
@@ -284,7 +284,6 @@ export const update_Edu_Exp = async (formData) => {
         return error.message;
     }
 }
-
 
 // update skills and resume 
 export const update_skills_resume = async ({ skills, resumeFile }) => {

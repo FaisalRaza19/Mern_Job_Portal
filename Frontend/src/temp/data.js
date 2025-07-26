@@ -305,8 +305,6 @@ export const testimonials = [
     },
 ]
 
-
-
 // industry types
 export const industryOptions = [
     "Information Technology (IT)",
@@ -362,3 +360,5 @@ export const industryOptions = [
     "Blockchain & Cryptocurrency",
     "Gaming & Game Development"
 ];
+
+

@@ -3,9 +3,9 @@ import { FaSearch, FaDownload, FaCheck, FaEye, FaUsers, FaArrowLeft, FaClock } f
 import { FiMessageCircle, FiX } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
 
-const ApplicantManagement = () => {
-  const { Jobs } = useContext(Context)
-  const { jobData, changeApplicationStatus } = Jobs
+const ApplicantManagement = ({jobData}) => {
+  const { Jobs,showAlert} = useContext(Context)
+  const {changeApplicationStatus } = Jobs
   const [status, setStatus] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -34,9 +34,9 @@ const ApplicantManagement = () => {
     try {
       const Data = { jobId, applicationId, status }
       const data = await changeApplicationStatus({ Data })
+      showAlert(data)
       if (data.statusCode === 200) {
         setStatus(status)
-        alert(data.message)
       }
     } catch (error) {
       console.log("Error during change the status", error.message)
@@ -288,7 +288,7 @@ const ApplicantManagement = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Job Openings</h1>
             <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm rounded-full">
-              {jobData.length} jobs
+              {jobData?.length || 0} jobs
             </span>
           </div>
 

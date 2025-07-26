@@ -6,7 +6,7 @@ import { Context } from "../../Context/context"
 
 
 const Register = () => {
-  const {userAuth} = useContext(Context)
+  const { userAuth, showAlert } = useContext(Context)
   const { register } = userAuth;
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false)
@@ -63,11 +63,15 @@ const Register = () => {
     if (!validateForm()) return;
     setIsLoading(true)
     try {
-      const data = await register(formData, navigate);
+      const data = await register(formData);
+      showAlert(data)
+      if (data.statusCode === 200) {
+        navigate("/email-verify")
+      }
       setIsLoading(false)
     } catch (error) {
-      console.log("register",error.message)
-    }finally{
+      console.log("register", error.message)
+    } finally {
       setIsLoading(false)
 
     }

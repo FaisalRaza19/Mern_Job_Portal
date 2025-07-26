@@ -21,7 +21,7 @@ export const ContextApi = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [savedJobIds, setSavedJobIds] = useState([]);
     const [appliedJobIds, setAppliedJobIds] = useState([]);
-    const [jobData, setJobData] = useState([])
+    const [alert, setAlert] = useState();
 
     // verify jwt
     const verifyToken = async () => {
@@ -44,6 +44,7 @@ export const ContextApi = ({ children }) => {
     const fetchUser = async () => {
         try {
             const data = await getUser();
+            showAlert(data)
             if (data.statusCode === 200) {
                 setUserData(data.data);
                 setIsLoggedIn(true);
@@ -77,21 +78,10 @@ export const ContextApi = ({ children }) => {
         }
     }, [userData]);
 
-    // get all jobs 
-    const JobsData = async () => {
-        try {
-            const data = await getAllJobs()
-            setJobData(data.data)
-        } catch (error) {
-            console.log("Error of get all jobs of user", error.message)
-        }
+    const onClose = () => setAlert(null);
+    const showAlert = (data) => {
+        setAlert(data);
     }
-
-    useEffect(() => {
-        if (userData && userData?.role === 'employer') {
-            JobsData()
-        }
-    }, [userData])
 
     const userProfile = { isEditProfile, setIsEditProfile };
     const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn };
@@ -100,7 +90,7 @@ export const ContextApi = ({ children }) => {
         verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
     };
     const Jobs = {
-        postJobs, jobData, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob,
+        postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob,
         saved_applied_jobs, changeApplicationStatus
     };
     const userImage = { image, setImage };
@@ -109,7 +99,7 @@ export const ContextApi = ({ children }) => {
     return (
         <Context.Provider value={{
             userAuth, userData, setUserData, isEmployer, setIsEmployer, userImage, verifyUser, userProfile, Jobs,
-            JobsAction
+            JobsAction, alert, showAlert, onClose
         }}>
             {children}
         </Context.Provider>

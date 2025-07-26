@@ -7,10 +7,6 @@ import { fileSizeFormatter } from "../utility/fileSizeFormater.js"
 import jwt from "jsonwebtoken"
 import { generateUsername } from "../utility/userNameGenerator.js"
 import bcrypt from "bcryptjs";
-import stream from "stream";
-import { promisify } from "util";
-import axios from "axios";
-const pipeline = promisify(stream.pipeline);
 
 // register user
 const valid_register = async (req, res) => {
@@ -298,11 +294,11 @@ const editProfile = async (req, res) => {
         if (!currentUser) {
             return res.status(404).json({ statusCode: 404, message: "User not found" });
         }
-        const { email, fullName, bio, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks = {} } = req.body;
+        const { email, fullName, bio, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks = {},companyLocation} = req.body;
 
         const { linkedin = "", facebook = "", twitter = "", instagram = "", github = "" } = socialLinks;
 
-        if (!email || !userName || !fullName) {
+        if (!email || !userName) {
             return res.status(400).json({ statusCode: 400, message: "Email and Username are required" });
         }
 
@@ -311,13 +307,13 @@ const editProfile = async (req, res) => {
 
         // Validate basic user input
         const inputVerify = validateUserInput(fullName, email, undefined, userName);
-        if (!inputVerify.isValid) {
+        if (!inputVerify.isValid == true) {
             return res.status(400).json({ statusCode: 400, message: inputVerify.errors });
         }
 
         // Validate employer-specific info
         if (currentUser.role === "employer") {
-            if (!companyName || !isNonEmptyString(companyName)) {
+            if (!companyName) {
                 return res.status(400).json({ statusCode: 400, message: "Company name is required" });
             }
             const optionalFields = {
@@ -325,13 +321,14 @@ const editProfile = async (req, res) => {
                 companySize,
                 companyWeb,
                 companyDescription,
-                socialLinks: { linkedin, facebook, twitter, instagram, github }
+                socialLinks: { linkedin, facebook, twitter, instagram, github },
+                companyLocation,
             };
 
             // Only validate if optional fields are provided
             const providedFields = {};
             for (const [key, value] of Object.entries(optionalFields)) {
-                if (isNonEmptyString(value) || typeof value === "object") {
+                if (value || typeof value === "object") {
                     providedFields[key] = value;
                 }
             }
@@ -339,11 +336,14 @@ const editProfile = async (req, res) => {
             if (!companyValidation.isValid) {
                 return res.status(400).json({
                     statusCode: 400,
-                    message: "Invalid company information",
+                    message: companyValidation.errors,
                     errors: companyValidation.errors
                 });
             }
         } else {
+            if(!fullName){
+                return res.status(400).json({ statusCode: 400, message: "fullName is required" });
+            }
             if (typeof bio === 'string' && bio.trim().length > 0 && bio.trim().length < 50) {
                 return res.status(400).json({ statusCode: 400, message: "Bio must be at least 50 characters." });
             }
@@ -364,7 +364,7 @@ const editProfile = async (req, res) => {
         }
 
         // If email changed, send verification code
-        if (currentUser.email !== email) {
+        if (email !== currentUser.email) {
             const verificationCode = await sendEmail(email);
             if (!verificationCode) {
                 return res.status(500).json({ statusCode: 500, message: "Failed to send verification code" });
@@ -389,6 +389,7 @@ const editProfile = async (req, res) => {
             if (companySize) currentUser.companyInfo.companySize = companySize;
             if (companyWeb) currentUser.companyInfo.companyWeb = companyWeb;
             if (companyDescription) currentUser.companyInfo.companyDescription = companyDescription;
+            if (companyLocation) currentUser.companyInfo.companyLocation = companyLocation;
             currentUser.companyInfo.socialLinks = { linkedin, facebook, twitter, instagram, github };
         } else {
             currentUser.jobSeekerInfo.fullName = fullName;
@@ -400,7 +401,7 @@ const editProfile = async (req, res) => {
 
         return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: currentUser });
     } catch (error) {
-        return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the profile.", error: error });
+        return res.status(500).json({ statusCode: 500, message: "An error occurred while edit updating the profile.", error: error });
     }
 };
 
@@ -431,7 +432,7 @@ const updateProfile = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "User data not found in session or verification incomplete. Please complete the edit profile process again." });
         }
 
-        const { fullName, bio, email, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks } = userInfo;
+        const { fullName, bio, email, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks, companyLocation } = userInfo;
         // Update the user profile
         if (role === "employer") {
             user.companyInfo.companyName = companyName
@@ -440,6 +441,7 @@ const updateProfile = async (req, res) => {
             user.companyInfo.companyWeb = companyWeb;
             user.companyInfo.companyDescription = companyDescription;
             user.companyInfo.socialLinks = socialLinks;
+            user.companyInfo.companyLocation = companyLocation;
         } else {
             user.jobSeekerInfo.fullName = fullName;
             user.jobSeekerInfo.bio = bio;
@@ -456,7 +458,7 @@ const updateProfile = async (req, res) => {
 
         return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: user });
     } catch (error) {
-        return res.status(500).json({ statusCode: 500, message: "An error occurred while updating the profile.", error: error.message });
+        return res.status(500).json({ statusCode: 500, message: "An error occurred while verify and updating the profile.", error: error.message });
     }
 };
 
@@ -542,7 +544,7 @@ const update_Skills_Resume = async (req, res) => {
         // Delete existing resume from Cloudinary if needed
         if (resume && user.jobSeekerInfo.resumeUrl?.resume_publicId) {
             const resourceType = "raw"
-            await removeFileFromCloudinary(user.jobSeekerInfo.resumeUrl.resume_publicId,resourceType);
+            await removeFileFromCloudinary(user.jobSeekerInfo.resumeUrl.resume_publicId, resourceType);
         }
 
         // Upload new resume to Cloudinary
@@ -550,7 +552,7 @@ const update_Skills_Resume = async (req, res) => {
         if (resume) {
             const folder = "Job Portal/User Resume";
             const resourceType = "raw"
-            fileUpload = await fileUploadOnCloudinary(resume, folder,resourceType);
+            fileUpload = await fileUploadOnCloudinary(resume, folder, resourceType);
         }
 
         // Save resume URL if uploaded

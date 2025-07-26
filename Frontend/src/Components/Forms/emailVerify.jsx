@@ -6,7 +6,7 @@ import { Context } from "../../Context/context"
 
 const EmailVerify = ({ setIsLogedIn }) => {
   const email = localStorage.getItem("email")
-  const { userAuth, setUserData, isEmployer, setIsEmployer, userProfile } = useContext(Context);
+  const { userAuth, setUserData, isEmployer, setIsEmployer, userProfile, showAlert } = useContext(Context);
   const { isEditProfile } = userProfile
   const { ResendCode, verify_register, verifyAndUpdateProfile } = userAuth
   const navigate = useNavigate();
@@ -77,6 +77,7 @@ const EmailVerify = ({ setIsLogedIn }) => {
       const code = otp.join("");
       if (isEditProfile) {
         const data = await verifyAndUpdateProfile({ code })
+        showAlert(data)
         if (data.statusCode === 200) {
           setUserData(data.data)
           setIsLogedIn(true)
@@ -89,6 +90,7 @@ const EmailVerify = ({ setIsLogedIn }) => {
         }
       } else {
         const data = await verify_register({ code, navigate })
+        showAlert(data)
         if (data.statusCode === 200) {
           setIsLogedIn(true)
         }
@@ -115,6 +117,7 @@ const EmailVerify = ({ setIsLogedIn }) => {
     setResendTimer(60)
     try {
       const data = await ResendCode();
+      showAlert(data)
     } catch (error) {
       console.log("resend code", error.message)
     }

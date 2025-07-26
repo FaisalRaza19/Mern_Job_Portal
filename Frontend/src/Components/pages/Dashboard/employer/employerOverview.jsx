@@ -3,16 +3,15 @@ import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiBriefcase, FiUsers, FiCalendar, FiTrendingUp, FiEdit} from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx";
 
-const EmployerOverview = ({setActiveTab,})=>{
-  const { userData,Jobs } = useContext(Context);
-  const {jobData} = Jobs
-  const activeJobs = jobData.filter((e) => e.status === "Active").length
-  const totalAplication = jobData.map((e)=>e.applicants.length)
+const EmployerOverview = ({setActiveTab,jobData})=>{
+  const { userData,} = useContext(Context);
+  const activeJobs = jobData?.filter((e) => e?.status === "Active").length
+  const totalAplication = jobData?.map((e)=>e?.applicants.length)
   const user = userData;
 
   const stats = [
-    { label: "Active Jobs", value: activeJobs, icon: FiBriefcase, color: "text-blue-600" },
-    { label: "Total Applications", value: totalAplication.reduce((e,i)=>e+i,0), icon: FiUsers, color: "text-green-600" },
+    { label: "Active Jobs", value: activeJobs || "0", icon: FiBriefcase, color: "text-blue-600" },
+    { label: "Total Applications", value: totalAplication?.reduce((e,i)=>e+i,0) || "0", icon: FiUsers, color: "text-green-600" },
     { label: "Interviews Scheduled", value: "12", icon: FiCalendar, color: "text-purple-600" },
     { label: "Hires This Month", value: "3", icon: FiTrendingUp, color: "text-orange-600" },
   ]

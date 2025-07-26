@@ -47,7 +47,10 @@ const companyInfoSchema = {
     companyWeb: {
         type: String,
     },
-    socialLinks: socialLinksSchema
+    companyLocation: {
+        type: String
+    },
+    socialLinks: socialLinksSchema,
 }
 
 // job seeker info schema

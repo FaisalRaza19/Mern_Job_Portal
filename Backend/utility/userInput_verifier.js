@@ -37,8 +37,6 @@ const validateUserInput = (fullName, email, password, userName) => {
   return { isValid, errors };
 };
 
-
-
 // verify company data 
 const isValidURL = (url) => {
   try {
@@ -147,7 +145,7 @@ const validateCompanyData = (data) => {
   const socialErrors = validateSocialLinks(data.socialLinks || {});
   for (const [key, isValid] of Object.entries(socialErrors)) {
     if (!isValid) {
-      errors[`socialLinks.${key}`] = `${key} URL is invalid.`;
+      errors[`socialLinks.${key}`] = `${key} URL is invalid. Get ${key} user profile not ${key} url`;
     }
   }
 

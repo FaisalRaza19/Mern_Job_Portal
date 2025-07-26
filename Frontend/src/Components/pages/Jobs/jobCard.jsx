@@ -4,7 +4,7 @@ import { FaBriefcase, FaCheckCircle, FaMapMarkerAlt, FaDollarSign, FaClock, FaTa
 import { Context } from "../../../Context/context";
 
 const JobCard = ({ job }) => {
-  const { Jobs, JobsAction } = useContext(Context)
+  const { Jobs, JobsAction,showAlert} = useContext(Context)
   const { savedJobIds, setSavedJobIds, appliedJobIds } = JobsAction;
   const { saveJob } = Jobs
   const isSaved = savedJobIds.includes(job._id);
@@ -13,6 +13,7 @@ const JobCard = ({ job }) => {
   const handleSaveToggle = async () => {
     try {
       const res = await saveJob({ jobId: job._id });
+      showAlert(res)
       if (res.statusCode === 200) {
         setSavedJobIds((prev) =>
           isSaved ? prev.filter((id) => id !== job._id) : [...prev, job._id]

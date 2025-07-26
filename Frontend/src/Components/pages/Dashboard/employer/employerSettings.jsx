@@ -1,12 +1,12 @@
-import React,{ useContext, useRef, useState } from "react"
+import React, { useContext, useRef, useState } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiSave, FiTrash2, FiEye, FiEyeOff, FiUpload, FiLoader } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
-import { industryOptions, socialLinks } from "../../../../temp/data.js"
+import { industryOptions } from "../../../../temp/data.js"
 import { useNavigate } from "react-router-dom"
 
 const EmployerSettings = () => {
-  const { userData, userAuth, userImage, userProfile } = useContext(Context);
+  const { userData, setUserData, userAuth, userImage, userProfile, showAlert } = useContext(Context);
   const { setIsEditProfile } = userProfile
   const { updateAvatar, editProfile } = userAuth
   const { image, setImage } = userImage
@@ -25,6 +25,7 @@ const EmployerSettings = () => {
     companySize: user?.companyInfo?.companySize || "",
     companyWeb: user?.companyInfo?.companyWeb || "",
     companyDescription: user?.companyInfo?.companyDescription || "",
+    companyLocation: user?.companyInfo?.companyLocation,
     socialLinks: {
       facebook: user?.companyInfo?.socialLinks?.facebook || "",
       linkedin: user?.companyInfo?.socialLinks?.linkedin || "",
@@ -81,10 +82,12 @@ const EmployerSettings = () => {
     try {
       const userData = companyData
       const data = await editProfile({ userData, navigate })
+      showAlert(data)
       if (data.statusCode === 201) {
         setIsEditProfile(true)
+      } else if (data.statusCode === 200) {
+        setUserData(data.data)
       }
-      console.log(data);
     }
     catch (error) {
       console.log("Error updating profile:", error.message)
@@ -92,7 +95,6 @@ const EmployerSettings = () => {
       setLoading(false)
     }
   }
-
 
   // update avatar
   const fileInputRef = useRef();
@@ -105,9 +107,10 @@ const EmployerSettings = () => {
       const file = e.target.files[0];
       setLoading(true)
       if (!file) {
-        console.log("File is required",);
+        showAlert({ message: "File is required" })
       }
       const data = await updateAvatar(file)
+      showAlert(data)
       setImage(data.data)
       setLoading(false)
     } catch (error) {
@@ -132,7 +135,7 @@ const EmployerSettings = () => {
                 {user?.companyInfo ? (
                   <img
                     src={image || user?.avatar?.avatar_Url}
-                    alt="User Avatar"
+                    alt="company Avatar"
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
@@ -217,6 +220,16 @@ const EmployerSettings = () => {
                     value={companyData.companyWeb || ""}
                     onChange={(e) => handleInputChange("companyWeb", e.target.value)}
                     placeholder="https://www.company.com"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">company Location</label>
+                  <input
+                    type="text"
+                    value={companyData.companyLocation || ""}
+                    onChange={(e) => handleInputChange("companyLocation", e.target.value)}
+                    placeholder="e.g New York"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>

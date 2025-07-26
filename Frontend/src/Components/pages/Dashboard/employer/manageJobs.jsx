@@ -6,9 +6,9 @@ import JobEditFormModal from "./editJobs.jsx"
 import { Context } from "../../../../Context/context.jsx"
 
 
-const ManageJobs = ({ setActiveTab}) => {
-  const { Jobs } = useContext(Context)
-  const { jobData, delJob, changeStatus } = Jobs
+const ManageJobs = ({ setActiveTab,jobData }) => {
+  const { Jobs, showAlert} = useContext(Context)
+  const {delJob, changeStatus } = Jobs
   const [jobs, setJobs] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -23,7 +23,7 @@ const ManageJobs = ({ setActiveTab}) => {
     try {
       setIsLoading(true)
       const data = jobData
-      setJobs(data)
+      setJobs(data);
     } catch (error) {
       console.log("Error of get all jobs of user", error.message)
     } finally {
@@ -60,6 +60,7 @@ const ManageJobs = ({ setActiveTab}) => {
     try {
       setIsLoading(true)
       const data = await delJob(jobId);
+      showAlert(data)
       setJobs(jobs.filter((job) => job._id !== jobId))
       setShowDeleteModal(null)
     } catch (error) {
@@ -74,6 +75,7 @@ const ManageJobs = ({ setActiveTab}) => {
     try {
       const Data = { status: newStatus, jobId }
       const data = await changeStatus({ Data })
+      showAlert(data)
       if (data.statusCode === 200) {
         setJobs(jobs.map((job) => (job._id === jobId ? { ...job, status: newStatus } : job)))
         setShowActionMenu(null)
@@ -81,6 +83,13 @@ const ManageJobs = ({ setActiveTab}) => {
     } catch (error) {
       console.log("error during change status", error.message)
     }
+  }
+
+  const handleJobUpdate = (updatedJob) => {
+    setJobs((prevJobs) =>
+      prevJobs.map((job) => (job._id === updatedJob._id ? updatedJob : job))
+    )
+    setShowEditModal(null)
   }
 
   const jobToPreview = showPreviewModal ? jobs.find((job) => job._id === showPreviewModal) : null
@@ -333,7 +342,7 @@ const ManageJobs = ({ setActiveTab}) => {
       {jobToPreview && <JobPreviewModal job={jobToPreview} onClose={() => setShowPreviewModal(null)} />}
 
       {/* Job Edit Form Modal */}
-      {jobToEdit && <JobEditFormModal job={jobToEdit} onClose={() => setShowEditModal(null)} />}
+      {jobToEdit && <JobEditFormModal job={jobToEdit} onUpdate={handleJobUpdate} onClose={() => setShowEditModal(null)} />}
     </div>
   )
 }

@@ -7,9 +7,9 @@ import SelectSkills from "../shared/selectSkills.jsx"
 
 const JobSeekerProfile = () => {
   const navigate = useNavigate()
-  const { userAuth, userData, userImage, userProfile, } = useContext(Context)
+  const { userAuth, userData, userImage, userProfile,showAlert} = useContext(Context)
   const { setIsEditProfile } = userProfile
-  const { updateAvatar, editProfile, update_Edu_Exp, update_skills_resume, } = userAuth;
+  const { updateAvatar, editProfile, update_Edu_Exp, update_skills_resume} = userAuth;
   const { image, setImage } = userImage
   const user = userData;
   const [isLoading, setLoading] = useState(false);
@@ -75,6 +75,7 @@ const JobSeekerProfile = () => {
     setLoading(true)
     try {
       const data = await update_Edu_Exp(edu_exp)
+      showAlert(data)
     } catch (error) {
       console.log("Error updating profile:", error.message)
     } finally {
@@ -89,6 +90,7 @@ const JobSeekerProfile = () => {
     try {
       const userData = userInfo
       const data = await editProfile({ userData, navigate })
+      showAlert(data)
       if (data.statusCode === 201) {
         setIsEditProfile(true)
       }
@@ -113,6 +115,7 @@ const JobSeekerProfile = () => {
         console.log("File is required",);
       }
       const data = await updateAvatar(file)
+      showAlert(data)
       setImage(data.data)
       setLoading(false)
     } catch (error) {
@@ -143,6 +146,7 @@ const JobSeekerProfile = () => {
     setLoading(true)
     try {
       const data = await update_skills_resume({ skills, resumeFile })
+      showAlert(data)
       if (data.statusCode === 200) {
         setResumeUrl(data.data.resumeUrl)
         setSkills(data.data.Skills)
