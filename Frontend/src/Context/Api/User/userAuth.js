@@ -36,8 +36,6 @@ export const verify_register = async ({ code, navigate }) => {
             return { message: errorDetails.message };
         }
 
-        console.log(response)
-
         const data = await response.json();
         localStorage.setItem("user_token", data.accesstoken);
         if (data.data.role === "jobseeker") {

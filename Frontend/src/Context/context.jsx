@@ -7,7 +7,7 @@ import {
 
 import {
     postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId,
-    applyJob, saveJob, saved_applied_jobs, changeApplicationStatus
+    applyJob, saveJob, saved_applied_jobs, changeApplicationStatus,allCompanies,companyAlljobs
 } from "./Api/User/Jobs.js";
 
 export const Context = createContext();
@@ -91,7 +91,7 @@ export const ContextApi = ({ children }) => {
     };
     const Jobs = {
         postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob,
-        saved_applied_jobs, changeApplicationStatus
+        saved_applied_jobs, changeApplicationStatus,allCompanies,companyAlljobs
     };
     const userImage = { image, setImage };
     const JobsAction = { savedJobIds, setSavedJobIds, appliedJobIds, setAppliedJobIds }

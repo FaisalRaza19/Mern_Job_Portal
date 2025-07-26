@@ -132,13 +132,13 @@ const changeJobStatus = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "Job is not exist" })
         }
 
-        if(job.company.equals(user.id)){
+        if (job.company.equals(user.id)) {
             job.status = status
         }
 
         await job.save()
 
-        return res.status(200).json({ statusCode: 200, message: "Job status change successfully",})
+        return res.status(200).json({ statusCode: 200, message: "Job status change successfully", })
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Something went wrong to change the status", error: error.message })
     }
@@ -205,7 +205,7 @@ const getAllJobs = async (req, res) => {
         }
 
         // find the job is exist
-        const job = await Job.find({ company: user.id }).sort({ createdAt: -1 }).populate({path:"applicants.User",select:"-password -refreshToken -jobSeekerInfo.appliedJobs -jobSeekerInfo.savedJobs"})
+        const job = await Job.find({ company: user.id }).sort({ createdAt: -1 }).populate({ path: "applicants.User", select: "-password -refreshToken -jobSeekerInfo.appliedJobs -jobSeekerInfo.savedJobs" })
 
         if (!job || job.length === 0) {
             return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
@@ -217,6 +217,7 @@ const getAllJobs = async (req, res) => {
     }
 }
 
+// all job present in db
 const allJob = async (req, res) => {
     try {
         const job = await Job.find().populate({
@@ -234,4 +235,37 @@ const allJob = async (req, res) => {
     }
 }
 
-export { postJob, editJob,changeJobStatus,deleteJob, getJob, getAllJobs, allJob }
+// get all companies present in db
+const allCompanies = async (req, res) => {
+    try {
+        const companies = await User.find({ role: "employer" }).select("-password -refreshToken")
+
+        if (!companies || companies.length === 0) {
+            return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
+        }
+
+        return res.status(200).json({ statusCode: 200, message: "all Companies get successfully", data: companies })
+    } catch (error) {
+        return res.status(500).json({ statusCode: 500, message: "Something went wrong to get the allCompanies", error: error.message })
+    }
+}
+
+// get all job of particular company 
+const companiesAllJobs = async (req, res) => {
+    try {
+        const { companyId } = req.params
+        const companiesJobs = await Job.find({ company: companyId }).select("-applicants").populate(
+            { path: "company", select: "-password -refreshToken" }
+        )
+
+        if (!companiesJobs || companiesJobs.length === 0) {
+            return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
+        }
+
+        return res.status(200).json({ statusCode: 200, message: "Company all jobs get successfully", data: companiesJobs })
+    } catch (error) {
+        return res.status(500).json({ statusCode: 500, message: "Something went wrong to get the allCompanies jobs", error: error.message })
+    }
+}
+
+export { postJob, editJob, changeJobStatus, deleteJob, getJob, getAllJobs, allJob, allCompanies, companiesAllJobs }

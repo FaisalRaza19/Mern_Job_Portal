@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { upload } from "../Middleware/Multer.js";
 import { verify_token } from "../Middleware/auth_middleware.js";
-import { postJob, editJob,changeJobStatus,deleteJob, getJob, getAllJobs, allJob } from "../Controller/job_controller.js";
+import {
+    postJob, editJob, changeJobStatus, deleteJob, getJob, getAllJobs,
+    allJob, allCompanies,companiesAllJobs
+} from "../Controller/job_controller.js";
 import { applyJob, saveJob, getSavedAndAppliedJobs, changeApplicationStatus } from "../Controller/apply_manage_job_controller.js"
 
 export const route = Router()
@@ -19,3 +22,7 @@ route.route("/applyJob").post(upload.fields([{ name: "resume", maxCount: 1 }]), 
 route.route("/saveJob").post(upload.none(), verify_token, saveJob)
 route.route("/get-Saved-applied-Jobs").get(upload.none(), verify_token, getSavedAndAppliedJobs)
 route.route("/change-status").post(upload.none(), verify_token, changeApplicationStatus)
+
+// get all Companies
+route.route("/allCompanies").get(upload.none(),allCompanies)
+route.route("/companiesAllJobs/:companyId").get(upload.none(),companiesAllJobs)

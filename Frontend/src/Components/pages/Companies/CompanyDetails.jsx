@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import JobList from "./components/JobList.jsx"
 import ReviewForm from "./components/ReviewForm.jsx"
 import ReviewList from "./components/ReviewList.jsx"
@@ -6,6 +6,7 @@ import SkeletonCompanyDetails from "./components/Skeleton/CompanyDetail.jsx"
 import { FaMapPin, FaBriefcase, FaGlobe, FaUsers, FaPhone, FaArrowLeft } from 'react-icons/fa'
 import { FiAlertCircle, FiMail } from 'react-icons/fi'
 import { Link, useParams } from 'react-router-dom'
+import { Context } from '../../../Context/context.jsx'
 
 // Mock Data for all companies (imported to find the specific company)
 const allCompaniesData = [
@@ -201,29 +202,43 @@ const allMockReviews = [
 ]
 
 const CompanyDetails = () => {
-    const {companyId} = useParams();
-
-    const [company, setCompany] = useState(null)
-    const [jobs, setJobs] = useState([])
+    const { companyId } = useParams();
+    const { Jobs } = useContext(Context);
+    const { companyAlljobs } = Jobs
+    const [CompanyDetails, setCompanyDetails] = useState("")
+    const [companyJobs, setCompanyJobs] = useState([]);
     const [reviews, setReviews] = useState([])
     const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        setLoading(true)
-        setTimeout(() => {
-            const foundCompany = allCompaniesData.find((c) => c.id === companyId)
-            if (foundCompany) {
-                setCompany(foundCompany)
-                setJobs(allMockJobs.filter((job) => job.companyId === companyId))
-                setReviews(allMockReviews.filter((review) => review.companyId === companyId))
-            } else {
-                setCompany(null)
-                setJobs([])
-                setReviews([])
-            }
+    // get company details and jobs
+    const companyDetails = async () => {
+        try {
+            setLoading(true)
+            const data = await companyAlljobs(companyId);
+            console.log(data)
+            setTimeout(() => {
+                if (data.statusCode === 200) {
+                    setCompanyDetails(data?.data?.[0].company)
+                    // setCompany(foundCompany)
+                    setCompanyJobs(data?.data)
+                    setReviews(allMockReviews.filter((review) => review.companyId === companyId))
+                } else {
+                    setCompany(null)
+                    setJobs([])
+                    setReviews([])
+                }
+            }, 800)
+        } catch (error) {
+            console.log("error during get compnay detaisl", error.message)
+        } finally {
             setLoading(false)
-        }, 800)
+        }
+    }
+
+    useEffect(() => {
+        companyDetails();
     }, [companyId])
+
 
     const handleReviewSubmit = (newReview) => {
         console.log("New review submitted:", newReview)
@@ -302,7 +317,7 @@ const CompanyDetails = () => {
         )
     }
 
-    if (!company) {
+    if (!companyDetails) {
         return (
             <main className="flex min-h-screen flex-col items-center justify-center ">
                 <FiAlertCircle className="mb-4 h-16 w-16 text-gray-500 dark:text-gray-400" />
@@ -334,64 +349,56 @@ const CompanyDetails = () => {
                 <section className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
                     <div className="flex flex-col items-center md:flex-row md:items-start md:space-x-6">
                         <img
-                            src={company.logo || "/placeholder.svg?height=128&width=128&query=company%20logo"}
-                            alt={`${company.name} logo`}
+                            src={CompanyDetails?.avatar?.avatar_Url || "/placeholder.svg?height=128&width=128&query=company%20logo"}
                             width={128}
                             height={128}
                             className="mb-4 h-32 w-32 rounded-full object-cover"
                         />
                         <div className="text-center md:text-left">
-                            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50">{company.name}</h1>
+                            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50">{CompanyDetails?.companyInfo?.companyName || ""}</h1>
                             <div className="mt-2 flex items-center justify-center space-x-4 text-gray-700 dark:text-gray-300 md:justify-start">
                                 <span className="flex items-center text-lg">
                                     <FaBriefcase className="mr-2 h-5 w-5" />
-                                    {company.industry}
+                                    {CompanyDetails?.companyInfo?.companyType || ""}
                                 </span>
                                 <span className="flex items-center text-lg">
                                     <FaMapPin className="mr-2 h-5 w-5" />
-                                    {company.location.split(",")[0]}
+                                    {CompanyDetails?.companyInfo?.companyLocation.split(",")[0]}
                                 </span>
                             </div>
                             <div className="mt-4 grid grid-cols-1 gap-2 text-gray-700 dark:text-gray-300 md:grid-cols-2 md:gap-4">
                                 <div className="flex items-center">
                                     <FaUsers className="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" />
-                                    <span>{company.size}</span>
+                                    <span>{CompanyDetails?.companyInfo?.companySize || 0}</span>
                                 </div>
                                 <a
-                                    href={company.website}
+                                    href={CompanyDetails?.companyInfo?.companyWeb || "/"}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center text-blue-600 hover:underline dark:text-blue-400"
                                 >
                                     <FaGlobe className="mr-2 h-5 w-5" />
-                                    {company.website.replace(/(^\w+:|^)\/\//, "")}
+                                    {CompanyDetails?.companyInfo?.companyWeb.replace(/(^\w+:|^)\/\//, "")}
                                 </a>
                                 <a
-                                    href={`mailto:${company.email}`}
+                                    href={`mailto:${CompanyDetails?.email}`}
                                     className="flex items-center text-blue-600 hover:underline dark:text-blue-400"
                                 >
                                     <FiMail className="mr-2 h-5 w-5" />
-                                    {company.email}
-                                </a>
-                                <a
-                                    href={`tel:${company.phone}`}
-                                    className="flex items-center text-blue-600 hover:underline dark:text-blue-400"
-                                >
-                                    <FaPhone className="mr-2 h-5 w-5" />
-                                    {company.phone}
+                                    {CompanyDetails?.email}
                                 </a>
                             </div>
                         </div>
                     </div>
                     <div className="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
                         <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-gray-50">About Us</h2>
-                        <p className="text-gray-700 dark:text-gray-300">{company.description}</p>
+                        <p className="text-gray-700 dark:text-gray-300">{CompanyDetails?.companyInfo?.companyDescription}</p>
                     </div>
                 </section>
 
                 {/* Job List Section */}
                 <section>
-                    <JobList jobs={jobs} />
+                    <JobList jobs={companyJobs} />
                 </section>
 
                 {/* Review Section */}

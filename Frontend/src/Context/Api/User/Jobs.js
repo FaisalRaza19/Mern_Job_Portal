@@ -282,3 +282,47 @@ export const changeApplicationStatus = async ({ Data }) => {
         return error.message
     }
 }
+
+// get all companies
+export const allCompanies = async()=>{
+    try {
+        const response = await fetch(job.allCompanies, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails };
+        }
+        const data = await response.json();
+        return data
+    } catch (error) {
+        return error.message
+    }
+}
+
+// company all jobs 
+export const companyAlljobs = async(companyId)=>{
+    try {
+        const response = await fetch(`${job.companyAllJobs}/${companyId}`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            const errorDetails = await response.json();
+            return { message: errorDetails };
+        }
+        const data = await response.json();
+        return data
+    } catch (error) {
+        return error.message
+    }
+}
