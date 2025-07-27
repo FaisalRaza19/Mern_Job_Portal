@@ -27,8 +27,15 @@ export const job = {
     applyJob: `http://localhost:${port}/jobs/applyJob`,
     saveJob: `http://localhost:${port}/jobs/saveJob`,
     getSaved_Applied_Jobs: `http://localhost:${port}/jobs/get-Saved-applied-Jobs`,
-    changeApplicationStatus : `http://localhost:${port}/jobs/change-status`,
+    changeApplicationStatus: `http://localhost:${port}/jobs/change-status`,
     // get all companies
-    allCompanies : `http://localhost:${port}/jobs/allCompanies`,
-    companyAllJobs : `http://localhost:${port}/jobs/companiesAllJobs`
+    allCompanies: `http://localhost:${port}/jobs/allCompanies`,
+    companyAllJobs: `http://localhost:${port}/jobs/companiesAllJobs`
+}
+
+export const review = {
+    addReview: `http://localhost:${port}/review/addReview`,
+    editReview: `http://localhost:${port}/review/editReview`,
+    delReview: `http://localhost:${port}/review/delReview`,
+    getAllReview: `http://localhost:${port}/review/getReview`
 }

@@ -10,6 +10,8 @@ import {
     applyJob, saveJob, saved_applied_jobs, changeApplicationStatus,allCompanies,companyAlljobs
 } from "./Api/User/Jobs.js";
 
+import {getAllReviews,addReview,editReview,delReview} from "./Api/User/Reviews.js"
+
 export const Context = createContext();
 
 export const ContextApi = ({ children }) => {
@@ -93,13 +95,14 @@ export const ContextApi = ({ children }) => {
         postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob,
         saved_applied_jobs, changeApplicationStatus,allCompanies,companyAlljobs
     };
+    const reviews = {getAllReviews,addReview,editReview,delReview}
     const userImage = { image, setImage };
     const JobsAction = { savedJobIds, setSavedJobIds, appliedJobIds, setAppliedJobIds }
 
     return (
         <Context.Provider value={{
             userAuth, userData, setUserData, isEmployer, setIsEmployer, userImage, verifyUser, userProfile, Jobs,
-            JobsAction, alert, showAlert, onClose
+            JobsAction, alert, showAlert, onClose,reviews
         }}>
             {children}
         </Context.Provider>

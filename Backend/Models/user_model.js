@@ -13,9 +13,33 @@ const appliedJobs = {
     isApplied: {
         type: Boolean
     },
-    date : {
-        type : Date,
-        default : Date.now()
+    date: {
+        type: Date,
+        default: Date.now()
+    }
+}
+
+// review schema
+const reviewSchema = {
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true
+    },
+    title: String,
+    comment: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 }
 
@@ -51,6 +75,7 @@ const companyInfoSchema = {
         type: String
     },
     socialLinks: socialLinksSchema,
+    companyReviews : [reviewSchema]
 }
 
 // job seeker info schema

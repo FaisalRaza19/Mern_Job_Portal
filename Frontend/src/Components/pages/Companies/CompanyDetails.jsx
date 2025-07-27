@@ -3,211 +3,19 @@ import JobList from "./components/JobList.jsx"
 import ReviewForm from "./components/ReviewForm.jsx"
 import ReviewList from "./components/ReviewList.jsx"
 import SkeletonCompanyDetails from "./components/Skeleton/CompanyDetail.jsx"
-import { FaMapPin, FaBriefcase, FaGlobe, FaUsers, FaPhone, FaArrowLeft } from 'react-icons/fa'
+import { FaMapPin, FaBriefcase, FaGlobe, FaUsers, FaArrowLeft } from 'react-icons/fa'
 import { FiAlertCircle, FiMail } from 'react-icons/fi'
 import { Link, useParams } from 'react-router-dom'
 import { Context } from '../../../Context/context.jsx'
 
-// Mock Data for all companies (imported to find the specific company)
-const allCompaniesData = [
-    {
-        id: "1",
-        name: "Tech Solutions Inc.",
-        logo: "/placeholder.svg?height=128&width=128",
-        location: "123 Tech Street, New York, NY 10001, USA",
-        industry: "Software Development, IT Services",
-        rating: 4.5,
-        size: "500-1000 employees",
-        website: "https://www.techsolutions.com",
-        email: "info@techsolutions.com",
-        phone: "+1 (212) 555-0100",
-        description:
-            "Tech Solutions Inc. is a leading innovator in software development and IT services, dedicated to creating cutting-edge solutions for businesses worldwide. With a focus on cloud computing, AI, and cybersecurity, we empower our clients to achieve digital transformation and stay ahead in a rapidly evolving technological landscape. Our team of passionate experts thrives on collaboration and continuous learning, fostering an environment where creativity and problem-solving flourish. We are committed to delivering excellence and driving impactful change through technology.",
-    },
-    {
-        id: "2",
-        name: "Global Finance Group",
-        logo: "/placeholder.svg?height=128&width=128",
-        location: "45 Wall Street, London, UK",
-        industry: "Finance",
-        rating: 4.2,
-        size: "1000+ employees",
-        website: "https://www.globalfinance.com",
-        email: "contact@globalfinance.com",
-        phone: "+44 20 7123 4567",
-        description:
-            "Global Finance Group is a premier financial services firm offering a wide range of solutions from investment banking to asset management. We pride ourselves on our global reach and deep market insights, helping clients navigate complex financial landscapes. Our commitment to integrity and client success drives everything we do.",
-    },
-    {
-        id: "3",
-        name: "Health Innovations",
-        logo: "/placeholder.svg?height=128&width=128",
-        location: "789 Medical Ave, San Francisco, CA 94105, USA",
-        industry: "Healthcare",
-        rating: 4.8,
-        size: "51-200 employees",
-        website: "https://www.healthinnovations.org",
-        email: "info@healthinnovations.org",
-        phone: "+1 (415) 987-6543",
-        description:
-            "Health Innovations is at the forefront of medical technology and patient care. We develop groundbreaking solutions that improve health outcomes and enhance the quality of life. Our collaborative environment fosters innovation and a deep commitment to making a difference in the healthcare sector.",
-    },
-    // Add more company data here if needed for dynamic testing
-]
-
-// Mock Data for jobs related to any company (will be filtered by companyId)
-const allMockJobs = [
-    {
-        id: "job1",
-        companyId: "1",
-        title: "Senior Software Engineer (Frontend)",
-        location: "New York, NY (Hybrid)",
-        salary: "$120,000 - $150,000",
-        experience: "5+ years",
-        status: "Active",
-    },
-    {
-        id: "job2",
-        companyId: "1",
-        title: "Cloud Solutions Architect",
-        location: "Remote",
-        salary: "$130,000 - $160,000",
-        experience: "7+ years",
-        status: "Active",
-    },
-    {
-        id: "job3",
-        companyId: "1",
-        title: "Product Manager (AI/ML)",
-        location: "New York, NY",
-        salary: "$110,000 - $140,000",
-        experience: "4+ years",
-        status: "Active",
-    },
-    {
-        id: "job4",
-        companyId: "1",
-        title: "DevOps Engineer",
-        location: "New York, NY (Hybrid)",
-        salary: "$100,000 - $130,000",
-        experience: "3+ years",
-        status: "Active",
-    },
-    {
-        id: "job5",
-        companyId: "1",
-        title: "Cybersecurity Analyst",
-        location: "New York, NY",
-        salary: "$90,000 - $120,000",
-        experience: "2+ years",
-        status: "Active",
-    },
-    {
-        id: "job6",
-        companyId: "1",
-        title: "Junior Software Developer",
-        location: "New York, NY",
-        salary: "$70,000 - $90,000",
-        experience: "0-2 years",
-        status: "Active",
-    },
-    {
-        id: "job7",
-        companyId: "1",
-        title: "HR Business Partner",
-        location: "New York, NY",
-        salary: "$80,000 - $100,000",
-        experience: "3+ years",
-        status: "Inactive", // This job should not be shown initially
-    },
-    {
-        id: "job8",
-        companyId: "2",
-        title: "Financial Analyst",
-        location: "London, UK",
-        salary: "£50,000 - £70,000",
-        experience: "2+ years",
-        status: "Active",
-    },
-    {
-        id: "job9",
-        companyId: "2",
-        title: "Investment Banker",
-        location: "London, UK",
-        salary: "£80,000 - £120,000",
-        experience: "5+ years",
-        status: "Active",
-    },
-    {
-        id: "job10",
-        companyId: "3",
-        title: "Biomedical Engineer",
-        location: "San Francisco, CA",
-        salary: "$90,000 - $110,000",
-        experience: "3+ years",
-        status: "Active",
-    },
-]
-
-// Mock Data for reviews related to any company (will be filtered by companyId)
-const allMockReviews = [
-    {
-        id: "rev1",
-        companyId: "1",
-        rating: 5,
-        headline: "Great place to grow!",
-        message:
-            "Tech Solutions Inc. offers an amazing environment for professional growth. The leadership is supportive, and the projects are challenging and innovative. Highly recommend for anyone looking to make a real impact.",
-        author: "Jane Doe",
-        date: "2023-10-26",
-    },
-    {
-        id: "rev2",
-        companyId: "1",
-        rating: 4,
-        headline: "Good work-life balance",
-        message:
-            "The company truly values work-life balance, which is rare in the tech industry. Compensation is competitive, and the benefits package is comprehensive. Some processes could be more streamlined, but overall a positive experience.",
-        author: "John Smith",
-        date: "2023-09-15",
-    },
-    {
-        id: "rev3",
-        companyId: "1",
-        rating: 5,
-        headline: "Innovative and collaborative",
-        message:
-            "Working at Tech Solutions Inc. has been a fantastic experience. The teams are highly collaborative, and there is a strong emphasis on innovation. Always learning something new here!",
-        author: "Alice Johnson",
-        date: "2023-08-01",
-    },
-    {
-        id: "rev4",
-        companyId: "2",
-        rating: 4,
-        headline: "Solid financial firm",
-        message: "Professional environment with good opportunities in finance. Fast-paced but rewarding.",
-        author: "Michael Brown",
-        date: "2023-11-01",
-    },
-    {
-        id: "rev5",
-        companyId: "3",
-        rating: 5,
-        headline: "Pioneering healthcare solutions",
-        message: "Exciting work in a field that truly matters. The team is brilliant and dedicated.",
-        author: "Sarah Green",
-        date: "2023-12-05",
-    },
-]
-
 const CompanyDetails = () => {
     const { companyId } = useParams();
-    const { Jobs } = useContext(Context);
+    const { Jobs, reviews, userData, showAlert } = useContext(Context);
     const { companyAlljobs } = Jobs
+    const { getAllReviews } = reviews
     const [CompanyDetails, setCompanyDetails] = useState("")
     const [companyJobs, setCompanyJobs] = useState([]);
-    const [reviews, setReviews] = useState([])
+    const [allReviews, setAllReviews] = useState([])
     const [loading, setLoading] = useState(true)
 
     // get company details and jobs
@@ -215,17 +23,17 @@ const CompanyDetails = () => {
         try {
             setLoading(true)
             const data = await companyAlljobs(companyId);
-            console.log(data)
+            const res = await getAllReviews(companyId);
             setTimeout(() => {
                 if (data.statusCode === 200) {
                     setCompanyDetails(data?.data?.[0].company)
-                    // setCompany(foundCompany)
                     setCompanyJobs(data?.data)
-                    setReviews(allMockReviews.filter((review) => review.companyId === companyId))
+                    if (res.statusCode === 200) {
+                        setAllReviews(res?.data?.companyInfo?.companyReviews)
+                    }
                 } else {
                     setCompany(null)
                     setJobs([])
-                    setReviews([])
                 }
             }, 800)
         } catch (error) {
@@ -239,15 +47,42 @@ const CompanyDetails = () => {
         companyDetails();
     }, [companyId])
 
+    // already saved by you, just modify handleReviewSubmit
+    const handleReviewSubmit = async (newReview) => {
+        try {
+            const formData = {
+                title: newReview.headline,
+                rating: newReview.rating,
+                comment: newReview.message,
+            }
+            const data = await reviews.addReview({ companyId, formData });
+            showAlert(data);
 
-    const handleReviewSubmit = (newReview) => {
-        console.log("New review submitted:", newReview)
-        // In a real app, you'd send this to an API and update state/re-fetch reviews
-        const newId = `rev${allMockReviews.length + 1}` // Simple mock ID
-        const reviewWithCompanyId = { ...newReview, id: newId, companyId: companyId }
-        setReviews((prevReviews) => [reviewWithCompanyId, ...prevReviews]) // Add new review to the top
-        alert("Review submitted! (Mock)")
+            if (data.statusCode === 200) {
+                const manualReview = {
+                    _id: Date.now().toString(),
+                    title: formData.title,
+                    comment: formData.comment,
+                    rating: formData.rating,
+                    createdAt: new Date().toISOString(),
+                    userId: {
+                        _id: userData?._id,
+                        jobSeekerInfo: {
+                            fullName: userData?.jobSeekerInfo?.fullName || "You",
+                        },
+                        avatar: userData?.avatar || { avatar_Url: "" },
+                    },
+                };
+
+                setAllReviews((prev) => [manualReview, ...prev]);
+            }
+        } catch (err) {
+            console.error("Failed to submit review", err);
+            alert("Something went wrong. Try again.");
+        }
     }
+
+
 
     if (loading) {
         return (
@@ -404,7 +239,7 @@ const CompanyDetails = () => {
                 {/* Review Section */}
                 <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                     <ReviewForm onSubmit={handleReviewSubmit} />
-                    <ReviewList reviews={reviews} />
+                    <ReviewList reviews={allReviews} userId={userData?._id} setReviews={setAllReviews} />
                 </section>
             </div>
         </main>
