@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useChat } from "../../../../../Context/chatContext.jsx";
 import { Context } from "../../../../../Context/context.jsx";
-import ChatSidebar from "./ChatSidebar.jsx";
+import ChatSidebar from "./ChatSideBar.jsx";
 import ChatWindow from "./ChatWindow.jsx";
 import WelcomeScreen from "./WelcomeScreen.jsx";
 
