@@ -2,9 +2,21 @@ import React, { useEffect, useState } from "react"
 import { FaStar, FaMapPin, FaBriefcase } from "react-icons/fa"
 import { Link } from "react-router-dom"
 
-const CompanyCard = ({ company, index}) => {
+const CompanyCard = ({ company, index }) => {
   const [isVisible, setIsVisible] = useState(false)
+  const [averageRating, setAverageRating] = useState(0)
 
+  useEffect(() => {
+    if (company?.companyInfo?.companyReviews && company?.companyInfo?.companyReviews.length > 0) {
+      const totalRating = company?.companyInfo?.companyReviews.reduce((sum, review) => sum + review.rating, 0)
+      const avg = (totalRating / company?.companyInfo?.companyReviews.length).toFixed(1)
+      setAverageRating(parseFloat(avg))
+    } else {
+      setAverageRating(0)
+    }
+  }, [company])
+
+  // Animation effect for cards
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true)
@@ -24,12 +36,16 @@ const CompanyCard = ({ company, index}) => {
           width={64}
           height={64}
           className="h-16 w-16 rounded-full object-cover"
+          alt={`${company?.companyInfo?.companyName} logo`}
         />
         <div className="flex-1">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-50">{company?.companyInfo?.companyName}</h3>
           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
             <FaStar className="mr-1 h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span>{0}</span>
+            <span>{averageRating}</span>
+            {company?.companyReviews && company.companyReviews.length > 0 && (
+              <span className="ml-1">({company.companyReviews.length} reviews)</span>
+            )}
           </div>
         </div>
       </div>

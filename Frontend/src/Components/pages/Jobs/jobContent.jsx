@@ -11,29 +11,30 @@ const JobContent = () => {
     const { Jobs, userData } = useContext(Context)
     const { allJob } = Jobs
     const [jobs, setJobs] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
+    const [initialLoading, setInitialLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [totalFilteredJobsCount, setTotalFilteredJobsCount] = useState(0)
-    const [allJobs, setAllJobs] = useState([]);
+    const [allJobs, setAllJobs] = useState([])
     const user = userData
 
     const fetchAndFilterJobs = async () => {
         try {
-            setLoading(true)
-            const data = await allJob();
-            const fetchedJobs = data.data;
-            setAllJobs(fetchedJobs);
+            setInitialLoading(true)
+            const data = await allJob()
+            const fetchedJobs = data.data
+            setAllJobs(fetchedJobs)
         } catch (error) {
-            console.error("Error getting all jobs:", error.message);
+            console.error("Error getting all jobs:", error.message)
         } finally {
-            setLoading(false)
+            setInitialLoading(false)
         }
-    };
+    }
 
     useEffect(() => {
-        fetchAndFilterJobs();
-    }, []);
+        fetchAndFilterJobs()
+    }, [])
 
     const initialFilters = {
         keyword: "",
@@ -44,55 +45,58 @@ const JobContent = () => {
         maxSalary: "",
         skills: "",
         isRemote: false,
-    };
-
+    }
 
     const [filters, setFilters] = useState(initialFilters)
 
     const filterAndPaginateJobs = (page, currentFilters) => {
-        setLoading(true);
+        setLoading(true)
 
         setTimeout(() => {
             const filtered = allJobs.filter((job) => {
+                if (job?.status !== "Active") {
+                    return false;
+                }
+
                 // Parse skills safely
-                let jobSkills = [];
-                if (Array.isArray(job.skillsRequired) && job.skillsRequired.length > 0) {
+                let jobSkills = []
+                if (Array.isArray(job?.skillsRequired) && job?.skillsRequired.length > 0) {
                     try {
-                        jobSkills = JSON.parse(job.skillsRequired[0].replace(/'/g, '"'));
+                        jobSkills = JSON.parse(job?.skillsRequired[0].replace(/'/g, '"'))
                     } catch (e) {
-                        console.warn("Failed to parse skills for job:", job._id);
+                        console.warn("Failed to parse skills for job:", job?._id)
                     }
                 }
 
-                const keyword = currentFilters.keyword.toLowerCase();
-                const companyName = job?.company?.companyInfo?.companyName?.toLowerCase() || "";
-                const title = job.title?.toLowerCase() || "";
+                const keyword = currentFilters.keyword.toLowerCase()
+                const companyName = job?.company?.companyInfo?.companyName?.toLowerCase() || ""
+                const title = job.title?.toLowerCase() || ""
 
                 const matchesKeyword = currentFilters.keyword
                     ? title.includes(keyword) || companyName.includes(keyword)
-                    : true;
+                    : true
 
                 const matchesJobType = currentFilters.jobType
                     ? job.employmentType === currentFilters.jobType
-                    : true;
+                    : true
 
                 const matchesLocation = currentFilters.isRemote
                     ? job.isRemote === true
                     : currentFilters.location
                         ? job.location?.toLowerCase().includes(currentFilters.location.toLowerCase())
-                        : true;
+                        : true
 
                 const matchesExperience = currentFilters.experience
                     ? job.experienceLevel === currentFilters.experience
-                    : true;
+                    : true
 
                 const matchesMinSalary = currentFilters.minSalary
                     ? job.salary?.min_salary >= parseInt(currentFilters.minSalary)
-                    : true;
+                    : true
 
                 const matchesMaxSalary = currentFilters.maxSalary
                     ? job.salary?.max_salary <= parseInt(currentFilters.maxSalary)
-                    : true;
+                    : true
 
                 const matchesSkills = currentFilters.skills
                     ? currentFilters.skills
@@ -103,7 +107,7 @@ const JobContent = () => {
                                 jobSkill.toLowerCase().includes(filterSkill.trim())
                             )
                         )
-                    : true;
+                    : true
 
                 return (
                     matchesKeyword &&
@@ -113,26 +117,26 @@ const JobContent = () => {
                     matchesMinSalary &&
                     matchesMaxSalary &&
                     matchesSkills
-                );
-            });
+                )
+            })
 
-            const calculatedTotalPages = Math.ceil(filtered.length / JOBS_PER_PAGE);
-            setTotalFilteredJobsCount(filtered.length);
-            setTotalPages(calculatedTotalPages > 0 ? calculatedTotalPages : 1);
+            const calculatedTotalPages = Math.ceil(filtered.length / JOBS_PER_PAGE)
+            setTotalFilteredJobsCount(filtered.length)
+            setTotalPages(calculatedTotalPages > 0 ? calculatedTotalPages : 1)
 
-            const startIndex = (page - 1) * JOBS_PER_PAGE;
-            const endIndex = startIndex + JOBS_PER_PAGE;
-            const paginatedJobs = filtered.slice(startIndex, endIndex);
+            const startIndex = (page - 1) * JOBS_PER_PAGE
+            const endIndex = startIndex + JOBS_PER_PAGE
+            const paginatedJobs = filtered.slice(startIndex, endIndex)
 
-            setJobs(paginatedJobs);
-            // setLoading(false);
-        }, 500);
-    };
+            setJobs(paginatedJobs)
+            setLoading(false)
+        }, 500)
+    }
 
     useEffect(() => {
-        setCurrentPage(1);
-        filterAndPaginateJobs(1, filters);
-    }, [filters, allJobs]);
+        setCurrentPage(1)
+        filterAndPaginateJobs(1, filters)
+    }, [filters, allJobs])
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) {
@@ -162,7 +166,7 @@ const JobContent = () => {
             <section>
                 <h2 className="text-2xl font-bold mb-6 text-primary">Available Jobs</h2>
 
-                {loading && jobs.length === 0 && totalFilteredJobsCount === 0 ? (
+                {initialLoading ? (
                     <div className="grid gap-6">
                         {Array.from({ length: JOBS_PER_PAGE }).map((_, index) => (
                             <JobSkeleton key={index} />
@@ -181,15 +185,24 @@ const JobContent = () => {
                                 job={job}
                             />
                         ))}
+                        {loading && jobs.length > 0 && (
+                            <div className="grid gap-6 col-span-full mt-4">
+                                {Array.from({ length: JOBS_PER_PAGE }).map((_, index) => (
+                                    <JobSkeleton key={`loading-${index}`} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    loading={loading}
-                />
+                {!initialLoading && totalFilteredJobsCount > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        loading={loading}
+                    />
+                )}
             </section>
         </div>
     )

@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FaUsers, FaSearch, FaBriefcase, FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa"
+import { Link } from 'react-router-dom'
+import { Context } from '../../../Context/context'
 
-const About = ()=>{
+const About = () => {
+  const { isEmployer } = useContext(Context)
   return (
     <div>
       {/* Hero Section */}
@@ -13,12 +16,16 @@ const About = ()=>{
             efficient, and meaningful.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 dark:hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
-              Find Your Dream Job
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 dark:hover:bg-gray-100 dark:hover:text-blue-600 transition-all duration-300 transform hover:scale-105">
-              Post a Job
-            </button>
+            <Link to={"/jobs"}>
+              <button className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 dark:hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                Find Your Dream Job
+              </button>
+            </Link>
+            <Link to={isEmployer ? "/employer-dashboard" : null}>
+              <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 dark:hover:bg-gray-100 dark:hover:text-blue-600 transition-all duration-300 transform hover:scale-105">
+                Post a Job
+              </button>
+            </Link>
           </div>
         </div>
       </section>
