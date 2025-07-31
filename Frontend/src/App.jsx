@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import Alert from "./Components/Forms/alert.jsx";
-import Admin from "./Components/pages/admin/Admin.jsx";
 import Navbar from "./Components/pages/Fixed Pages/Navbar.jsx";
 import Footer from "./Components/pages/Fixed Pages/Footer.jsx";
 import About from "./Components/pages/Fixed Pages/About.jsx";
@@ -73,7 +72,6 @@ function App() {
           <Route path="/companies/:companyId" element={<CompanyDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/admin" element={<Admin />} />
           <Route
             path="/jobseeker-dashboard"
             element={
