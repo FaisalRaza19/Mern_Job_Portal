@@ -5,7 +5,7 @@ import { Context } from "../../../../Context/context.jsx"
 import { industryOptions } from "../../../../temp/data.js"
 import { useNavigate } from "react-router-dom"
 
-const EmployerSettings = () => {
+const employerSettings = () => {
   const { userData, setUserData, userAuth, userImage, userProfile, showAlert } = useContext(Context);
   const { setIsEditProfile } = userProfile
   const { updateAvatar, editProfile } = userAuth
@@ -486,4 +486,4 @@ const EmployerSettings = () => {
   )
 }
 
-export default EmployerSettings
+export default employerSettings
