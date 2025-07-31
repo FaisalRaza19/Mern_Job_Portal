@@ -6,7 +6,7 @@ export const generate_accessToken = (payload)=>{
 }
 
 export const generate_refreshToken = (payload)=>{
-    const refreshToken = jwt.sign({id : payload},process.env.REFRESH_TOKEN_SECRET,{expiresIn:process.env.REFRESH_TOKEN_SECRET});
+    const refreshToken = jwt.sign({id : payload},process.env.REFRESH_TOKEN_SECRET,{expiresIn:process.env.REFRESH_TOKEN_EXPIRY});
     return refreshToken
 }
 
