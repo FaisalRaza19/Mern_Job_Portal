@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useChat } from "../../../../../Context/chatContext.jsx";
-import ChatHeader from "./ChatHeader";
-import MessageList from "./MessageList";
-import MessageInput from "./MessageInput";
-import TypingIndicator from "./TypingIndicator";
+import ChatHeader from "./ChatHeader.jsx";
+import MessageList from "./MessageList.jsx";
+import MessageInput from "./MessageInput.jsx";
+import TypingIndicator from "./TypingIndicator.jsx";
 
 const ChatWindow = () => {
   const { activeChat, messages, loadMessages, markSeen, isTyping, userData } = useChat();

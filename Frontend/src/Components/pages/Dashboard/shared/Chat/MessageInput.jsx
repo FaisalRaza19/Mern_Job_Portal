@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
 import { useChat } from "../../../../../Context/chatContext.jsx";
 import { FiSend, FiPaperclip, FiMic, FiX, FiImage, FiVideo, FiFile, FiSmile } from "react-icons/fi";
-import VoiceRecorder from "./VoiceRecorder";
-import EmojiPicker from "./EmojiPicker";
+import VoiceRecorder from "./VoiceRecorder.jsx";
+import EmojiPicker from "./emojiPicker.jsx";
 import { Context } from "../../../../../Context/context.jsx";
 
 

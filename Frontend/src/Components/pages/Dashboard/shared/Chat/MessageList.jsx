@@ -1,5 +1,5 @@
 import React from "react";
-import MessageBubble from "./MessageBubble";
+import MessageBubble from "./MessageBubble.jsx";
 
 const MessageList = ({ messages, currentUserId }) => {
   // Groups messages by date for date headers
