@@ -39,3 +39,8 @@ export const review = {
     delReview: `http://localhost:${port}/review/delReview`,
     getAllReview: `http://localhost:${port}/review/getReview`
 }
+
+export const chat = {
+    getAllChats : `http://localhost:${port}/chat/getAllChats`,
+    getChatMessages : `http://localhost:${port}/chat/getChatMessages`,
+}

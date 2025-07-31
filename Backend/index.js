@@ -1,53 +1,181 @@
-import express from 'express';
+import express from "express"
 import session from "express-session"
 import connectToDb from "./DataBase/db.js"
-import cors from 'cors';
+import cors from "cors"
 import dotenv from "dotenv"
-import {router} from "./Routes/user.route.js"
-import {route} from "./Routes/jobs.routes.js"
-import { review } from './Routes/reviews.routes.js';
+import { router as userRoutes } from "./Routes/user.route.js"
+import { route as jobRoutes } from "./Routes/jobs.routes.js"
+import { review as reviewRoutes } from "./Routes/reviews.routes.js"
+import { chat as chatRoutes } from "./Routes/Chat.routes.js"
+import { createServer } from "http"
+import { Server } from "socket.io"
+import jwt from "jsonwebtoken"
+import {
+  handleCreateChat, handleSendMessage, handleEditMessage, handleDeleteMessage, handleMarkMessagesSeen,
+  handleDeleteChat, handleTyping, handleUserOnline, handleUserOffline,
+} from "./Controller/chat_controller.js"
 
-const app = express();
-dotenv.config({path : ".env"});
-connectToDb();
-app.use(express.json());
+dotenv.config({ path: ".env" })
+connectToDb()
 
+const app = express()
+app.use(express.json({ limit: "100mb" }))
+app.use(express.urlencoded({ limit: "100mb", extended: true }))
+
+// Enhanced CORS configuration
 const corsOptions = {
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'token'],
-    credentials: true,
-    optionsSuccessStatus: 200,
-};
+  origin: ["http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization", "token", "X-Requested-With"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+}
+app.use(cors(corsOptions))
 
-app.use(cors(corsOptions));
-
-
+// Enhanced session middleware
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 3600000,
-        },
+  session({
+    secret: process.env.SESSION_SECRET || "fallback-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    },
+  }),
+)
+
+
+// API routes
+app.get("/", (req, res) => res.send("Hello World"))
+app.use("/user", userRoutes)
+app.use("/jobs", jobRoutes)
+app.use("/review", reviewRoutes)
+app.use("/chat", chatRoutes)
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err)
+  res.status(500).json({
+    statusCode: 500,
+    success: false,
+    message: "Internal server error",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+  })
+})
+
+const server = createServer(app)
+
+// Enhanced Socket.IO configuration
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  },
+  transports: ["websocket", "polling"],
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  maxHttpBufferSize: 1e8,
+  allowEIO3: true,
+})
+
+// Socket.IO authentication middleware
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token
+  if (!token) {
+    console.error("Socket authentication failed: Token missing.")
+    return next(new Error("Authentication token missing"))
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      console.error("Socket authentication failed: Invalid token.", err.message)
+      return next(new Error("Invalid token"))
+    }
+    socket.user = decoded
+    console.log("🧠 Socket authenticated successfully for user:", decoded?.id)
+    next()
+  })
+})
+
+// Track online users
+const onlineUsers = new Map()
+
+// Socket.IO connection handling
+io.on("connection", (socket) => {
+  const userId = socket.user.id
+  console.log(`✅ User ${userId} connected to Socket.IO with ID: ${socket.id}`)
+
+  // Add user to online users
+  onlineUsers.set(userId, socket.id)
+  socket.join(userId)
+
+  // Handle user online status
+  handleUserOnline(socket, {}, io)
+
+  // Socket event handlers
+  socket.on("createChat", (data) => handleCreateChat(socket, data, io))
+  socket.on("sendMessage", (data) => handleSendMessage(socket, data, io))
+  socket.on("editMessage", (data) => handleEditMessage(socket, data, io))
+  socket.on("deleteMessage", (data) => handleDeleteMessage(socket, data, io))
+  socket.on("markSeen", (data) => handleMarkMessagesSeen(socket, data, io))
+  socket.on("deleteChat", (data) => handleDeleteChat(socket, data, io))
+  socket.on("typing", (data) => handleTyping(socket, data, io))
+
+  // Handle voice call events (for future implementation)
+  socket.on("voiceCallOffer", (data) => {
+    const { receiverId, offer } = data
+    io.to(receiverId).emit("voiceCallOffer", {
+      callerId: userId,
+      offer,
     })
-);
+  })
 
-app.get('/', (req, res) => {
-  res.send('Hello world');
-});
-// change pass
-app.get(`/change-password/:token`, (req, res) => {
-  res.send('change the password');
-});
+  socket.on("voiceCallAnswer", (data) => {
+    const { callerId, answer } = data
+    io.to(callerId).emit("voiceCallAnswer", {
+      answer,
+    })
+  })
 
-app.use("/user",router);
-app.use("/jobs",route);
-app.use("/review",review)
+  socket.on("voiceCallEnd", (data) => {
+    const { receiverId } = data
+    io.to(receiverId).emit("voiceCallEnd", {
+      callerId: userId,
+    })
+  })
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`server running on http://localhost:${PORT}`);
-});
+  // Handle disconnect
+  socket.on("disconnect", (reason) => {
+    console.log(`❌ User ${userId} disconnected from Socket.IO. Reason: ${reason}`)
+    onlineUsers.delete(userId)
+    socket.leave(userId.toString())
+    handleUserOffline(socket, io)
+  })
 
+  // Handle socket errors
+  socket.on("error", (err) => {
+    console.error(`Socket error for user ${userId}:`, err)
+    socket.emit("errorMessage", { statusCode: 500, message: "A socket error occurred." })
+  })
+
+  // Handle connection errors
+  socket.on("connect_error", (err) => {
+    console.error(`Connection error for user ${userId}:`, err)
+  })
+})
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received, shutting down gracefully")
+  server.close(() => {
+    console.log("Process terminated")
+  })
+})
+
+const PORT = process.env.PORT || 3000
+server.listen(PORT, () => {
+  console.log(`App server and socket server running on this port http://localhost:${PORT}`)
+})

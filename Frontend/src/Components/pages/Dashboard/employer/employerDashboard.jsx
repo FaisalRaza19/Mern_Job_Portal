@@ -5,7 +5,9 @@ import EmployerOverview from "./employerOverview.jsx"
 import PostJob from "./postJobs.jsx"
 import ManageJobs from "./manageJobs.jsx"
 import ApplicantManagement from "./aplicationManagement.jsx"
-import EmployerMessages from "./EmployerMessages.jsx"
+// import EmployerMessages from "./EmployerMessages.jsx"
+import ChatApp from "../shared/Chat/ChatApp.jsx"
+import { ChatProvider } from "../../../../Context/chatContext.jsx"
 import EmployerAnalytics from "./employerAnalytics.jsx"
 import AdminRequests from "./adminRequest.jsx"
 import EmployerSettings from "./EmployerSettings.jsx"
@@ -23,7 +25,7 @@ const EmployerDashboard = ({ setIsLoggedIn }) => {
   const [activeTab, setActiveTab] = useState("overview")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [jobData,setJobData] = useState([] || {});
+  const [jobData, setJobData] = useState([] || {});
 
   const JobsData = async () => {
     try {
@@ -34,21 +36,21 @@ const EmployerDashboard = ({ setIsLoggedIn }) => {
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     JobsData()
-  },[jobData])
+  }, [jobData])
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
-        return <EmployerOverview setActiveTab={setActiveTab} jobData={jobData}/>
+        return <EmployerOverview setActiveTab={setActiveTab} jobData={jobData} />
       case "post-job":
-        return <PostJob setJobData={setJobData}/>
+        return <PostJob setJobData={setJobData} />
       case "manage-jobs":
-        return <ManageJobs setActiveTab={setActiveTab} jobData={jobData}/>
+        return <ManageJobs setActiveTab={setActiveTab} jobData={jobData} />
       case "applicants":
-        return <ApplicantManagement jobData={jobData}/>
+        return <ChatProvider><ApplicantManagement jobData={jobData} setActiveTab={setActiveTab}/></ChatProvider>
       case "messages":
-        return <EmployerMessages />
+        return <ChatProvider><ChatApp /></ChatProvider>
       case "analytics":
         return <EmployerAnalytics />
       case "admin-requests":

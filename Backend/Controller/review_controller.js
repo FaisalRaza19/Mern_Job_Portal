@@ -1,5 +1,4 @@
 import { User } from "../Models/user_model.js";
-import { Job } from "../Models/job_model.js";
 
 // add reviews
 const addReview = async (req, res) => {

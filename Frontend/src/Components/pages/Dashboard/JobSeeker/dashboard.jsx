@@ -5,7 +5,9 @@ import JobSeekerOverview from "./overview.jsx"
 import SavedJobs from "./savedJobs.jsx"
 import AppliedJobs from "./apliedJobs.jsx"
 import JobSeekerProfile from "./profile.jsx"
-import JobSeekerMessages from "./jobSeekerMessages.jsx"
+// import JobSeekerMessages from "./jobSeekerMessages.jsx"
+import { ChatProvider } from "../../../../Context/chatContext.jsx"
+import ChatApp from "../shared/Chat/ChatApp.jsx"
 import JobSeekerSettings from "./settings.jsx"
 import { Context } from "../../../../Context/context.jsx"
 
@@ -50,7 +52,8 @@ const JobSeekerDashboard = ({ setIsLoggedIn }) => {
       case "profile":
         return <JobSeekerProfile />
       case "messages":
-        return <JobSeekerMessages />
+        // return <JobSeekerMessages />
+        return <ChatProvider><ChatApp /></ChatProvider>
       case "settings":
         return <JobSeekerSettings />
       default:
