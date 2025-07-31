@@ -9,7 +9,7 @@ import ChatApp from "../shared/Chat/ChatApp.jsx"
 import { ChatProvider } from "../../../../Context/chatContext.jsx"
 import EmployerAnalytics from "./employerAnalytics.jsx"
 import AdminRequests from "./adminRequest.jsx"
-import EmployerSettings from "./EmployerSettings.jsx"
+import EmployerSettings from "./employerSetting.jsx"
 import { Context } from "../../../../Context/context.jsx"
 
 const mockNotifications = [
