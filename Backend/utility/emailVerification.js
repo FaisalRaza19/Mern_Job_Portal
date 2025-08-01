@@ -37,7 +37,7 @@ const sendEmail = async (email) => {
 }
 
 // email for change password
-const pas_Email = async (email, id) => {
+const pas_Email = async (email, token) => {
     try {
         // create transpoter
         const transporter = nodemailer.createTransport({
@@ -48,8 +48,7 @@ const pas_Email = async (email, id) => {
             },
         });
 
-        const link = `${process.env.BASE_URL}/change-password/${id}`
-        console.log(link)
+        const link = `http://localhost:5173/change-password/${token}`
         // send email 
         await transporter.sendMail({
             from: `"JobPortal Pro" <${process.env.GMAIL_EMAIL}>`,

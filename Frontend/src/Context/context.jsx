@@ -1,16 +1,16 @@
 import { createContext, useState, useEffect } from "react";
 // user auth
 import {
-    register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT,
-    editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
+    register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT, editProfile,
+    verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume, forgetPass, updatePassword
 } from "./Api/User/userAuth";
 
 import {
     postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId,
-    applyJob, saveJob, saved_applied_jobs, changeApplicationStatus,allCompanies,companyAlljobs
+    applyJob, saveJob, saved_applied_jobs, changeApplicationStatus, allCompanies, companyAlljobs
 } from "./Api/User/Jobs.js";
 
-import {getAllReviews,addReview,editReview,delReview} from "./Api/User/Reviews.js"
+import { getAllReviews, addReview, editReview, delReview } from "./Api/User/Reviews.js"
 
 export const Context = createContext();
 
@@ -88,21 +88,21 @@ export const ContextApi = ({ children }) => {
     const userProfile = { isEditProfile, setIsEditProfile };
     const verifyUser = { isVerify, isLoggedIn, setIsLoggedIn };
     const userAuth = {
-        register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar,
-        verifyJWT, editProfile, verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume,
+        register, ResendCode, verify_register, Login, LogOut, getUser, updateAvatar, verifyJWT, editProfile,
+        verifyAndUpdateProfile, update_Edu_Exp, update_skills_resume, forgetPass, updatePassword
     };
     const Jobs = {
         postJobs, getAllJobs, editJob, changeStatus, delJob, allJob, getJobFromId, applyJob, saveJob,
-        saved_applied_jobs, changeApplicationStatus,allCompanies,companyAlljobs
+        saved_applied_jobs, changeApplicationStatus, allCompanies, companyAlljobs
     };
-    const reviews = {getAllReviews,addReview,editReview,delReview}
+    const reviews = { getAllReviews, addReview, editReview, delReview }
     const userImage = { image, setImage };
     const JobsAction = { savedJobIds, setSavedJobIds, appliedJobIds, setAppliedJobIds }
 
     return (
         <Context.Provider value={{
             userAuth, userData, setUserData, isEmployer, setIsEmployer, userImage, verifyUser, userProfile, Jobs,
-            JobsAction, alert, showAlert, onClose,reviews
+            JobsAction, alert, showAlert, onClose, reviews
         }}>
             {children}
         </Context.Provider>

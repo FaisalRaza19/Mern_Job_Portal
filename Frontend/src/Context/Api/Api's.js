@@ -13,6 +13,9 @@ export const userAuth = {
     // update edu and exp
     update_edu_exp: `http://localhost:${port}/user/update-edu-exp`,
     update_skills_resume: `http://localhost:${port}/user/update-skills-resume`,
+    // forget pass
+    email_pass : `http://localhost:${port}/user/email-pass`,
+    update_pass : `http://localhost:${port}/user/change-pass`
 }
 
 export const job = {

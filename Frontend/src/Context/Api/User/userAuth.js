@@ -77,7 +77,7 @@ export const Login = async ({ formData, navigate, }) => {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData),
-            credentials : "include"
+            credentials: "include"
         });
 
         if (!response.ok) {
@@ -313,3 +313,50 @@ export const update_skills_resume = async ({ skills, resumeFile }) => {
     }
 };
 
+// forget password
+export const forgetPass = async ({ email }) => {
+    try {
+        localStorage.removeItem("user_token");
+        const response = await fetch(userAuth.email_pass, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to forget pass");
+        }
+
+        return data
+    } catch (error) {
+        console.error("Update failed:", error.message);
+    }
+};
+
+// update pass word 
+export const updatePassword = async ({new_pass,token}) => {
+    try {
+        localStorage.removeItem("user_token");
+        const response = await fetch(`${userAuth.update_pass}/${token}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({new_pass}),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to forget pass");
+        }
+
+        return data
+    } catch (error) {
+        console.error("Update failed:", error.message);
+    }
+};

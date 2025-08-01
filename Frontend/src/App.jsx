@@ -12,24 +12,28 @@ import HomePage from "./Components/pages/Home/HomePage.jsx";
 import Login from "./Components/Forms/login.jsx";
 import Register from "./Components/Forms/Register.jsx";
 import EmailVerify from "./Components/Forms/emailVerify.jsx";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import ChangePass from "./Components/Forms/ChangePass.jsx"
+import { Routes, Route, useLocation, Navigate,matchPath } from "react-router-dom";
 import JobSeekerDashboard from "./Components/pages/Dashboard/JobSeeker/dashboard.jsx";
 import EmployerDashboard from "./Components/pages/Dashboard/employer/employerDashboard.jsx";
 import { Context } from "./Context/context.jsx";
+
 
 function App() {
   const { isEmployer, verifyUser } = useContext(Context);
   const { isLoggedIn, setIsLoggedIn } = verifyUser;
   const [darkMode, setDarkMode] = useState(true);
   const authPage = useLocation();
+  const isChangePasswordPage = matchPath("/change-password/:token", authPage.pathname);
   const isAuthPage = [
     "/login",
     "/register",
     "/email-verify",
+    "/change-password/:token",
     "/jobseeker-dashboard",
     "/admin",
     "/employer-dashboard",
-  ].includes(authPage.pathname);
+  ].includes(authPage.pathname) || isChangePasswordPage;
 
   // Load saved or system preference dark mode on mount
   useEffect(() => {
@@ -98,6 +102,7 @@ function App() {
             element={<EmailVerify setIsLogedIn={setIsLoggedIn} />}
           />
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/change-password/:token" element={<ChangePass />} />
         </Routes>
         {!isAuthPage && <Footer />}
       </div>

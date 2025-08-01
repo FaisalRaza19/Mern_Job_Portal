@@ -19,7 +19,7 @@ const validateUserInput = (fullName, email, password, userName) => {
 
   // Validate password
   if (password !== undefined && password !== null && password.trim() !== '') {
-    const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{8,}$/;
     if (!passwordRegex.test(password.trim())) {
       errors.password = 'Password must be at least 8 characters long and include at least one special character.';
     }

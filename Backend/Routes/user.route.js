@@ -17,8 +17,8 @@ router.route("/logOut").post(upload.none(), verify_token, logOut);
 router.route("/change-avatar").post(upload.fields([{ name: "avatar", maxCount: 1 }]), verify_token, changeAvatar);
 router.route("/edit-profile").post(upload.none(), verify_token, editProfile);
 router.route("/verify-profile").post(upload.none(), verify_token, updateProfile);
-router.route("/email-pass").post(upload.none(), verify_token, email_for_Pass);
-router.route("/change-pass/:token").post(upload.none(), verify_token, update_pass);
+router.route("/email-pass").post(upload.none(), email_for_Pass);
+router.route("/change-pass/:token").post(upload.none(),update_pass);
 router.route("/get-user").get(upload.none(), verify_token, getUser);
 router.route("/verify-jwt").post(upload.none(), verify_token, userVerifyJWT);
 

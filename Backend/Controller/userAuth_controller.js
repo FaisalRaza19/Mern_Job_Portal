@@ -1,4 +1,5 @@
 import { User } from "../Models/user_model.js";
+import { PassReset } from "../Models/ChangePassToken_model.js";
 import { validateUserInput, validateCompanyData, socialLinkVerify } from "../utility/userInput_verifier.js";
 import { generate_accessToken, generate_refreshToken, generate_passToken } from "../utility/generateToken.js";
 import { sendEmail, verifyEmail, pas_Email } from "../utility/emailVerification.js";
@@ -259,13 +260,13 @@ const changeAvatar = async (req, res) => {
         // If user has an existing avatar, clear it
         if (user.avatar?.public_Id) {
             const resourceType = "image"
-            await removeFileFromCloudinary(user.avatar.public_Id,resourceType);
+            await removeFileFromCloudinary(user.avatar.public_Id, resourceType);
         }
 
         // upload avatar to Cloudinary
         const folder = "Job Portal/User Avatar"
         const resourceType = "image"
-        const fileUpload = await fileUploadOnCloudinary(avatarPath, folder,resourceType);
+        const fileUpload = await fileUploadOnCloudinary(avatarPath, folder, resourceType);
 
         // update in db
         user.avatar = {
@@ -294,7 +295,7 @@ const editProfile = async (req, res) => {
         if (!currentUser) {
             return res.status(404).json({ statusCode: 404, message: "User not found" });
         }
-        const { email, fullName, bio, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks = {},companyLocation} = req.body;
+        const { email, fullName, bio, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks = {}, companyLocation } = req.body;
 
         const { linkedin = "", facebook = "", twitter = "", instagram = "", github = "" } = socialLinks;
 
@@ -341,7 +342,7 @@ const editProfile = async (req, res) => {
                 });
             }
         } else {
-            if(!fullName){
+            if (!fullName) {
                 return res.status(400).json({ statusCode: 400, message: "fullName is required" });
             }
             if (typeof bio === 'string' && bio.trim().length > 0 && bio.trim().length < 50) {
@@ -612,71 +613,75 @@ const getUser = async (req, res) => {
     }
 }
 
-// change password
+// email pass
 const email_for_Pass = async (req, res) => {
     try {
-        // get id from token
-        const userId = req.user?._id;
-
-        // find the user in db
-        const user = await User.findById(userId).select("-password -refreshToken");
-        if (!user) {
-            return res.status(400).json({ statusCode: 400, message: "User did not exist" })
-        };
-
-        const token = generate_passToken(userId);
-        req.session.passToken = { token, used: false }
-
-        // send the email for pass change
-        const sendEmail = await pas_Email(user.email, token);
-        if (!sendEmail) {
-            return res.status(500).json({ statusCode: 500, message: "Something went wrong to send the email" })
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ statusCode: 400, message: "Email is required" });
         }
 
-        return res.status(200).json({ statusCode: 200, message: "Check your email box." })
+        const user = await User.findOne({ email }).select("-password -refreshToken");
+        if (!user) {
+            return res.status(400).json({ statusCode: 400, message: "User does not exist" });
+        }
+
+        const token = generate_passToken(user.id);
+
+        // Save token in DB
+        await PassReset.create({
+            userId: user._id,
+            token,
+            used: false
+        });
+
+        const sendEmail = await pas_Email(user.email, token);
+        if (!sendEmail) {
+            return res.status(500).json({ statusCode: 500, message: "Something went wrong while sending the email" });
+        }
+
+        return res.status(200).json({ statusCode: 200, message: "Check your email inbox.",token : token});
     } catch (error) {
-        return res.status(500).json({ statusCode: 500, message: "Something went wrong to get the User", error: error.message });
+        return res.status(500).json({ statusCode: 500, message: "Something went wrong", error: error.message });
     }
-}
+};
 
 // update password in db
 const update_pass = async (req, res) => {
     try {
-        // get id from token
         const { token } = req.params;
         const { new_pass } = req.body;
 
-        // check token
-        const sessionToken = req.session.passToken;
-        if (!sessionToken || sessionToken.token !== token || sessionToken.used) {
+        // Check token in DB
+        const resetTokenEntry = await PassReset.findOne({ token });
+        if (!resetTokenEntry || resetTokenEntry.used) {
             return res.status(401).json({ statusCode: 400, message: "Token is invalid or already used" });
         }
 
-        // verify token
+        // Verify token
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-        // validate pass
-        const checkPass = validateUserInput(null, null, new_pass, null)
+        // Validate password
+        const checkPass = validateUserInput(null, null, new_pass, null);
         if (!checkPass) {
-            return res.status(400).json({ statusCode: 400, message: checkPass.errors })
+            return res.status(400).json({ statusCode: 400, message: checkPass.errors });
         }
 
-        // create password hash
+        // Hash and update password
         const hashedPassword = await bcrypt.hash(new_pass, 10);
-
-        // find the user and change the pass in db
-        const changePass = await User.findByIdAndUpdate(decoded?.id, { $set: { password: hashedPassword } })
+        const changePass = await User.findByIdAndUpdate(decoded?.id, { password: hashedPassword });
         if (!changePass) {
-            return res.status(500).json({ statusCode: 500, message: "something went wrong to change the pass" })
-        };
+            return res.status(500).json({ statusCode: 500, message: "Something went wrong changing the password" });
+        }
 
-        req.session.passToken = null
+        // DELETE the token document from DB
+        await PassReset.findByIdAndDelete(resetTokenEntry._id);
 
-        return res.status(200).json({ statusCode: 200, message: "Your password change successfully" });
+        return res.status(200).json({ statusCode: 200, message: "Your password was changed successfully." });
     } catch (error) {
-        return res.status(500).json({ statusCode: 500, message: "Something went wrong to get the User", error: error.message });
+        return res.status(500).json({ statusCode: 500, message: "Something went wrong", error: error.message });
     }
-}
+};
 
 // verify jwt
 const userVerifyJWT = async (req, res) => {
