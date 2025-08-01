@@ -222,8 +222,8 @@ const allJob = async (req, res) => {
     try {
         const job = await Job.find().populate({
             path: "company",
-            select: "companyInfo.companyName companyInfo.companyDescription companyInfo.companyType companyInfo.companyWeb"
-        })
+            select: "avatar.avatar_Url companyInfo.companyName companyInfo.companyDescription companyInfo.companyType companyInfo.companyWeb"
+        }).select("-applicants")
 
         if (!job || job.length === 0) {
             return res.status(400).json({ statusCode: 400, message: "No jobs found for this company." });
