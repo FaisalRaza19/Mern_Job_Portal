@@ -1,49 +1,49 @@
-const port = 7855
+const apiUrl = import.meta.env.VITE_API_URL
 export const userAuth = {
-    register: `http://localhost:${port}/user/register`,
-    verify_register: `http://localhost:${port}/user/verify-register`,
-    resendCode: `http://localhost:${port}/user/resend-code`,
-    login: `http://localhost:${port}/user/login`,
-    logOut: `http://localhost:${port}/user/logOut`,
-    getUser: `http://localhost:${port}/user/get-user`,
-    updateAvatar: `http://localhost:${port}/user/change-avatar`,
-    verifyJWT: `http://localhost:${port}/user/verify-jwt`,
-    editProfile: `http://localhost:${port}/user/edit-profile`,
-    verify_edit: `http://localhost:${port}/user/verify-profile`,
+    register: `${apiUrl}/user/register`,
+    verify_register: `${apiUrl}/user/verify-register`,
+    resendCode: `${apiUrl}/user/resend-code`,
+    login: `${apiUrl}/user/login`,
+    logOut: `${apiUrl}/user/logOut`,
+    getUser: `${apiUrl}/user/get-user`,
+    updateAvatar: `${apiUrl}/user/change-avatar`,
+    verifyJWT: `${apiUrl}/user/verify-jwt`,
+    editProfile: `${apiUrl}/user/edit-profile`,
+    verify_edit: `${apiUrl}/user/verify-profile`,
     // update edu and exp
-    update_edu_exp: `http://localhost:${port}/user/update-edu-exp`,
-    update_skills_resume: `http://localhost:${port}/user/update-skills-resume`,
+    update_edu_exp: `${apiUrl}/user/update-edu-exp`,
+    update_skills_resume: `${apiUrl}/user/update-skills-resume`,
     // forget pass
-    email_pass : `http://localhost:${port}/user/email-pass`,
-    update_pass : `http://localhost:${port}/user/change-pass`
+    email_pass: `${apiUrl}/user/email-pass`,
+    update_pass: `${apiUrl}/user/change-pass`
 }
 
 export const job = {
-    postJob: `http://localhost:${port}/jobs/postJob`,
-    editJob: `http://localhost:${port}/jobs/editJob`,
+    postJob: `${apiUrl}/jobs/postJob`,
+    editJob: `${apiUrl}/jobs/editJob`,
     // chnage job status
-    changeStatus: `http://localhost:${port}/jobs/changeStatus`,
-    delJob: `http://localhost:${port}/jobs/delJob`,
-    getJob: `http://localhost:${port}/jobs/getJob/jobId=`,
-    getAllJob: `http://localhost:${port}/jobs/getAllJob`,
-    allJob: `http://localhost:${port}/jobs/allJob`,
-    applyJob: `http://localhost:${port}/jobs/applyJob`,
-    saveJob: `http://localhost:${port}/jobs/saveJob`,
-    getSaved_Applied_Jobs: `http://localhost:${port}/jobs/get-Saved-applied-Jobs`,
-    changeApplicationStatus: `http://localhost:${port}/jobs/change-status`,
+    changeStatus: `${apiUrl}/jobs/changeStatus`,
+    delJob: `${apiUrl}/jobs/delJob`,
+    getJob: `${apiUrl}/jobs/getJob/jobId=`,
+    getAllJob: `${apiUrl}/jobs/getAllJob`,
+    allJob: `${apiUrl}/jobs/allJob`,
+    applyJob: `${apiUrl}/jobs/applyJob`,
+    saveJob: `${apiUrl}/jobs/saveJob`,
+    getSaved_Applied_Jobs: `${apiUrl}/jobs/get-Saved-applied-Jobs`,
+    changeApplicationStatus: `${apiUrl}/jobs/change-status`,
     // get all companies
-    allCompanies: `http://localhost:${port}/jobs/allCompanies`,
-    companyAllJobs: `http://localhost:${port}/jobs/companiesAllJobs`
+    allCompanies: `${apiUrl}/jobs/allCompanies`,
+    companyAllJobs: `${apiUrl}/jobs/companiesAllJobs`
 }
 
 export const review = {
-    addReview: `http://localhost:${port}/review/addReview`,
-    editReview: `http://localhost:${port}/review/editReview`,
-    delReview: `http://localhost:${port}/review/delReview`,
-    getAllReview: `http://localhost:${port}/review/getReview`
+    addReview: `${apiUrl}/review/addReview`,
+    editReview: `${apiUrl}/review/editReview`,
+    delReview: `${apiUrl}/review/delReview`,
+    getAllReview: `${apiUrl}/review/getReview`
 }
 
 export const chat = {
-    getAllChats : `http://localhost:${port}/chat/getAllChats`,
-    getChatMessages : `http://localhost:${port}/chat/getChatMessages`,
+    getAllChats: `${apiUrl}/chat/getAllChats`,
+    getChatMessages: `${apiUrl}/chat/getChatMessages`,
 }
