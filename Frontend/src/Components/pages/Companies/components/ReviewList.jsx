@@ -14,15 +14,15 @@ const ReviewList = ({ reviews, userId, setReviews }) => {
         let tempReviews = [...reviews];
 
         if (filter === "recent") {
-            tempReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            tempReviews?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         } else if (filter === "rating") {
-            tempReviews.sort((a, b) => b.rating - a.rating);
+            tempReviews?.sort((a, b) => b.rating - a.rating);
         }
 
         setSortedReviews(tempReviews);
     }, [reviews, filter]);
 
-    const reviewsToShow = sortedReviews.slice(0, displayCount)
+    const reviewsToShow = sortedReviews?.slice(0, displayCount)
 
     const handleShowMore = () => {
         setIsLoading(true)
@@ -51,7 +51,7 @@ const ReviewList = ({ reviews, userId, setReviews }) => {
             </div>
 
             <div className="grid gap-6">
-                {reviewsToShow.map((review) => (
+                {reviewsToShow?.map((review) => (
                     <ReviewCard key={review._id} review={review} userId={userId} setReviews={setReviews}
                         reviews={reviews} />
                 ))}

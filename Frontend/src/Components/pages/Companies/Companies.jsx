@@ -25,10 +25,10 @@ const Companies = () => {
     const fetchCompanies = async () => {
         try {
             const data = await allCompanies()
-            setAllCompanyData(data.data)
-            setFilteredData(data.data)
-            setDisplayedCompanies(data.data.slice(0, companiesPerPage))
-            setHasMore(data.data.length > companiesPerPage)
+            setAllCompanyData(data?.data)
+            setFilteredData(data?.data)
+            setDisplayedCompanies(data?.data?.slice(0, companiesPerPage))
+            setHasMore(data?.data?.length > companiesPerPage)
             setLoading(false)
         } catch (error) {
             console.error("Error fetching companies:", error)
@@ -47,16 +47,16 @@ const Companies = () => {
             const size = company?.companyInfo?.companySize || ""
 
             return (
-                name.includes(searchTerm.toLowerCase()) &&
-                (filters.location ? location.includes(filters.location) : true) &&
-                (filters.industry ? industry.includes(filters.industry) : true) &&
-                (filters.size ? size === filters.size : true)
+                name?.includes(searchTerm.toLowerCase()) &&
+                (filters?.location ? location?.includes(filters?.location) : true) &&
+                (filters?.industry ? industry?.includes(filters?.industry) : true) &&
+                (filters?.size ? size === filters?.size : true)
             )
         })
 
         setFilteredData(filtered)
-        setDisplayedCompanies(filtered.slice(0, companiesPerPage))
-        setHasMore(filtered.length > companiesPerPage)
+        setDisplayedCompanies(filtered?.slice(0, companiesPerPage))
+        setHasMore(filtered?.length > companiesPerPage)
     }, [searchTerm, filters, allCompanyData])
 
     const loadMoreCompanies = useCallback(() => {
@@ -64,10 +64,10 @@ const Companies = () => {
         setLoading(true)
 
         setTimeout(() => {
-            const currentCount = displayedCompanies.length
-            const more = filteredData.slice(currentCount, currentCount + companiesPerPage)
+            const currentCount = displayedCompanies?.length
+            const more = filteredData?.slice(currentCount, currentCount + companiesPerPage)
             setDisplayedCompanies((prev) => [...prev, ...more])
-            setHasMore(filteredData.length > currentCount + companiesPerPage)
+            setHasMore(filteredData?.length > currentCount + companiesPerPage)
             setLoading(false)
         }, 800)
     }, [filteredData, displayedCompanies, hasMore, loading])
@@ -96,7 +96,7 @@ const Companies = () => {
                 </div>
 
                 {/* Company Grid */}
-                {filteredData.length === 0 && !loading ? (
+                {filteredData?.length === 0 && !loading ? (
                     <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400">
                         <FiAlertCircle className="mb-4 h-16 w-16" />
                         <p className="text-xl font-semibold">No companies found.</p>
@@ -104,10 +104,10 @@ const Companies = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {loading && displayedCompanies.length === 0
-                            ? Array.from({ length: 8 }).map((_, i) => <CompanyCardSkeleton key={i} />)
-                            : displayedCompanies.map((company, index) => (
-                                <CompanyCard key={company._id} company={company} index={index} />
+                        {loading && displayedCompanies?.length === 0
+                            ? Array?.from({ length: 8 })?.map((_, i) => <CompanyCardSkeleton key={i} />)
+                            : displayedCompanies?.map((company, index) => (
+                                <CompanyCard key={company?._id} company={company} index={index} />
                             ))}
                     </div>
                 )}
@@ -123,7 +123,7 @@ const Companies = () => {
                     )}
                 </div>
 
-                {!hasMore && displayedCompanies.length > 0 && (
+                {!hasMore && displayedCompanies?.length > 0 && (
                     <div className="mt-10 flex justify-center text-gray-500 dark:text-gray-400">
                         <p>You've reached the end of the list!</p>
                     </div>

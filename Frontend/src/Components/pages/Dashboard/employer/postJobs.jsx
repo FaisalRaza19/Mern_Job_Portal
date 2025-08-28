@@ -50,7 +50,7 @@ const PostJob = ({setJobData}) => {
     try {
       const data = await postJobs({ formData })
       showAlert(data)
-      setJobData(data.data)
+      setJobData(data?.data)
     } catch (error) {
       console.log("Error to post job", error.message)
     } finally {

@@ -12,9 +12,6 @@ const employerSettings = () => {
   const { image, setImage } = userImage
   const user = userData
   const [isLoading, setLoading] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   // copmay data
   const [companyData, setCompanyData] = useState({
@@ -61,15 +58,6 @@ const employerSettings = () => {
     marketingEmails: false,
   })
 
-
-  const handlePasswordChange = () => {
-    if (formData.newPassword !== formData.confirmPassword) {
-      alert("New passwords do not match")
-      return
-    }
-    console.log("Password change requested")
-  }
-
   const handleDeleteAccount = () => {
     console.log("Account deletion requested")
     setShowDeleteModal(false)
@@ -111,7 +99,7 @@ const employerSettings = () => {
       }
       const data = await updateAvatar(file)
       showAlert(data)
-      setImage(data.data)
+      setImage(data?.data)
       setLoading(false)
     } catch (error) {
       console.log("upload image", error.message)

@@ -77,7 +77,7 @@ const EditJobs = ({ job, onClose, onUpdate }) => {
             const data = await editJob({ updatedJob });
             showAlert(data)
             if (data.statusCode === 200) {
-                onUpdate(data.data)
+                onUpdate(data?.data)
             }
         } catch (error) {
             console.log("Error of edit the job", error.message)

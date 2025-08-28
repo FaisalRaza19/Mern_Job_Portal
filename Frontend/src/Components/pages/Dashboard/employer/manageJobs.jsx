@@ -50,9 +50,9 @@ const ManageJobs = ({ setActiveTab,jobData }) => {
     }
   }
 
-  const filteredJobs = jobs.filter((job) => {
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || job.status === statusFilter
+  const filteredJobs = jobs?.filter((job) => {
+    const matchesSearch = job?.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === "all" || job?.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
@@ -61,7 +61,7 @@ const ManageJobs = ({ setActiveTab,jobData }) => {
       setIsLoading(true)
       const data = await delJob(jobId);
       showAlert(data)
-      setJobs(jobs.filter((job) => job._id !== jobId))
+      setJobs(jobs?.filter((job) => job._id !== jobId))
       setShowDeleteModal(null)
     } catch (error) {
       console.log("Error to del the job", error.message)
@@ -76,8 +76,8 @@ const ManageJobs = ({ setActiveTab,jobData }) => {
       const Data = { status: newStatus, jobId }
       const data = await changeStatus({ Data })
       showAlert(data)
-      if (data.statusCode === 200) {
-        setJobs(jobs.map((job) => (job._id === jobId ? { ...job, status: newStatus } : job)))
+      if (data?.statusCode === 200) {
+        setJobs(jobs?.map((job) => (job?._id === jobId ? { ...job, status: newStatus } : job)))
         setShowActionMenu(null)
       }
     } catch (error) {
@@ -87,7 +87,7 @@ const ManageJobs = ({ setActiveTab,jobData }) => {
 
   const handleJobUpdate = (updatedJob) => {
     setJobs((prevJobs) =>
-      prevJobs.map((job) => (job._id === updatedJob._id ? updatedJob : job))
+      prevJobs?.map((job) => (job?._id === updatedJob._id ? updatedJob : job))
     )
     setShowEditModal(null)
   }

@@ -30,7 +30,7 @@ const JobSeekerDashboard = ({ setIsLoggedIn }) => {
     try {
       const data = await saved_applied_jobs()
       if (data.statusCode === 200) {
-        setJobs(data.data)
+        setJobs(data?.data)
       }
     } catch (error) {
       console.log("error during get saved and applied jobs", error.message)
