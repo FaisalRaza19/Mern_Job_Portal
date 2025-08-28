@@ -31,30 +31,30 @@ const JobList = ({ jobs }) => {
     const { search, role, location, salary, remoteOnly } = filters
 
     if (search) {
-      tempJobs = tempJobs.filter((job) =>
+      tempJobs = tempJobs?.filter((job) =>
         job.title?.toLowerCase().includes(search.toLowerCase())
       )
     }
 
     if (role) {
-      tempJobs = tempJobs.filter((job) =>
+      tempJobs = tempJobs?.filter((job) =>
         job.title?.toLowerCase().includes(role.toLowerCase())
       )
     }
 
     if (location) {
-      tempJobs = tempJobs.filter((job) =>
+      tempJobs = tempJobs?.filter((job) =>
         job.location?.toLowerCase().includes(location.toLowerCase())
       )
     }
 
     if (remoteOnly) {
-      tempJobs = tempJobs.filter((job) => job.isRemote === true)
+      tempJobs = tempJobs?.filter((job) => job.isRemote === true)
     }
 
     if (salary) {
       const [min, max] = salary.replace(/\$/g, "").replace(/k/g, "000").split(" - ").map(Number)
-      tempJobs = tempJobs.filter((job) => {
+      tempJobs = tempJobs?.filter((job) => {
         const minSalary = parseInt(job.salary?.min_salary || 0)
         const maxSalary = parseInt(job.salary?.max_salary || 0)
         return minSalary >= min && maxSalary <= max

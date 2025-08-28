@@ -40,7 +40,7 @@ const Companies = () => {
     }, [])
 
     useEffect(() => {
-        const filtered = allCompanyData.filter((company) => {
+        const filtered = allCompanyData?.filter((company) => {
             const name = company?.companyInfo?.companyName?.toLowerCase() || ""
             const location = company?.companyInfo?.companyLocation || ""
             const industry = company?.companyInfo?.companyType || ""

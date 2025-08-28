@@ -64,7 +64,7 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
             const res = await delReview(companyId, _id);
             showAlert(res)
             if (res.statusCode === 200) {
-                setReviews(prev => prev.filter(r => r._id !== _id));
+                setReviews(prev => prev?.filter(r => r._id !== _id));
             }
         } catch (error) {
             console.error("Error deleting review:", error);
