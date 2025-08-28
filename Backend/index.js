@@ -19,12 +19,29 @@ dotenv.config({ path: ".env" })
 connectToDb()
 
 const app = express()
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
+// Get allowed origins from environment variables.
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",").map(o => o.trim()).filter(Boolean)
+  : [];
+
 app.use(express.json({ limit: "100mb" }))
 app.use(express.urlencoded({ limit: "100mb", extended: true }))
 
 // Enhanced CORS configuration
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const isAllowed = allowedOrigins.includes(origin);
+    if (isAllowed || allowedOrigins.length === 0) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "token", "X-Requested-With"],
   credentials: true,
@@ -39,10 +56,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      httpOnly: true,
+      maxAge: 10 * 60 * 1000, // 10 minutes in milliseconds
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
   }),
 )
@@ -71,7 +87,15 @@ const server = createServer(app)
 // Enhanced Socket.IO configuration
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      const isAllowed = allowedOrigins.includes(origin);
+      if (isAllowed || allowedOrigins.length === 0) {
+        return cb(null, true);
+      } else {
+        return cb(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   },
   transports: ["websocket", "polling"],
