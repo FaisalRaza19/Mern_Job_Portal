@@ -109,7 +109,7 @@ const Navbar = ({ isEmployer, darkMode, setDarkMode, isLoggedIn,}) => {
             ))}
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-              {isLoggedIn ? (
+              {isLoggedIn === true ? (
                 <div className="space-y-1">
                   <Link to={isEmployer ? "/employer-dashboard" : "/jobseeker-dashboard"}>
                     <button className="flex items-center space-x-2 w-full px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200">
