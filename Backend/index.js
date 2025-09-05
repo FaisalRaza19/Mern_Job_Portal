@@ -14,6 +14,7 @@ import {
   handleCreateChat, handleSendMessage, handleEditMessage, handleDeleteMessage, handleMarkMessagesSeen,
   handleDeleteChat, handleTyping, handleUserOnline, handleUserOffline,
 } from "./Controller/chat_controller.js"
+import MongoStore from "connect-mongo";
 
 dotenv.config({ path: ".env" })
 connectToDb()
@@ -55,6 +56,11 @@ app.use(
     secret: process.env.SESSION_SECRET || "fallback-secret",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.DB_URL,
+        collectionName: "sessions",
+        ttl: 10 * 60,
+    }),
     cookie: {
       maxAge: 10 * 60 * 1000, // 10 minutes in milliseconds
       secure: process.env.NODE_ENV === "production",
