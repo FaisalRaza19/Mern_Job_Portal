@@ -185,5 +185,5 @@ process.on("SIGTERM", () => {
 
 const PORT = process.env.PORT || 3000
 server.listen(PORT, () => {
-  console.log(`App server and socket server running on this port http://localhost:${PORT}`)
+  console.log(`App server and socket server running on this port ${process.env.BASE_URL || `http://localhost:${PORT}`}`)
 })
