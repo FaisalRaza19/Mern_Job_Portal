@@ -112,8 +112,8 @@ const register_user = async (req, res) => {
     try {
         // get info
         const { code } = req.body;
-        const { emailCode, userInfo } = req.session;
-        console.log(session,code,userInfo,emailCode)
+        const { userInfo, emailCode } = req.session;
+        console.log("code",session, code, userInfo, emailCode)
         if (!userInfo || !emailCode) {
             return res.status(400).json({ statusCode: 400, message: "Session is expired,please try again" })
         }

@@ -15,6 +15,7 @@ const EmailVerify = ({ setIsLogedIn }) => {
   const [activeInput, setActiveInput] = useState(0);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isResendLoading,setIsResendLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(null);
 
   const inputRefs = useRef([]);
@@ -75,7 +76,6 @@ const EmailVerify = ({ setIsLogedIn }) => {
       if (isEditProfile) {
         const data = await verifyAndUpdateProfile({ code });
         showAlert(data);
-        if (data.message === "Session is expired,please try again") navigate("/register");
         if (data.statusCode === 200) {
           setUserData(data.data);
           setIsLogedIn(true);
@@ -85,10 +85,12 @@ const EmailVerify = ({ setIsLogedIn }) => {
       } else {
         const data = await verify_register({ code, navigate });
         showAlert(data);
-        if (data.statusCode === 200) setIsLogedIn(true);
-        setIsEmployer(data.data.role === "employer");
-        setUserData(data.data);
-        localStorage.removeItem("email");
+        if (data.statusCode === 200) {
+          setIsLogedIn(true);
+          setIsEmployer(data.data.role === "employer");
+          setUserData(data.data);
+          localStorage.removeItem("email");
+        }
       }
     } catch (error) {
       console.log("verify email", error.message);
@@ -100,13 +102,19 @@ const EmailVerify = ({ setIsLogedIn }) => {
   const handleResend = async () => {
     setOtp(["", "", "", "", "", ""]);
     setActiveInput(0);
-    setResendTimer(60);
     setError("");
+    setIsResendLoading(true)
     try {
       const data = await ResendCode();
       showAlert(data);
+      if (data.statusCode === 200) {
+        setResendTimer(60);
+      }
     } catch (error) {
       console.log("resend code", error.message);
+
+    } finally {
+      setIsResendLoading(false)
     }
   };
 
@@ -189,7 +197,7 @@ const EmailVerify = ({ setIsLogedIn }) => {
             className={`inline-flex items-center text-sm font-medium transition-colors ${resendTimer !== null && resendTimer > 0 ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-700"}`}
           >
             <FiRefreshCw className={`mr-1 w-4 h-4 ${resendTimer !== null && resendTimer > 0 ? "" : "hover:rotate-180 transition-transform duration-300"}`} />
-            {resendTimer !== null && resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend Code"}
+            {resendTimer !== null && resendTimer > 0 ? `Resend in ${resendTimer}s` : (isResendLoading ? "Resending Email..." : "Resend Code")}
           </button>
         </div>
 
