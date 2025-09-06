@@ -26,12 +26,12 @@ const ChangePass = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="min-h-screen flex flex-col bg-gray-50 p-6">
             {/* Back Button */}
 
             <Link to={"/login"}>
                 <button
-                    className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 mb-8 self-start hover:text-blue-600 transition"
+                    className="flex items-center space-x-2 text-gray-700 mb-8 self-start hover:text-blue-600 transition"
                 >
                     <FaArrowLeft size={20} />
                     <span className="font-medium text-lg">Back</span>
@@ -39,8 +39,8 @@ const ChangePass = () => {
             </Link>
 
             {/* Form Container */}
-            <div className="max-w-md mt-32 w-full mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-                <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
+            <div className="max-w-md mt-32 w-full mx-auto bg-white p-8 rounded-xl shadow-lg">
+                <h2 className="text-2xl font-semibold mb-6 text-gray-900">
                     Change Password
                 </h2>
 
@@ -48,7 +48,7 @@ const ChangePass = () => {
                     <div>
                         <label
                             htmlFor="newPassword"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                            className="block text-sm font-medium text-gray-700 mb-2"
                         >
                             New Password
                         </label>
@@ -59,13 +59,13 @@ const ChangePass = () => {
                                 value={newPass}
                                 onChange={(e) => setNewPass(e.target.value)}
                                 placeholder="Enter your new password"
-                                className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPass(!showPass)}
-                                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
                                 aria-label={showPass ? "Hide password" : "Show password"}
                             >
                                 {showPass ? <FiEyeOff size={20} /> : <FiEye size={20} />}

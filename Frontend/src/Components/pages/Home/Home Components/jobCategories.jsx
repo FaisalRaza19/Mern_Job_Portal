@@ -4,12 +4,12 @@ import {categories} from "../../../../temp/data.js"
 const JobCategories = ()=>{
 
   return (
-    <section className="py-16 lg:py-24 bg-white dark:bg-gray-900 transition-colors duration-300">
+    <section className="py-16 lg:py-24 bg-white transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Browse by Category</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Browse by Category</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Explore opportunities across different industries and find the perfect match for your skills
           </p>
         </div>
@@ -33,7 +33,7 @@ const JobCategories = ()=>{
                 >
                   {category.name}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">{category.jobCount} jobs</p>
+                <p className="text-gray-500 text-sm">{category.jobCount} jobs</p>
               </div>
             )
           })}
@@ -41,7 +41,7 @@ const JobCategories = ()=>{
 
         {/* Call to Action */}
         <div className="text-center mt-12">
-          <p className="text-gray-600 dark:text-gray-400 mb-6">Can't find what you're looking for?</p>
+          <p className="text-gray-600 mb-6">Can't find what you're looking for?</p>
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 transform hover:scale-105">
             View All Categories
           </button>

@@ -22,7 +22,6 @@ import { Context } from "./Context/context.jsx";
 function App() {
   const { isEmployer, verifyUser } = useContext(Context);
   const { isLoggedIn, setIsLoggedIn } = verifyUser;
-  const [darkMode, setDarkMode] = useState(true);
   const authPage = useLocation();
   const isChangePasswordPage = matchPath("/change-password/:token", authPage.pathname);
   const isAuthPage = [
@@ -35,36 +34,13 @@ function App() {
     "/employer-dashboard",
   ].includes(authPage.pathname) || isChangePasswordPage;
 
-  // Load saved or system preference dark mode on mount
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem("darkMode");
-    if (savedDarkMode !== null) {
-      setDarkMode(JSON.parse(savedDarkMode));
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setDarkMode(prefersDark);
-    }
-  }, []);
-
-  // Apply dark mode and save to localStorage on change
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
-
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
-      <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-white text-gray-900 transition-colors duration-300">
+      <div className="bg-white text-gray-900 transition-colors duration-300">
         <Alert />
         {!isAuthPage && (
           <Navbar
             isEmployer={isEmployer}
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
             isLoggedIn={isLoggedIn}
           />
         )}

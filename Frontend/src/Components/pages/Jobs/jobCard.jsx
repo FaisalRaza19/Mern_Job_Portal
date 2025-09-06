@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext} from "react";
 import { Link } from "react-router-dom";
 import { FaBriefcase, FaCheckCircle, FaMapMarkerAlt, FaDollarSign, FaClock, FaTag, FaBookmark, FaRegBookmark, } from "react-icons/fa";
 import { Context } from "../../../Context/context";

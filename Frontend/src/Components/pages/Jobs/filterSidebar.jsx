@@ -1,31 +1,37 @@
-import React from "react"
-import { FaSearch, FaMapMarkerAlt, FaDollarSign, FaGraduationCap, FaTag, FaTimes, } from "react-icons/fa"
+import React from "react";
+import {
+  FaSearch,
+  FaMapMarkerAlt,
+  FaDollarSign,
+  FaGraduationCap,
+  FaTag,
+  FaTimes,
+} from "react-icons/fa";
 
 const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    onFilterChange({ ...filters, [name]: value })
-  }
+    const { name, value } = e.target;
+    onFilterChange({ ...filters, [name]: value });
+  };
 
   const handleSkillChange = (e) => {
-    onFilterChange({ ...filters, skills: e.target.value })
-  }
+    onFilterChange({ ...filters, skills: e.target.value });
+  };
 
   const handleJobTypeChange = (type) => {
-    onFilterChange({ ...filters, jobType: type })
-  }
+    onFilterChange({ ...filters, jobType: type });
+  };
 
   return (
-    <div className="bg-white m-2 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700 sticky top-20 h-fit">
-      <h2 className="text-lg font-semibold mb-4">Filters</h2>
-      <div className="space-y-6">
+    <aside className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 sticky top-16 h-fit transition-all duration-300">
+      <div className="space-y-8">
         {/* Keyword */}
         <div>
-          <label htmlFor="keyword" className="block text-sm font-medium mb-2">
+          <label htmlFor="keyword" className="block text-[14px] font-medium mb-2 text-gray-700">
             Keyword
           </label>
           <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               id="keyword"
@@ -33,22 +39,22 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
               placeholder="Job title, company..."
               value={filters.keyword}
               onChange={handleInputChange}
-              className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+              className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 bg-white placeholder-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
 
         {/* Job Type */}
         <div>
-          <label className="block text-sm font-medium mb-2">Job Type</label>
+          <label className="block text-[14px] font-medium mb-2 text-gray-700">Job Type</label>
           <div className="flex flex-wrap gap-2">
             {["Full-Time", "Part-Time", "Contract", "Internship", "Freelance"].map((type) => (
               <button
                 key={type}
                 onClick={() => handleJobTypeChange(type)}
-                className={`px-3 py-1 rounded-full text-sm transition-all ${filters.jobType === type
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filters.jobType === type
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-blue-50"
                   }`}
               >
                 {type}
@@ -59,21 +65,23 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
 
         {/* Location & Remote */}
         <div>
-          <label htmlFor="location" className="block text-sm font-medium mb-2">Location</label>
+          <label htmlFor="location" className="block text-[14px] font-medium mb-2 text-gray-700">
+            Location
+          </label>
           <div className="relative">
-            <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               id="location"
               name="location"
-              placeholder="City,Country"
+              placeholder="City, Country"
               value={filters.location}
               onChange={(e) => onFilterChange({ ...filters, location: e.target.value })}
               disabled={filters.isRemote}
-              className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+              className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
             />
           </div>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-3 flex items-center gap-2">
             <input
               type="checkbox"
               id="isRemote"
@@ -82,43 +90,40 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
               onChange={(e) => onFilterChange({ ...filters, isRemote: e.target.checked })}
               className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <label htmlFor="isRemote" className="text-sm">Remote only</label>
+            <label htmlFor="isRemote" className="text-[14px] text-gray-600">
+              Remote only
+            </label>
           </div>
         </div>
 
-
-
         {/* Experience */}
         <div>
-          <label htmlFor="experience" className="block text-sm font-medium mb-2">
+          <label htmlFor="experience" className="block text-[14px] font-medium mb-2 text-gray-700">
             Experience Level
           </label>
           <div className="relative">
-            <FaGraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <FaGraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <select
               id="experience"
               name="experience"
               value={filters.experience}
               onChange={handleInputChange}
-              className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
             >
               <option value="">Any</option>
               <option value="Entry Level">Entry Level</option>
               <option value="Mid Level">Mid Level</option>
               <option value="Senior Level">Senior Level</option>
             </select>
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
-              ▼
-            </span>
           </div>
         </div>
 
         {/* Salary Range */}
         <div>
-          <label className="block text-sm font-medium mb-2">Salary Range</label>
-          <div className="flex gap-2">
+          <label className="block text-[14px] font-medium mb-2 text-gray-700">Salary Range</label>
+          <div className="flex gap-3">
             <div className="relative w-1/2">
-              <FaDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <FaDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="number"
                 id="minSalary"
@@ -126,11 +131,11 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
                 placeholder="Min"
                 value={filters.minSalary}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
             <div className="relative w-1/2">
-              <FaDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <FaDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="number"
                 id="maxSalary"
@@ -138,7 +143,7 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
                 placeholder="Max"
                 value={filters.maxSalary}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
           </div>
@@ -146,11 +151,11 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
 
         {/* Skills */}
         <div>
-          <label htmlFor="skills" className="block text-sm font-medium mb-2">
-            Skills (comma-separated)
+          <label htmlFor="skills" className="block text-[14px] font-medium mb-2 text-gray-700">
+            Skills
           </label>
           <div className="relative">
-            <FaTag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <FaTag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               id="skills"
@@ -158,7 +163,7 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
               placeholder="React, Node.js, AWS"
               value={filters.skills}
               onChange={handleSkillChange}
-              className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
@@ -166,14 +171,14 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
         {/* Clear Filters */}
         <button
           onClick={onClearFilters}
-          className="w-full inline-flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 py-2 px-4 rounded-md transition-all text-sm"
+          className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-sm"
         >
           <FaTimes className="w-4 h-4" />
           Clear Filters
         </button>
       </div>
-    </div>
-  )
-}
+    </aside>
+  );
+};
 
-export default FilterSidebar
+export default FilterSidebar;

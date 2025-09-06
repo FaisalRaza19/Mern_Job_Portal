@@ -53,17 +53,32 @@ const valid_register = async (req, res) => {
             return res.status(500).json({ statusCode: 500, message: "Something went wrong while sending the email" });
         }
 
-        // Save info in session
-        req.session.userInfo = {
-            email,
-            password,
-            role,
-            ...(role !== "employer" && { fullName }),
-            ...(role === "employer" && { companyName }),
-        };
-        req.session.emailCode = verificationCode;
+        // Save info in session. Using a fresh session to avoid issues.
+        req.session.regenerate(err => {
+            if (err) {
+                return res.status(500).json({ statusCode: 500, message: "Could not store a session" });
+            }
 
-        return res.status(200).json({ statusCode: 200, message: "Verification code sent to your email. Please verify it.", });
+            req.session.userInfo = {
+                email,
+                password : password,
+                role,
+                ...(role !== "employer" && { fullName }),
+                ...(role === "employer" && { companyName }),
+            };
+            req.session.emailCode = verificationCode;
+
+            req.session.save(saveErr => {
+                if (saveErr) {
+                    return res.status(500).json({ statusCode: 500, message: "Failed to save session" });
+                }
+
+                return res.status(200).json({
+                    statusCode: 200,
+                    message: "Verification code sent to your email. Please verify it."
+                });
+            });
+        });
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Internal server error", error: error.message, });
     }
@@ -80,9 +95,13 @@ const resendVerificationCode = async (req, res) => {
         // resend email  
         const verificationCode = await sendEmail(userInfo.email);
         console.log(verificationCode)
-        req.session.emailCode = verificationCode;
+        req.session.save(err => {
+            if (err) {
+                return res.status(500).json({ statusCode: 500, message: "Failed to update session" });
+            }
 
-        return res.status(200).json({ statusCode: 200, message: "New verification code sent to your email." });
+            return res.status(200).json({ statusCode: 200, message: "New verification code sent to your email." });
+        });
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Error while resending verification code.", error: error.message });
     }
@@ -94,7 +113,12 @@ const register_user = async (req, res) => {
         // get info
         const { code } = req.body;
         const { emailCode, userInfo } = req.session;
+        console.log(session,code,userInfo,emailCode)
+        if (!userInfo || !emailCode) {
+            return res.status(400).json({ statusCode: 400, message: "Session is expired,please try again" })
+        }
         const { fullName, email, password, role, companyName } = userInfo
+        console.log(userInfo)
 
         // verify email
         const verifyMail = verifyEmail(code, emailCode);
@@ -158,10 +182,24 @@ const register_user = async (req, res) => {
             return res.status(500).json({ statusCode: 500, message: "Internal server error" });
         }
 
-        req.session.userInfo = null;
-        req.session.emailCode = null;
+        // Destroy the session after successful registration
+        req.session.destroy(err => {
+            if (err) {
+                return res.status(200).json({
+                    statusCode: 200,
+                    message: "User created,session",
+                    data: createdUser,
+                    accesstoken: accessToken
+                });
+            }
 
-        return res.status(200).json({ statusCode: 200, message: "User create successfully", data: createdUser, accesstoken: accessToken });
+            return res.status(200).json({
+                statusCode: 200,
+                message: "User created successfully",
+                data: createdUser,
+                accesstoken: accessToken
+            });
+        });
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Internal server error", error: error.message })
     }
@@ -372,13 +410,17 @@ const editProfile = async (req, res) => {
             }
 
             req.session.emailCode = verificationCode;
-            req.session.userInfo = req.body;
-            req.session.role = currentUser.role;
+            req.session.userInfo = { fullName, email, userName, totalLawyer, address, role: currentUser.role };
 
-            return res.status(201).json({
-                statusCode: 201,
-                message: "Verification code sent to your email. Please verify."
+            // Explicitly save session and provide a response
+            req.session.save(err => {
+                if (err) console.error("Session save error:", err);
+                return res.status(201).json({
+                    statusCode: 201,
+                    message: "Verification code sent to your email. Please verify to complete the profile update."
+                });
             });
+            return;
         }
 
         // Perform update
@@ -427,13 +469,13 @@ const updateProfile = async (req, res) => {
         }
 
         // get data from session
-        const { emailCode, userInfo, role } = req.session;
+        const { emailCode, userInfo } = req.session;
         const isVerified = verifyEmail(code, emailCode);
         if (!userInfo || !isVerified) {
             return res.status(400).json({ statusCode: 400, message: "User data not found in session or verification incomplete. Please complete the edit profile process again." });
         }
 
-        const { fullName, bio, email, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks, companyLocation } = userInfo;
+        const { fullName, bio, email, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks, companyLocation, role } = userInfo;
         // Update the user profile
         if (role === "employer") {
             user.companyInfo.companyName = companyName
@@ -452,10 +494,12 @@ const updateProfile = async (req, res) => {
         user.userName = userName;
         await user.save();
 
-        // Clear session data after update
-        req.session.emailCode = null;
-        req.session.userInfo = null;
-        req.session.role = null;
+        // Clear session data after successful update
+        req.session.destroy(err => {
+            if (err) {
+                console.error("Session destroy error:", err);
+            }
+        });
 
         return res.status(200).json({ statusCode: 200, message: "Profile updated successfully", data: user });
     } catch (error) {
@@ -640,7 +684,7 @@ const email_for_Pass = async (req, res) => {
             return res.status(500).json({ statusCode: 500, message: "Something went wrong while sending the email" });
         }
 
-        return res.status(200).json({ statusCode: 200, message: "Check your email inbox.",token : token});
+        return res.status(200).json({ statusCode: 200, message: "Check your email inbox.", token: token });
     } catch (error) {
         return res.status(500).json({ statusCode: 500, message: "Something went wrong", error: error.message });
     }

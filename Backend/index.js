@@ -3,18 +3,21 @@ import session from "express-session"
 import connectToDb from "./DataBase/db.js"
 import cors from "cors"
 import dotenv from "dotenv"
+import { createServer } from "http"
+import { Server } from "socket.io"
+import jwt from "jsonwebtoken"
+import MongoStore from "connect-mongo";
+
+// routes
 import { router as userRoutes } from "./Routes/user.route.js"
 import { route as jobRoutes } from "./Routes/jobs.routes.js"
 import { review as reviewRoutes } from "./Routes/reviews.routes.js"
 import { chat as chatRoutes } from "./Routes/Chat.routes.js"
-import { createServer } from "http"
-import { Server } from "socket.io"
-import jwt from "jsonwebtoken"
+// chat import 
 import {
   handleCreateChat, handleSendMessage, handleEditMessage, handleDeleteMessage, handleMarkMessagesSeen,
   handleDeleteChat, handleTyping, handleUserOnline, handleUserOffline,
 } from "./Controller/chat_controller.js"
-import MongoStore from "connect-mongo";
 
 dotenv.config({ path: ".env" })
 connectToDb()
@@ -51,23 +54,21 @@ const corsOptions = {
 app.use(cors(corsOptions))
 
 // Enhanced session middleware
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "fallback-secret",
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: process.env.DB_URL,
-        collectionName: "sessions",
-        ttl: 10 * 60,
-    }),
-    cookie: {
-      maxAge: 10 * 60 * 1000, // 10 minutes in milliseconds
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    },
+app.use(session({
+  secret: process.env.SESSION_SECRET || "fallback-secret",
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.DB_URL,
+    collectionName: "sessions",
+    ttl: 10 * 60,
   }),
-)
+  cookie: {
+    maxAge: 10 * 60 * 1000, // 10 minutes in milliseconds
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  },
+}));
 
 
 // API routes
@@ -125,7 +126,7 @@ io.use((socket, next) => {
       return next(new Error("Invalid token"))
     }
     socket.user = decoded
-    console.log("🧠 Socket authenticated successfully for user:", decoded?.id)
+    console.log("Socket authenticated successfully for user:", decoded?.id)
     next()
   })
 })
@@ -136,7 +137,7 @@ const onlineUsers = new Map()
 // Socket.IO connection handling
 io.on("connection", (socket) => {
   const userId = socket.user.id
-  console.log(`✅ User ${userId} connected to Socket.IO with ID: ${socket.id}`)
+  console.log(`User connected to Socket.IO with ID: ${socket.id}`)
 
   // Add user to online users
   onlineUsers.set(userId, socket.id)
@@ -154,32 +155,9 @@ io.on("connection", (socket) => {
   socket.on("deleteChat", (data) => handleDeleteChat(socket, data, io))
   socket.on("typing", (data) => handleTyping(socket, data, io))
 
-  // Handle voice call events (for future implementation)
-  socket.on("voiceCallOffer", (data) => {
-    const { receiverId, offer } = data
-    io.to(receiverId).emit("voiceCallOffer", {
-      callerId: userId,
-      offer,
-    })
-  })
-
-  socket.on("voiceCallAnswer", (data) => {
-    const { callerId, answer } = data
-    io.to(callerId).emit("voiceCallAnswer", {
-      answer,
-    })
-  })
-
-  socket.on("voiceCallEnd", (data) => {
-    const { receiverId } = data
-    io.to(receiverId).emit("voiceCallEnd", {
-      callerId: userId,
-    })
-  })
-
   // Handle disconnect
   socket.on("disconnect", (reason) => {
-    console.log(`❌ User ${userId} disconnected from Socket.IO. Reason: ${reason}`)
+    console.log(`User disconnected from Socket.IO. Reason: ${reason}`)
     onlineUsers.delete(userId)
     socket.leave(userId.toString())
     handleUserOffline(socket, io)
