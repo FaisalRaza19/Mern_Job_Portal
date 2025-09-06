@@ -61,7 +61,7 @@ const valid_register = async (req, res) => {
 
             req.session.userInfo = {
                 email,
-                password : password,
+                password: password,
                 role,
                 ...(role !== "employer" && { fullName }),
                 ...(role === "employer" && { companyName }),
@@ -92,9 +92,15 @@ const resendVerificationCode = async (req, res) => {
             return res.status(400).json({ statusCode: 400, message: "Session expired or user not found." });
         }
 
-        // resend email  
+        // resend email 
         const verificationCode = await sendEmail(userInfo.email);
+        if (!verificationCode) {
+            return res.status(500).json({ statusCode: 500, message: "Failed to send new verification code." });
+        }
+
+        req.session.emailCode = verificationCode;
         console.log(verificationCode)
+
         req.session.save(err => {
             if (err) {
                 return res.status(500).json({ statusCode: 500, message: "Failed to update session" });
@@ -110,39 +116,38 @@ const resendVerificationCode = async (req, res) => {
 // verify and register user
 const register_user = async (req, res) => {
     try {
-        // get info
         const { code } = req.body;
-        const { userInfo, emailCode } = req.session;
-        console.log("code",session, code, userInfo, emailCode)
-        if (!userInfo || !emailCode) {
-            return res.status(400).json({ statusCode: 400, message: "Session is expired,please try again" })
+        if (!req.session || !req.session.userInfo || !req.session.emailCode) {
+            return res.status(400).json({ statusCode: 400, message: "Session is expired, please try again." });
         }
-        const { fullName, email, password, role, companyName } = userInfo
-        console.log(userInfo)
+
+        const { userInfo, emailCode } = req.session;
+        const { fullName, email, password, role, companyName } = userInfo;
 
         // verify email
         const verifyMail = verifyEmail(code, emailCode);
         if (!verifyMail) {
-            return res.status(401).json({ statusCode: 400, message: "Invalid email code" })
+            return res.status(400).json({ statusCode: 400, message: "Invalid email code." });
         }
-        // assign userName 
+
+        // generate unique userName
         let userName;
-        while (true) {
-            const sampleUserName = generateUsername(fullName || companyName);
-            // find the user
-            const findUserName = await User.findOne({ userName: sampleUserName })
-            if (!findUserName) {
-                userName = sampleUserName
-                break;
-            }
-        };
+        do {
+            userName = generateUsername(fullName || companyName);
+        } while (await User.findOne({ userName }));
 
-        // hashed the password
-        const hashedPassword = await bcrypt.hash(password, 10)
+        // Check if user already exists again to prevent race conditions
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ statusCode: 400, message: "User already exists." });
+        }
 
-        // create the new user user
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create the new user
         let user;
-        if (role == "employer") {
+        if (role === "employer") {
             user = new User({
                 companyInfo: {
                     companyName: companyName
@@ -151,7 +156,7 @@ const register_user = async (req, res) => {
                 password: hashedPassword,
                 userName,
                 role,
-            })
+            });
         } else {
             user = new User({
                 jobSeekerInfo: {
@@ -164,33 +169,24 @@ const register_user = async (req, res) => {
             });
         }
 
-
         await user.save();
 
-
-        // generate tokens
+        // Generate and save tokens
         const accessToken = generate_accessToken(user._id);
         const refreshToken = generate_refreshToken(user._id);
-
-        // update db and add refreshtoken 
-        user.refreshToken = refreshToken
+        user.refreshToken = refreshToken;
         await user.save();
 
-        // create user object
+        // Create user object
         const createdUser = await User.findById(user._id).select("-password -refreshToken");
         if (!createdUser) {
-            return res.status(500).json({ statusCode: 500, message: "Internal server error" });
+            return res.status(500).json({ statusCode: 500, message: "User created but could not be retrieved." });
         }
 
         // Destroy the session after successful registration
         req.session.destroy(err => {
             if (err) {
-                return res.status(200).json({
-                    statusCode: 200,
-                    message: "User created,session",
-                    data: createdUser,
-                    accesstoken: accessToken
-                });
+                console.error("Session destruction failed:", err);
             }
 
             return res.status(200).json({
@@ -201,9 +197,9 @@ const register_user = async (req, res) => {
             });
         });
     } catch (error) {
-        return res.status(500).json({ statusCode: 500, message: "Internal server error", error: error.message })
+        return res.status(500).json({ statusCode: 500, message: "Internal server error", error: error.message });
     }
-}
+};
 
 // login user 
 const login = async (req, res) => {
