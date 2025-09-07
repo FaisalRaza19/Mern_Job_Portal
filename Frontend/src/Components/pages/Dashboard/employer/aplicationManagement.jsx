@@ -19,17 +19,17 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "New":
-        return "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300"
+        return "bg-blue-100 text-blue-800"
       case "Shortlisted":
-        return "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300"
+        return "bg-yellow-100 text-yellow-800"
       case "Hired":
-        return "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300"
+        return "bg-green-100 text-green-800"
       case "Interview":
-        return "bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-300"
+        return "bg-purple-100 text-purple-800"
       case "Rejected":
-        return "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300"
+        return "bg-red-100 text-red-800"
       default:
-        return "bg-gray-100 dark:bg-gray-900/20 text-gray-800 dark:text-gray-300"
+        return "bg-gray-100 text-gray-800"
     }
   }
 
@@ -101,7 +101,7 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
   }
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 lg:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
       {selectedJob ? (
         // Display Applicants for a specific job
         <>
@@ -112,21 +112,21 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                 setSearchTerm("")
                 setStatusFilter("all")
               }}
-              className="inline-flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm sm:text-base"
+              className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors text-sm sm:text-base"
             >
               <FaArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="font-medium">Back to Job Openings</span>
             </button>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center sm:text-left flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 text-center sm:text-left flex-1">
               Applicants for {selectedJob.title}
             </h1>
-            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm rounded-full">
+            <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
               {currentFilteredApplicants.length} applicants
             </span>
           </div>
 
           {/* Filters for applicants */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1 relative">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -135,14 +135,14 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                   placeholder="Search applicants..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900  text-sm"
                 />
               </div>
               <div className="flex space-x-2 sm:space-x-4">
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  className="px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900  text-sm"
                 >
                   <option value="all">All Status</option>
                   <option value="New">New</option>
@@ -161,7 +161,7 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
             {currentFilteredApplicants.map((e) => (
               <div
                 key={e?._id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+                className="bg-white  rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
               >
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
@@ -171,8 +171,8 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                         className="w-12 h-12 rounded-full object-cover"
                       />
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{e?.User?.jobSeekerInfo?.fullName || ""}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{e?.User?.email || ""}</p>
+                        <h3 className="font-semibold text-gray-900 ">{e?.User?.jobSeekerInfo?.fullName || ""}</h3>
+                        <p className="text-sm text-gray-600 ">{e?.User?.email || ""}</p>
                       </div>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status || e?.status)}`}>
@@ -181,27 +181,27 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                   </div>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Applied for:</p>
-                      <p className="text-sm text-blue-600 dark:text-blue-400">{selectedJob?.title || ""}</p>
+                      <p className="text-sm font-medium text-gray-900 ">Applied for:</p>
+                      <p className="text-sm text-blue-600">{selectedJob?.title || ""}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Experience:</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{getExperienceYears(e?.User?.jobSeekerInfo?.experience?.startDate, e?.User?.jobSeekerInfo?.experience?.endDate) || "0 Year"}</p>
+                      <p className="text-sm font-medium text-gray-900 ">Experience:</p>
+                      <p className="text-sm text-gray-600 ">{getExperienceYears(e?.User?.jobSeekerInfo?.experience?.startDate, e?.User?.jobSeekerInfo?.experience?.endDate) || "0 Year"}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Applied:</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm font-medium text-gray-900 ">Applied:</p>
+                      <p className="text-sm text-gray-600 ">
                         {new Date(e?.appliedAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Skills:</p>
+                    <p className="text-sm font-medium text-gray-900  mb-2">Skills:</p>
                     <div className="flex flex-wrap gap-1">
                       {e?.User?.jobSeekerInfo?.skills?.map((skill) => (
                         <span
                           key={skill}
-                          className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded"
+                          className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
                         >
                           {skill}
                         </span>
@@ -217,14 +217,14 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                       <span>View</span>
                     </button>
                     <button onClick={() => handleChat(selectedJob?._id, e?._id, e?.User?._id)}
-                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      className="px-3 py-2 border border-gray-300  text-gray-700  rounded-lg hover:bg-gray-50 transition-colors">
                       <FiMessageCircle className="w-4 h-4" />
                     </button>
                     <a
                       href={getDownloadableResumeUrl(e?.resumeUrl?.resume_Url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+                      className="px-3 py-2 border border-gray-300  text-gray-700  rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
                       title="Download Resume"
                     >
                       <FaDownload className="w-4 h-4" />
@@ -238,7 +238,7 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                       <FaCheck className="w-3 h-3" />
                       <span>You are Hired</span>
                     </button> : (
-                      <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
                         <button
                           onClick={() => handleStatusChange(selectedJob?._id, e?._id, "Pending")}
                           className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs min-w-[100px]"
@@ -282,11 +282,11 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
           </div>
 
           {currentFilteredApplicants.length === 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div className="bg-white  rounded-lg shadow-sm p-6">
               <div className="text-center py-8">
                 <FaUsers className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No applicants found</h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-medium text-gray-900  mb-2">No applicants found</h3>
+                <p className="text-gray-600 ">
                   No applicants match your current filters for this job.
                 </p>
               </div>
@@ -297,27 +297,27 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
         // Display Job Openings Table
         <>
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Job Openings</h1>
-            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm rounded-full">
+            <h1 className="text-2xl font-bold text-gray-900 ">Job Openings</h1>
+            <span className="px-3 py-1 bg-blue-100 text-blue-800  text-sm rounded-full">
               {jobData?.length || 0} jobs
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {jobData.map((job) => (
+            {jobData?.map((job) => (
               <div
                 key={job?._id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+                className="bg-white  rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{job?.title || ""}</h3>
-                  <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">
+                  <h3 className="text-lg font-semibold text-gray-900 ">{job?.title || ""}</h3>
+                  <span className="px-2 py-1 bg-gray-100  text-gray-700  text-xs rounded-full">
                     {job?.openings || 0} openings
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{job?.description || ""}</p>
+                <p className="text-sm text-gray-600  mb-4">{job?.description || ""}</p>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center space-x-1 text-gray-600 ">
                     <FaUsers className="w-4 h-4" />
                     <span className="text-sm">{job?.applicants?.length || 0} applicants</span>
                   </div>
@@ -338,18 +338,18 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
       {/* Applicant Detail Modal */}
       {selectedApplicant && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
+          <div className="bg-white  rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center space-x-4">
                   <img
                     src={selectedApplicant?.User?.avatar?.avatar_Url || "/placeholder.svg?height=40&width=40"}
-                    alt={selectedApplicant.name}
+                    alt={selectedApplicant?.User?.jobSeekerInfo?.fullName}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">{selectedApplicant?.User?.jobSeekerInfo?.fullName || ""}</h2>
-                    <p className="text-gray-600 dark:text-gray-400">{selectedApplicant?.User?.email || ""}</p>
+                    <h2 className="text-xl font-bold text-gray-900 ">{selectedApplicant?.User?.jobSeekerInfo?.fullName || ""}</h2>
+                    <p className="text-gray-600 ">{selectedApplicant?.User?.email || ""}</p>
                     <span
                       className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 ${getStatusColor(status || selectedApplicant.status)}`}
                     >
@@ -359,42 +359,42 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                 </div>
                 <button
                   onClick={() => setSelectedApplicant(null)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-gray-500 hover:text-gray-700"
                 >
                   <FiX className="w-6 h-6" />
                 </button>
               </div>
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Application Details</h3>
+                  <h3 className="font-semibold text-gray-900  mb-2">Application Details</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600 dark:text-gray-400">Position:</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{selectedJob?.title || ""}</p>
+                      <p className="text-gray-600 ">Position:</p>
+                      <p className="font-medium text-gray-900 ">{selectedJob?.title || ""}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600 dark:text-gray-400">Experience:</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{getExperienceYears(selectedApplicant?.User?.jobSeekerInfo?.experience?.startDate, selectedApplicant?.User?.jobSeekerInfo?.experience?.endDate) || "0 Year"}</p>
+                      <p className="text-gray-600 ">Experience:</p>
+                      <p className="font-medium text-gray-900 ">{getExperienceYears(selectedApplicant?.User?.jobSeekerInfo?.experience?.startDate, selectedApplicant?.User?.jobSeekerInfo?.experience?.endDate) || "0 Year"}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600 dark:text-gray-400">Applied Date:</p>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="text-gray-600 ">Applied Date:</p>
+                      <p className="font-medium text-gray-900 ">
                         {new Date(selectedApplicant?.appliedAt).toLocaleDateString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 dark:text-gray-400">Status:</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{status || selectedApplicant?.status || ""}</p>
+                      <p className="text-gray-600 ">Status:</p>
+                      <p className="font-medium text-gray-900 ">{status || selectedApplicant?.status || ""}</p>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Skills</h3>
+                  <h3 className="font-semibold text-gray-900  mb-2">Skills</h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedApplicant?.User?.jobSeekerInfo?.skills.map((skill) => (
                       <span
                         key={skill}
-                        className="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm rounded-full"
+                        className="px-3 py-1 bg-blue-100 text-blue-800  text-sm rounded-full"
                       >
                         {skill}
                       </span>
@@ -411,7 +411,7 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                     <FaDownload className="w-4 h-4" />
                     <span>Download Resume</span>
                   </a>
-                  <button onClick={() => handleChat(selectedJob?._id, selectedApplicant?._id, selectedApplicant?.User?._id)} className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <button onClick={() => handleChat(selectedJob?._id, selectedApplicant?._id, selectedApplicant?.User?._id)} className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border border-gray-300  text-gray-700  rounded-lg hover:bg-gray-50 transition-colors">
                     <FiMessageCircle className="w-4 h-4" />
                     <span>Send Message</span>
                   </button>
@@ -423,7 +423,7 @@ const ApplicantManagement = ({ jobData, setActiveTab }) => {
                     <FaCheck className="w-3 h-3" />
                     <span>You are Hired</span>
                   </button> : (
-                    <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
                       <button
                         onClick={() => handleStatusChange(selectedJob?._id, selectedApplicant?._id, "Pending")}
                         className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs min-w-[100px]"

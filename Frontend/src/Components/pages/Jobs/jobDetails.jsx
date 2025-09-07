@@ -113,7 +113,7 @@ const JobDetails = () => {
 
     if (loading) {
         return (
-            <div className="bg-white mt-6 mb-8 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg shadow p-8 border dark:border-gray-700 animate-pulse">
+            <div className="bg-white mt-6 mb-8 text-gray-900 rounded-lg shadow p-8 border animate-pulse">
                 {/* Skeleton UI */}
             </div>
         );
@@ -121,13 +121,13 @@ const JobDetails = () => {
 
     if (notFound || !job) {
         return (
-            <div className="text-center py-20 text-gray-800 dark:text-gray-200">
+            <div className="text-center py-20 text-gray-800">
                 <FaTimesCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
                 <h2 className="text-2xl font-bold">Job Not Found</h2>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                <p className="text-gray-600 mt-2">
                     This job does not exist or has been removed.
                 </p>
-                <Link to="/jobs" className="text-blue-600 dark:text-blue-400 hover:underline mt-2 block">
+                <Link to="/jobs" className="text-blue-600 hover:underline mt-2 block">
                     Go to Job Listings
                 </Link>
             </div>
@@ -137,26 +137,26 @@ const JobDetails = () => {
     return (
         <div>
             {/* Job Detail Section */}
-            <div className="bg-white mt-9 mb-6 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg shadow-sm p-8 border dark:border-gray-700">
+            <div className="bg-white mt-9 mb-6 text-gray-900 rounded-lg shadow-sm p-8 border">
                 <div className="flex items-center mb-6">
                     <button
                         onClick={() => navigate("/jobs")}
-                        className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 p-2 rounded-full mr-4"
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-800 p-2 rounded-full mr-4"
                     >
                         <FaArrowLeft />
                     </button>
-                    <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Job Details</h1>
+                    <h1 className="text-2xl font-bold text-blue-600">Job Details</h1>
                 </div>
 
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
                     <img
                         src={job?.company?.avatar?.avatar_Url || "/placeholder.svg"}
-                        className="w-20 h-20 rounded-full border p-2 bg-white dark:bg-gray-800 dark:border-gray-700"
+                        className="w-20 h-20 rounded-full border p-2 bg-white"
                         alt="Company Logo"
                     />
                     <div className="flex-1">
                         <h2 className="text-3xl font-bold mb-1">{job?.title || ""}</h2>
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-gray-600">
                             {job?.company?.companyInfo?.companyName || ""}
                         </p>
                     </div>
@@ -180,7 +180,7 @@ const JobDetails = () => {
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 text-sm text-gray-700 dark:text-gray-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 text-sm text-gray-700">
                     <InfoItem icon={<FaMapMarkerAlt />} label={job?.isRemote ? "Remote" : job?.location} />
                     <InfoItem icon={<FaDollarSign />} label={`${job?.salary?.min_salary || 0} - ${job?.salary?.max_salary || 0} ${job?.salary?.currency || ''}`} />
                     <InfoItem icon={<FaClock />} label={job?.employmentType || ""} />
@@ -193,8 +193,8 @@ const JobDetails = () => {
                 <Section title="Skills">
                     <div className="flex flex-wrap gap-2">
                         {parsedSkills.map((skill, i) => (
-                            <span key={i} className="flex items-center gap-1 bg-gray-200 dark:bg-gray-700 text-sm px-3 py-1 rounded-full">
-                                <FaTag className="text-gray-600 dark:text-gray-300" />
+                            <span key={i} className="flex items-center gap-1 bg-gray-200 text-sm px-3 py-1 rounded-full">
+                                <FaTag className="text-gray-600" />
                                 {skill}
                             </span>
                         ))}
@@ -205,8 +205,8 @@ const JobDetails = () => {
                     <Section title="Suggested Skills">
                         <div className="flex flex-wrap gap-2">
                             {suggestedSkills.map((skill, i) => (
-                                <span key={i} className="flex items-center gap-1 bg-green-100 dark:bg-green-700 text-sm px-3 py-1 rounded-full">
-                                    <FaTag className="text-green-600 dark:text-green-300" />
+                                <span key={i} className="flex items-center gap-1 bg-green-100 text-sm px-3 py-1 rounded-full">
+                                    <FaTag className="text-green-600" />
                                     {skill}
                                 </span>
                             ))}
@@ -215,12 +215,12 @@ const JobDetails = () => {
                 )}
 
                 <Section title="Job Description">
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{job?.description}</p>
+                    <p className="text-gray-700 leading-relaxed">{job?.description}</p>
                 </Section>
 
                 {job?.Requirements && (
                     <Section title="Requirements">
-                        <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+                        <ul className="list-disc pl-5 space-y-2 text-gray-700">
                             {job.Requirements
                                 .split(/(?<=[.?!])\s+(?=[A-Z])/)
                                 .filter((line) => line.trim().length > 0)
@@ -232,7 +232,7 @@ const JobDetails = () => {
                 )}
 
                 {showApplyForm && (
-                    <div className="mt-12 pt-8 border-t dark:border-gray-700">
+                    <div className="mt-12 pt-8 border-t">
                         <ApplyForm
                             jobId={job?._id || ""}
                             jobTitle={job?.title || ""}
@@ -277,14 +277,14 @@ const JobDetails = () => {
 
 const InfoItem = ({ icon, label }) => (
     <div className="flex items-center gap-2">
-        <span className="text-blue-500 dark:text-blue-400">{icon}</span>
+        <span className="text-blue-500">{icon}</span>
         <span>{label}</span>
     </div>
 );
 
 const Section = ({ title, children }) => (
     <div className="mb-8">
-        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4 ml-4">{title}</h3>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4 ml-4">{title}</h3>
         {children}
     </div>
 );

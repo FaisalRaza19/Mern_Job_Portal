@@ -39,7 +39,7 @@ Don't repeat existing skills. Just list the names — one per line.
                     content: prompt,
                 },
             ],
-            max_tokens: 150,
+            max_tokens: 1000,
         });
 
         const result = completion.choices[0].message.content;
@@ -56,4 +56,19 @@ Don't repeat existing skills. Just list the names — one per line.
         console.error("Error getting suggestions:", err.message);
         return [];
     }
+};
+
+export const fetchGPTResponse = async (message) => {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "openai/gpt-4o",
+      messages: [{ role: "user", content: message }],
+      max_tokens: 1000,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    return content || "I received an empty response. Please try again.";
+  } catch (error) {
+    return "⚠️ I'm sorry, the GPT API failed to respond. Please try again later.";
+  }
 };

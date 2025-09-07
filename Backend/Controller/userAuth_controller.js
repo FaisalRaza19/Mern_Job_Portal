@@ -331,14 +331,14 @@ const editProfile = async (req, res) => {
         }
         const { email, fullName, bio, userName, companyName, companyType, companySize, companyWeb, companyDescription, socialLinks = {}, companyLocation } = req.body;
 
-        const { linkedin = "", facebook = "", twitter = "", instagram = "", github = "" } = socialLinks;
+        const { linkedin = "", facebook = "", X = "", instagram = "", github = "" } = socialLinks;
 
         if (!email || !userName) {
             return res.status(400).json({ statusCode: 400, message: "Email and Username are required" });
         }
 
         // social link obj
-        let socialLinksObj = { linkedin, facebook, twitter, instagram, github };
+        let socialLinksObj = { linkedin, facebook, X, instagram, github };
 
         // Validate basic user input
         const inputVerify = validateUserInput(fullName, email, undefined, userName);
@@ -356,7 +356,7 @@ const editProfile = async (req, res) => {
                 companySize,
                 companyWeb,
                 companyDescription,
-                socialLinks: { linkedin, facebook, twitter, instagram, github },
+                socialLinks: { linkedin, facebook, X, instagram, github },
                 companyLocation,
             };
 
@@ -429,11 +429,11 @@ const editProfile = async (req, res) => {
             if (companyWeb) currentUser.companyInfo.companyWeb = companyWeb;
             if (companyDescription) currentUser.companyInfo.companyDescription = companyDescription;
             if (companyLocation) currentUser.companyInfo.companyLocation = companyLocation;
-            currentUser.companyInfo.socialLinks = { linkedin, facebook, twitter, instagram, github };
+            currentUser.companyInfo.socialLinks = { linkedin, facebook, X, instagram, github };
         } else {
             currentUser.jobSeekerInfo.fullName = fullName;
             if (bio) currentUser.jobSeekerInfo.bio = bio;
-            currentUser.jobSeekerInfo.socialLinks = { linkedin, facebook, twitter, instagram, github };
+            currentUser.jobSeekerInfo.socialLinks = { linkedin, facebook, X, instagram, github };
         }
 
         await currentUser.save();

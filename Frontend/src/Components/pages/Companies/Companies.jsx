@@ -87,7 +87,7 @@ const Companies = () => {
     return (
         <main className="min-h-screen md:p-8 border-b-cyan-600">
             <section className="mx-auto max-w-6xl">
-                <h1 className="mb-6 text-3xl font-bold text-gray-900 dark:text-gray-50">Find Your Next Company</h1>
+                <h1 className="mb-6 text-3xl font-bold text-gray-900">Find Your Next Company</h1>
 
                 {/* Search & Filters */}
                 <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center">
@@ -97,7 +97,7 @@ const Companies = () => {
 
                 {/* Company Grid */}
                 {filteredData?.length === 0 && !loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-col items-center justify-center py-20 text-gray-500">
                         <FiAlertCircle className="mb-4 h-16 w-16" />
                         <p className="text-xl font-semibold">No companies found.</p>
                         <p className="mt-2 text-center">Try adjusting your search or filters.</p>
@@ -116,15 +116,15 @@ const Companies = () => {
                 {/* Infinite Loader */}
                 <div ref={observerTarget} className="mt-10 flex justify-center">
                     {loading && hasMore && (
-                        <span className="flex items-center text-lg font-medium text-gray-500 dark:text-gray-400">
-                            <span className="mr-3 h-6 w-6 animate-spin rounded-full border-b-2 border-gray-500 dark:border-gray-400" />
+                        <span className="flex items-center text-lg font-medium text-gray-500">
+                            <span className="mr-3 h-6 w-6 animate-spin rounded-full border-b-2 border-gray-500" />
                             Loading more companies...
                         </span>
                     )}
                 </div>
 
                 {!hasMore && displayedCompanies?.length > 0 && (
-                    <div className="mt-10 flex justify-center text-gray-500 dark:text-gray-400">
+                    <div className="mt-10 flex justify-center text-gray-500 ">
                         <p>You've reached the end of the list!</p>
                     </div>
                 )}

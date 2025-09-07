@@ -92,15 +92,15 @@ const JobList = ({ jobs }) => {
   const handleHide = () => setDisplayCount(5)
 
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
+    <div className="rounded-xl bg-white p-6 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h3 className="text-2xl font-bold text-gray-900">
           Active Jobs ({filteredJobs.length})
         </h3>
         {isAnyFilterActive && (
           <button
             onClick={clearAllFilters}
-            className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-400"
+            className="inline-flex items-center text-sm font-medium text-red-600 hover:underline"
           >
             Clear All Filters
           </button>
@@ -120,7 +120,7 @@ const JobList = ({ jobs }) => {
           </>
         )}
         {!isLoading && filteredJobs.length === 0 && (
-          <div className="text-center text-gray-500 dark:text-gray-400 py-10">
+          <div className="text-center text-gray-500 py-10">
             <p className="text-lg">No jobs found matching your filters.</p>
           </div>
         )}
@@ -131,11 +131,11 @@ const JobList = ({ jobs }) => {
           <button
             onClick={handleShowMore}
             disabled={isLoading}
-            className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-gray-700 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200"
+            className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-gray-700"
           >
             {isLoading ? (
               <>
-                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white dark:border-gray-900" />
+                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
                 Loading...
               </>
             ) : (
@@ -148,7 +148,7 @@ const JobList = ({ jobs }) => {
         {displayCount > 5 && filteredJobs.length > 5 && (
           <button
             onClick={handleHide}
-            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50 dark:hover:bg-gray-800"
+            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm hover:bg-gray-50"
           >
             Hide Jobs
           </button>

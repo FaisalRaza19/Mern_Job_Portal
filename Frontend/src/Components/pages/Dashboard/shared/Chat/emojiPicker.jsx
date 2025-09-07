@@ -155,7 +155,7 @@ const EmojiPicker = ({ onEmojiSelect, onClose }) => {
   ]
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
+    <div className="bg-white p-2 rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto custom-scrollbar">
       <div className="grid grid-cols-8 gap-1">
         {emojis.map((emoji, index) => (
           <button
@@ -164,7 +164,7 @@ const EmojiPicker = ({ onEmojiSelect, onClose }) => {
               onEmojiSelect({ native: emoji });
               onClose(); // Close picker after selection
             }}
-            className="p-1 text-xl rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-1 text-xl rounded-md hover:bg-gray-100 transition-colors"
             aria-label={`Select emoji ${emoji}`}
           >
             {emoji}

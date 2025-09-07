@@ -12,7 +12,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, loading }) => {
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1 || loading}
                 aria-label="Previous page"
-                className="h-10 w-10 p-0 rounded-md flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="h-10 w-10 p-0 rounded-md flex items-center justify-center bg-zinc-100 text-zinc-800 hover:bg-zinc-200 transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 <FaChevronLeft className="w-4 h-4" />
             </button>
@@ -25,8 +25,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange, loading }) => {
                     aria-current={currentPage === page ? "page" : undefined}
                     className={`h-10 w-10 p-0 rounded-md flex items-center justify-center text-sm font-medium transition
                         ${currentPage === page
-                            ? "bg-blue-600 text-white dark:bg-blue-500"
-                            : "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                            ? "bg-blue-600 text-white"
+                            : "bg-zinc-100 text-zinc-800 hover:bg-zinc-200"
                         }`}
                 >
                     {page}
@@ -37,7 +37,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, loading }) => {
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages || loading}
                 aria-label="Next page"
-                className="h-10 w-10 p-0 rounded-md flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="h-10 w-10 p-0 rounded-md flex items-center justify-center bg-zinc-100 text-zinc-800 hover:bg-zinc-200 transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 <FaChevronRight className="w-4 h-4" />
             </button>

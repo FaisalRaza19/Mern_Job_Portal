@@ -50,9 +50,9 @@ const ChatWindow = () => {
   // Display a prompt if no chat is active
   if (!activeChat) {
     return (
-      <div className="flex flex-col h-full bg-white dark:bg-gray-800 items-center justify-center">
+      <div className="flex flex-col h-full bg-white items-center justify-center">
         <div className="text-center p-4">
-          <p className="text-lg text-gray-500 dark:text-gray-400">Select a chat to start messaging</p>
+          <p className="text-lg text-gray-500">Select a chat to start messaging</p>
         </div>
       </div>
     );
@@ -64,12 +64,12 @@ const ChatWindow = () => {
 
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800">
+    <div className="flex flex-col h-full bg-white">
       {/* Chat Header */}
       <ChatHeader />
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
+      <div className="flex-1 overflow-hidden bg-gray-50 relative">
         {/* Background Pattern for aesthetics */}
         <div
           className="absolute inset-0 opacity-5"

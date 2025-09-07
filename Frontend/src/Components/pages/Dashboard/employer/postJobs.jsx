@@ -5,9 +5,9 @@ import CurrencyDropdown from "./currencyDropDown.jsx";
 import SelectSkills from "../shared/selectSkills.jsx";
 import { Context } from "../../../../Context/context.jsx";
 
-const PostJob = ({setJobData}) => {
+const PostJob = ({ setJobData }) => {
   const { Jobs, showAlert } = useContext(Context)
-  const { postJobs} = Jobs
+  const { postJobs } = Jobs
   const [isLoading, setIsLoading] = useState(false)
   const initialFormState = {
     title: "",
@@ -62,10 +62,10 @@ const PostJob = ({setJobData}) => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Post New Job</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Post New Job</h1>
         <button
           onClick={() => setShowPreview(!showPreview)}
-          className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <FiEye className="w-4 h-4" />
           <span>{showPreview ? "Hide Preview" : "Show Preview"}</span>
@@ -78,25 +78,25 @@ const PostJob = ({setJobData}) => {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job Title *</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Job Title *</label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
                     placeholder="e.g. Senior Frontend Developer"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 "
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
                   <input
                     disabled={formData.isRemote === true}
                     type="text"
                     value={formData.isRemote === true ? "" : formData.location}
                     onChange={(e) => handleInputChange("location", e.target.value)}
                     placeholder="e.g. San Francisco, CA or Remote"
-                    className="w-full disabled:cursor-not-allowed px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full disabled:cursor-not-allowed px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 "
                     required
                   />
                 </div>
@@ -104,7 +104,7 @@ const PostJob = ({setJobData}) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Salary Range</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Salary Range</label>
                   <div className="flex gap-2">
                     <CurrencyDropdown
                       value={formData.salary.currency}
@@ -117,24 +117,24 @@ const PostJob = ({setJobData}) => {
                       value={formData.salary.min_salary}
                       onChange={(e) => handleSalaryChange("min_salary", Number(e.target.value))}
                       placeholder="Min"
-                      className="w-1/2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-1/2 px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
                     />
                     <input
                       type="number"
                       value={formData.salary.max_salary}
                       onChange={(e) => handleSalaryChange("max_salary", Number(e.target.value))}
                       placeholder="Max"
-                      className="w-1/2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-1/2 px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Experience Level *</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Experience Level *</label>
                   <select
                     value={formData.experienceLevel}
                     onChange={(e) => handleInputChange("experienceLevel", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
                     required
                   >
                     <option value="">Select Level</option>
@@ -147,7 +147,7 @@ const PostJob = ({setJobData}) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Employment Type *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Employment Type *</label>
                 <div className="flex space-x-4">
                   {['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'].map((type) => (
                     <label key={type} className="flex items-center">
@@ -159,7 +159,7 @@ const PostJob = ({setJobData}) => {
                         onChange={(e) => handleInputChange("employmentType", e.target.value)}
                         className="mr-2 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{type}</span>
+                      <span className="text-sm text-gray-700 ">{type}</span>
                     </label>
                   ))}
                 </div>
@@ -167,23 +167,23 @@ const PostJob = ({setJobData}) => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Openings *</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Openings *</label>
                   <input
                     type="number"
                     value={formData.openings}
                     onChange={(e) => handleInputChange("openings", Number(e.target.value))}
                     min="1"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Application Deadline</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Application Deadline</label>
                   <input
                     type="date"
                     value={formData.applicationDeadline}
                     onChange={(e) => handleInputChange("applicationDeadline", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
                   />
                 </div>
                 <div className="flex items-center space-x-2 mt-6">
@@ -193,30 +193,30 @@ const PostJob = ({setJobData}) => {
                     onChange={(e) => handleInputChange("isRemote", e.target.checked)}
                     className="h-4 w-4 text-blue-600"
                   />
-                  <label className="text-sm text-gray-700 dark:text-gray-300">Remote</label>
+                  <label className="text-sm text-gray-700 ">Remote</label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job Description *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Job Description *</label>
                 <textarea
                   rows={6}
                   value={formData.description}
                   onChange={(e) => handleInputChange("description", e.target.value)}
                   placeholder="Describe the role and responsibilities"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900  resize-none"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requirements *</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Requirements *</label>
                 <textarea
                   rows={4}
                   value={formData.Requirements}
                   onChange={(e) => handleInputChange("Requirements", e.target.value)}
                   placeholder="List the required skills, qualifications..."
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900  resize-none"
                   required
                 />
               </div>
@@ -231,7 +231,7 @@ const PostJob = ({setJobData}) => {
 
               <div className="flex space-x-4">
                 <button
-                  className="flex items-center space-x-2 px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="flex items-center space-x-2 px-6 py-2 border border-gray-300  text-gray-700  rounded-lg hover:bg-gray-50"
                 >
                   <FiSave className="w-4 h-4" />
                   <span>Save as Draft</span>
@@ -249,35 +249,35 @@ const PostJob = ({setJobData}) => {
           {showPreview && (
             <DashboardCard title="Live Preview">
               <div className="space-y-4">
-                <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{formData.title || "Job Title"}</h2>
-                  <p className="text-blue-600 dark:text-blue-400 font-medium">Your Company</p>
+                <div className="border-b border-gray-200 pb-4">
+                  <h2 className="text-xl font-bold text-gray-900 ">{formData.title || "Job Title"}</h2>
+                  <p className="text-blue-600 font-medium">Your Company</p>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {formData.location && (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded">
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700  text-sm rounded">
                         📍 {formData.location}
                       </span>
                     )}
                     {formData.employmentType && (
-                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-sm rounded">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded">
                         {formData.employmentType}
                       </span>
                     )}
                     {formData.experienceLevel && (
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm rounded">
+                      <span className="px-2 py-1 bg-green-100 text-green-700 text-sm rounded">
                         {formData.experienceLevel}
                       </span>
                     )}
-                    <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 text-sm rounded">
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-sm rounded">
                       Openings: {formData.openings}
                     </span>
                     {formData.applicationDeadline && (
-                      <span className="px-2 py-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm rounded">
+                      <span className="px-2 py-1 bg-red-100 text-red-700 text-sm rounded">
                         Deadline: {formData.applicationDeadline}
                       </span>
                     )}
                     {formData.isRemote && (
-                      <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 text-sm rounded">
+                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-sm rounded">
                         Remote
                       </span>
                     )}
@@ -286,22 +286,22 @@ const PostJob = ({setJobData}) => {
 
                 {formData.description && (
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Job Description</h3>
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{formData.description}</p>
+                    <h3 className="font-semibold text-gray-900  mb-2">Job Description</h3>
+                    <p className="text-gray-700  whitespace-pre-wrap">{formData.description}</p>
                   </div>
                 )}
 
                 {formData.Requirements && (
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Requirements</h3>
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{formData.Requirements}</p>
+                    <h3 className="font-semibold text-gray-900  mb-2">Requirements</h3>
+                    <p className="text-gray-700  whitespace-pre-wrap">{formData.Requirements}</p>
                   </div>
                 )}
 
                 {formData.skillsRequired.length > 0 && (
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Required Skills</h3>
-                    <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+                    <h3 className="font-semibold text-gray-900  mb-2">Required Skills</h3>
+                    <ul className="list-disc list-inside text-gray-700 ">
                       {formData.skillsRequired.map((skill, index) => (
                         <li key={index}>{skill}</li>
                       ))}

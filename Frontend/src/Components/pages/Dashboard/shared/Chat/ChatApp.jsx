@@ -12,21 +12,21 @@ const ChatApp = () => {
   // If user is not logged in, display a login prompt
   if (!verifyUser.isLoggedIn) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Please Login</h2>
-          <p className="text-gray-600 dark:text-gray-300">You need to be logged in to access the chat.</p>
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Please Login</h2>
+          <p className="text-gray-600 ">You need to be logged in to access the chat.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden font-inter">
+    <div className="flex h-screen bg-gray-50 overflow-hidden font-inter">
       {/* Sidebar - Visible on desktop, hidden on mobile when a chat is active */}
       <div
-        className={`${isMobile ? (activeChat ? "hidden" : "w-full") : "w-80 border-r border-gray-200 dark:border-gray-700"
-          } bg-white dark:bg-gray-800 flex-shrink-0`}
+        className={`${isMobile ? (activeChat ? "hidden" : "w-full") : "w-80 border-r border-gray-200"
+          } bg-white flex-shrink-0`}
       >
         <ChatSidebar />
       </div>

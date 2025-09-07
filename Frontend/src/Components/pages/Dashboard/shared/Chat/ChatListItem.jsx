@@ -38,7 +38,7 @@ const ChatListItem = ({ chat, currentUserId, onDeleteChat }) => {
 
     if (msg.isDeletedForEveryone) {
       return (
-        <div className="flex items-center space-x-1 italic text-gray-500 dark:text-gray-400">
+        <div className="flex items-center space-x-1 italic text-gray-500 ">
           <FiTrash2 className="w-3 h-3" />
           <span>{prefix}This message was deleted</span>
         </div>
@@ -117,7 +117,7 @@ const ChatListItem = ({ chat, currentUserId, onDeleteChat }) => {
 
   return (
     <div
-      className={`relative group flex items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${isActive ? "bg-green-50 dark:bg-green-900 border-r-4 border-green-500" : ""
+      className={`relative group flex items-center p-4 hover:bg-gray-50 cursor-pointer transition-colors ${isActive ? "bg-green-50 border-r-4 border-green-500" : ""
         } rounded-md mx-2 my-1`}
       onClick={() => setActiveChat(chat)}
       role="button"
@@ -129,24 +129,24 @@ const ChatListItem = ({ chat, currentUserId, onDeleteChat }) => {
         <img
           src={avatar}
           alt={name}
-          className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-gray-600"
+          className="w-12 h-12 rounded-full object-cover border border-gray-200"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = "/placeholder.svg?height=48&width=48";
           }}
         />
         {isOnline && (
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
         )}
       </div>
 
       {/* Content */}
       <div className="flex-1 ml-3 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{name}</h3>
+          <h3 className="text-sm font-semibold text-gray-900 truncate">{name}</h3>
           <div className="flex items-center space-x-1">
             {getMessageStatus()}
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+            <span className="text-xs text-gray-500  ml-1">
               {chat.lastMessage && formatTime(chat.lastMessage.createdAt)}
             </span>
             <button
@@ -154,7 +154,7 @@ const ChatListItem = ({ chat, currentUserId, onDeleteChat }) => {
                 e.stopPropagation();
                 onDeleteChat();
               }}
-              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 dark:hover:bg-gray-700 rounded transition-opacity duration-200"
+              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity duration-200"
               title="Delete chat"
               aria-label={`Delete chat with ${name}`}
             >
@@ -164,7 +164,7 @@ const ChatListItem = ({ chat, currentUserId, onDeleteChat }) => {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600 dark:text-gray-300 truncate flex-1 mr-2">{getMessagePreview()}</div>
+          <div className="text-sm text-gray-600 truncate flex-1 mr-2">{getMessagePreview()}</div>
 
           {/* Unread count badge */}
           {chat.unreadCount > 0 && (

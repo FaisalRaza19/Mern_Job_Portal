@@ -28,7 +28,7 @@ const CompanyFilter = ({ onFilter }) => {
   return (
     <div className={`transition-all duration-500 ease-out ${isVisible ? "translate-y-0 opacity-100 delay-200" : "translate-y-4 opacity-0"}`}>
       <div className="flex flex-wrap gap-4 items-center">
-        <select value={location} onChange={(e) => setLocation(e.target.value)} className="rounded-md border border-gray-300 py-2 pr-8 text-gray-900 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
+        <select value={location} onChange={(e) => setLocation(e.target.value)} className="rounded-md border border-gray-300 py-2 pr-8 text-gray-900 shadow-sm">
           <option value="">All Locations</option>
           <option value="New York">New York</option>
           <option value="London">London</option>
@@ -36,7 +36,7 @@ const CompanyFilter = ({ onFilter }) => {
           <option value="San Francisco">San Francisco</option>
         </select>
 
-        <select value={industry} onChange={(e) => setIndustry(e.target.value)} className="rounded-md border border-gray-300 py-2 pr-8 text-gray-900 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
+        <select value={industry} onChange={(e) => setIndustry(e.target.value)} className="rounded-md border border-gray-300 py-2 pr-8 text-gray-900 shadow-sm">
           <option value="">All Industries</option>
           {industryOptions.map((industry) => (
             <option key={industry} value={industry}>
@@ -45,7 +45,7 @@ const CompanyFilter = ({ onFilter }) => {
           ))}
         </select>
 
-        <select value={size} onChange={(e) => setSize(e.target.value)} className="rounded-md border border-gray-300 py-2 pr-8 text-gray-900 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
+        <select value={size} onChange={(e) => setSize(e.target.value)} className="rounded-md border border-gray-300 py-2 pr-8 text-gray-900 shadow-sm">
           <option value="">All Sizes</option>
           <option value="1-10">1-10</option>
           <option value="11-50">11-50</option>
@@ -60,7 +60,7 @@ const CompanyFilter = ({ onFilter }) => {
         {isAnyFilterApplied && (
           <button
             onClick={handleClear}
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50 dark:hover:bg-gray-800"
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             Clear All
           </button>

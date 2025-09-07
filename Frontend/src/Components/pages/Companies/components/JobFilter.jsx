@@ -13,16 +13,16 @@ const JobFilter = ({ filters, onChange }) => {
                     value={search}
                     onChange={(e) => onChange({ search: e.target.value })}
                     placeholder="Search job titles..."
-                    className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50"
+                    className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500"
                 />
-                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             </div>
 
             {/* Role */}
             <select
                 value={role}
                 onChange={(e) => onChange({ role: e.target.value })}
-                className="col-span-6 md:col-span-1 rounded-md border border-gray-300 py-2 px-3 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50"
+                className="col-span-6 md:col-span-1 rounded-md border border-gray-300 py-2 px-3 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500"
             >
                 <option value="">All Roles</option>
                 <option value="Software Engineer">Software Engineer</option>
@@ -36,7 +36,7 @@ const JobFilter = ({ filters, onChange }) => {
             <select
                 value={location}
                 onChange={(e) => onChange({ location: e.target.value })}
-                className="col-span-6 md:col-span-1 rounded-md border border-gray-300 py-2 px-3 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50"
+                className="col-span-6 md:col-span-1 rounded-md border border-gray-300 py-2 px-3 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500"
             >
                 <option value="">All Locations</option>
                 <option value="Remote">Remote</option>
@@ -49,7 +49,7 @@ const JobFilter = ({ filters, onChange }) => {
             <select
                 value={salary}
                 onChange={(e) => onChange({ salary: e.target.value })}
-                className="col-span-6 md:col-span-1 rounded-md border border-gray-300 py-2 px-3 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50"
+                className="col-span-6 md:col-span-1 rounded-md border border-gray-300 py-2 px-3 text-gray-900 shadow-sm focus:border-gray-500 focus:ring-gray-500"
             >
                 <option value="">All Salaries</option>
                 <option value="$50000 - $70000">$50k - $70k</option>
@@ -65,9 +65,9 @@ const JobFilter = ({ filters, onChange }) => {
                     type="checkbox"
                     checked={remoteOnly}
                     onChange={(e) => onChange({ remoteOnly: e.target.checked })}
-                    className="h-4 w-4 rounded text-gray-900 border-gray-300 focus:ring-gray-500 dark:bg-gray-800 dark:border-gray-600"
+                    className="h-4 w-4 rounded text-gray-900 border-gray-300 focus:ring-gray-500"
                 />
-                <label htmlFor="remote" className="text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="remote" className="text-sm text-gray-700">
                     Remote Only
                 </label>
             </div>

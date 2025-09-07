@@ -33,8 +33,8 @@ const SavedJobs = ({ jobs }) => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Saved Jobs</h1>
-        <p className="text-gray-600 dark:text-gray-400">{savedJobs.length} jobs saved</p>
+        <h1 className="text-2xl font-bold text-gray-900">Saved Jobs</h1>
+        <p className="text-gray-600">{savedJobs.length} jobs saved</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -43,14 +43,14 @@ const SavedJobs = ({ jobs }) => {
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{job.jobId?.title || ''}</h3>
-                  <p className="text-blue-600 dark:text-blue-400 font-medium">
+                  <h3 className="text-lg font-semibold text-gray-900 ">{job.jobId?.title || ''}</h3>
+                  <p className="text-blue-600 font-medium">
                     {job.jobId?.company?.companyInfo?.companyName || ''}
                   </p>
                 </div>
                 <button
                   onClick={() => setShowConfirmModal(job.jobId?._id)}
-                  className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   title="Remove from saved"
                 >
                   <FiTrash2 className="w-4 h-4" />
@@ -58,11 +58,11 @@ const SavedJobs = ({ jobs }) => {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 ">
                   <FiMapPin className="w-4 h-4" />
                   <span>{job.jobId?.isRemote ? "Remote" : job.jobId?.location || "World"}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 ">
                   <FiCalendar className="w-4 h-4" />
                   <span>Saved on {new Date(job.date).toLocaleDateString()}</span>
                 </div>
@@ -70,12 +70,12 @@ const SavedJobs = ({ jobs }) => {
 
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">
+                  <p className="font-semibold text-gray-900 ">
                     {job.jobId?.salary?.currency} {job.jobId?.salary?.min_salary} - {job.jobId?.salary?.max_salary}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{job.jobId?.employmentType}</p>
+                  <p className="text-sm text-gray-600 ">{job.jobId?.employmentType}</p>
                 </div>
-                <span className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-xs rounded-full">
+                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                   <FiBookmark className="w-3 h-3 inline mr-1" />
                   Saved
                 </span>
@@ -90,7 +90,7 @@ const SavedJobs = ({ jobs }) => {
                 </Link>
                 <button
                   onClick={() => setPreviewJob(job)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Preview
                 </button>
@@ -104,8 +104,8 @@ const SavedJobs = ({ jobs }) => {
         <DashboardCard>
           <div className="text-center py-8">
             <FiBookmark className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No saved jobs yet</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h3 className="text-lg font-medium text-gray-900  mb-2">No saved jobs yet</h3>
+            <p className="text-gray-600 ">
               Start browsing jobs and save the ones you're interested in!
             </p>
           </div>
@@ -115,15 +115,15 @@ const SavedJobs = ({ jobs }) => {
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Remove Saved Job</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900  mb-4">Remove Saved Job</h3>
+            <p className="text-gray-600  mb-6">
               Are you sure you want to remove this job from your saved list?
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowConfirmModal(null)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
@@ -141,20 +141,20 @@ const SavedJobs = ({ jobs }) => {
       {/* Preview Modal */}
       {previewJob && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
-          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6">
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6">
             <button
               onClick={() => setPreviewJob(null)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
               aria-label="Close"
             >
               <FiX className="w-6 h-6" />
             </button>
 
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900  mb-4">
               {previewJob.jobId?.title}
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-gray-700 dark:text-gray-300">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-gray-700">
               <div className="flex items-center gap-2">
                 <FiDollarSign />
                 <span>
@@ -203,20 +203,20 @@ const SavedJobs = ({ jobs }) => {
               )}
             </div>
 
-            <div className="text-gray-800 dark:text-gray-200 mb-6">
+            <div className="text-gray-800 mb-6">
               <h3 className="text-xl font-semibold mb-2">Job Description</h3>
               <p className="whitespace-pre-wrap">{previewJob.jobId?.description || "No description provided."}</p>
             </div>
 
             {previewJob.jobId?.Requirements && (
-              <div className="text-gray-800 dark:text-gray-200 mb-6">
+              <div className="text-gray-800 mb-6">
                 <h3 className="text-xl font-semibold mb-2">Requirements</h3>
                 <p className="whitespace-pre-wrap">{previewJob.jobId.Requirements}</p>
               </div>
             )}
 
             {previewJob.jobId?.skillsRequired?.length > 0 && (
-              <div className="text-gray-800 dark:text-gray-200">
+              <div className="text-gray-800">
                 <h3 className="text-xl font-semibold mb-2">Skills</h3>
                 <ul className="list-disc pl-5">
                   {previewJob.jobId?.skillsRequired?.map((skill, index) => (

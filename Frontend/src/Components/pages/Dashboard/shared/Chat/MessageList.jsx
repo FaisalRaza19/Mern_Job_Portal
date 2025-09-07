@@ -50,8 +50,8 @@ const MessageList = ({ messages, currentUserId }) => {
         .map(([date, groupMessages]) => (
           <div key={date}>
             <div className="flex justify-center mb-4 sticky top-0 z-10 py-2">
-              <div className="bg-white dark:bg-gray-700 px-3 py-1 rounded-full shadow-sm border border-gray-200 dark:border-gray-600">
-                <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">{formatDateHeader(date)}</span>
+              <div className="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200">
+                <span className="text-xs text-gray-600 font-medium">{formatDateHeader(date)}</span>
               </div>
             </div>
 

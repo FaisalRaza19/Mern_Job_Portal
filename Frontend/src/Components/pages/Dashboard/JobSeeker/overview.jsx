@@ -1,11 +1,11 @@
-import React,{ useState, useContext } from "react"
+import React, { useState, useContext } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiFileText, FiBookmark, FiTrendingUp, FiEdit, FiUpload, FiX } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
 
 const JobSeekerOverview = ({ activeTab }) => {
-  const { userData,JobsAction} = useContext(Context);
-  const {savedJobIds,appliedJobIds} = JobsAction
+  const { userData, JobsAction } = useContext(Context);
+  const { savedJobIds, appliedJobIds } = JobsAction
   const [preview, setPreview] = useState(false)
 
   const stats = [
@@ -55,8 +55,8 @@ const JobSeekerOverview = ({ activeTab }) => {
             <DashboardCard key={index}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                 </div>
                 <Icon className={`w-8 h-8 ${stat.color}`} />
               </div>
@@ -86,15 +86,15 @@ const JobSeekerOverview = ({ activeTab }) => {
               className="w-20 h-20 rounded-full"
             />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{user?.jobSeekerInfo?.fullName}</h3>
-              <h5 className="text-lg font-semibold text-gray-900 dark:text-white">{user?.userName}</h5>
-              <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
+              <h3 className="text-lg font-semibold text-gray-900">{user?.jobSeekerInfo?.fullName}</h3>
+              <h5 className="text-lg font-semibold text-gray-900">{user?.userName}</h5>
+              <p className="text-gray-600">{user?.email}</p>
               <div className="mt-2">
-                <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-xs rounded-full">
+                <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                   Active Job Seeker
                 </span>
               </div>
-              <div className="mt-3 flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+              <div className="mt-3 flex items-center space-x-2 text-sm text-gray-600 ">
                 <FiFileText className="w-4 h-4" />
                 <span>{user?.jobSeekerInfo?.resumeUrl?.resume_Url ? "Resume uploaded" : "No Resume available"}</span>
               </div>
@@ -105,24 +105,24 @@ const JobSeekerOverview = ({ activeTab }) => {
         {/* Resume Status */}
         <DashboardCard title="Resume & Skills">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-green-50  rounded-lg">
               <div className="flex items-center space-x-3">
                 <FiFileText className="w-5 h-5 text-green-600" />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{user?.jobSeekerInfo?.resumeUrl?.file_name || "resume.pdf"}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{getTimeAgo(user?.updatedAt) || "Uploaded 2 days ago"}</p>
+                  <p className="font-medium text-gray-900 ">{user?.jobSeekerInfo?.resumeUrl?.file_name || "resume.pdf"}</p>
+                  <p className="text-sm text-gray-600 ">{getTimeAgo(user?.updatedAt) || "Uploaded 2 days ago"}</p>
                 </div>
               </div>
               <button className="text-blue-600 hover:text-blue-700 text-sm font-medium" onClick={() => setPreview(true)}>Preview</button>
             </div>
 
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white mb-2">Skills</h4>
+              <h4 className="font-medium text-gray-900  mb-2">Skills</h4>
               <div className="flex flex-wrap gap-2">
                 {user?.jobSeekerInfo?.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm rounded-full"
+                    className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
                   >
                     {skill}
                   </span>
@@ -131,7 +131,7 @@ const JobSeekerOverview = ({ activeTab }) => {
             </div>
 
             <button onClick={() => activeTab("profile")}
-              className="w-full flex items-center justify-center space-x-2 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 transition-colors">
+              className="w-full flex items-center justify-center space-x-2 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
               <FiUpload className="w-4 h-4" />
               <span>Update Resume</span>
             </button>
@@ -141,7 +141,7 @@ const JobSeekerOverview = ({ activeTab }) => {
 
       {preview && (
         <div div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full relative">
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full relative">
             <button
               onClick={() => setPreview(false)}
               className="absolute top-2 right-2 text-red-500 hover:text-red-700"

@@ -45,11 +45,11 @@ const JobCard = ({ job }) => {
   const skills = parseSkills(job.skillsRequired);
 
   return (
-    <div className="relative bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 flex flex-col transition-colors duration-300 h-full hover:shadow-lg">
+    <div className="relative bg-white text-gray-800 rounded-lg shadow-md border border-gray-200 p-6 flex flex-col transition-colors duration-300 h-full hover:shadow-lg">
       {/* Save Icon */}
       <button
         onClick={handleSaveToggle}
-        className="absolute top-3 right-3 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+        className="absolute top-3 right-3 text-gray-500 hover:text-blue-600"
       >
         {isSaved === true ? (
           <FaBookmark className="w-5 h-5 text-blue-400" />
@@ -59,24 +59,24 @@ const JobCard = ({ job }) => {
       </button>
 
       {/* Title */}
-      <h3 className="text-xl font-semibold text-primary dark:text-blue-200 mb-2">
+      <h3 className="text-xl font-semibold text-primary mb-2">
         {job.title || ""}
       </h3>
 
       {/* Company */}
-      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
+      <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
         <FaBriefcase className="w-4 h-4" />
         <span>{job.company?.companyInfo?.companyName || "IT Company"}</span>
       </div>
 
       {/* Location */}
-      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
+      <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
         <FaMapMarkerAlt className="w-4 h-4" />
         <span>{job.isRemote === false ? job.location : "Remote"}</span>
       </div>
 
       {/* Salary */}
-      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
+      <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
         <FaDollarSign className="w-4 h-4" />
         <span>
           {job?.salary?.min_salary && job?.salary?.max_salary
@@ -94,9 +94,9 @@ const JobCard = ({ job }) => {
       )}
 
       {/* Employment Type */}
-      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-3">
+      <div className="flex items-center gap-2 text-gray-600 text-sm mb-3">
         <FaClock className="w-4 h-4" />
-        <span className="inline-flex items-center rounded-md bg-blue-100 dark:bg-blue-800/30 px-2 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-300">
+        <span className="inline-flex items-center rounded-md bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">
           {job.employmentType || "Full Time"}
         </span>
       </div>
@@ -106,7 +106,7 @@ const JobCard = ({ job }) => {
         {skills.map((skill, index) => (
           <span
             key={index}
-            className="inline-flex items-center rounded-full bg-gray-200 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-100"
+            className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs font-medium text-gray-800"
           >
             <FaTag className="w-3 h-3 mr-1" />
             {skill}
@@ -116,7 +116,7 @@ const JobCard = ({ job }) => {
 
       {/* View Details Button */}
       <Link to={`/jobs/${job._id}`}
-        className="mt-auto inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 h-10 px-4 py-2"
+        className="mt-auto inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white h-10 px-4 py-2"
       >
         View Details
       </Link>

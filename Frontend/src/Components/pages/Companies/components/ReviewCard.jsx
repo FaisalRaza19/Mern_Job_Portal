@@ -90,7 +90,7 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
 
         const remaining = 5 - stars.length
         for (let i = 0; i < remaining; i++) {
-            stars.push(<FaRegStar key={`star-empty-${i}`} className="text-gray-300 dark:text-gray-600 h-5 w-5" />)
+            stars.push(<FaRegStar key={`star-empty-${i}`} className="text-gray-300 h-5 w-5" />)
         }
 
         return stars
@@ -99,24 +99,24 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
     return (
         <>
             {isVisible && (
-                <article className={`transition-all duration-300 transform ${!isVisible ? 'scale-0 opacity-0' : ''} relative rounded-xl bg-white p-6 shadow-md dark:bg-gray-800 transition-all duration-300 hover:shadow-lg`}>
+                <article className={`transition-all duration-300 transform ${!isVisible ? 'scale-0 opacity-0' : ''} relative rounded-xl bg-white p-6 shadow-md transition-all duration-300 hover:shadow-lg`}>
                     {/* Dropdown menu */}
                     {isOwner && (
                         <div className="absolute top-4 right-4">
                             <button
                                 onClick={toggleMenu}
-                                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+                                className="text-gray-500 hover:text-gray-700"
                             >
                                 <FaEllipsisV />
                             </button>
                             {menuOpen && (
-                                <div className="absolute right-0 mt-2 w-32 rounded-md bg-white dark:bg-gray-900 shadow-lg z-50">
+                                <div className="absolute right-0 mt-2 w-32 rounded-md bg-white shadow-lg z-50">
                                     <button
                                         onClick={() => {
                                             setMenuOpen(false)
                                             setShowEditModal(true)
                                         }}
-                                        className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                                        className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
                                     >
                                         Edit
                                     </button>
@@ -125,7 +125,7 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
                                             setMenuOpen(false)
                                             setShowDeleteConfirm(true)
                                         }}
-                                        className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 dark:hover:bg-gray-800"
+                                        className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
                                     >
                                         Delete
                                     </button>
@@ -138,13 +138,13 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
                     <div className="flex items-center mb-4">
                         <img
                             src={userId?.avatar?.avatar_Url || '/placeholder-user.jpg'}
-                            className="h-12 w-12 rounded-full object-cover border border-gray-300 dark:border-gray-700"
+                            className="h-12 w-12 rounded-full object-cover border border-gray-300"
                         />
                         <div className="ml-4">
-                            <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h4 className="text-lg font-semibold text-gray-900">
                                 {userId?.jobSeekerInfo?.fullName || 'Anonymous'}
                             </h4>
-                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center text-sm text-gray-500">
                                 <FaCalendar className="mr-1 h-4 w-4" />
                                 <span>{formattedDate}</span>
                             </div>
@@ -154,16 +154,16 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
                     {/* Stars */}
                     <div className="flex items-center mb-2">
                         {renderStars()}
-                        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="ml-2 text-sm text-gray-600">
                             ({rating.toFixed(1)})
                         </span>
                     </div>
 
                     {/* Title */}
-                    <h5 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{title}</h5>
+                    <h5 className="text-xl font-bold text-gray-900 mb-2">{title}</h5>
 
                     {/* Comment */}
-                    <p className="text-gray-700 dark:text-gray-300">{comment}</p>
+                    <p className="text-gray-700">{comment}</p>
                 </article>
             )}
 
@@ -171,20 +171,20 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
             {showEditModal &&
                 createPortal(
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                        <div className="rounded-xl bg-white p-6 w-full max-w-md dark:bg-gray-900 shadow-xl">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Edit Review</h3>
+                        <div className="rounded-xl bg-white p-6 w-full max-w-md shadow-xl">
+                            <h3 className="text-xl font-semibold mb-4 text-gray-900">Edit Review</h3>
                             <input
                                 type="text"
                                 value={editForm.title}
                                 onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                                className="w-full mb-3 rounded border border-gray-300 p-2 dark:bg-gray-800 dark:text-white"
+                                className="w-full mb-3 rounded border border-gray-300 p-2"
                                 placeholder="Review title"
                             />
                             <textarea
                                 value={editForm.comment}
                                 onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })}
                                 rows="4"
-                                className="w-full mb-3 rounded border border-gray-300 p-2 dark:bg-gray-800 dark:text-white"
+                                className="w-full mb-3 rounded border border-gray-300 p-2"
                                 placeholder="Your review"
                             />
                             <input
@@ -196,12 +196,12 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
                                 onChange={(e) =>
                                     setEditForm({ ...editForm, rating: parseFloat(e.target.value) })
                                 }
-                                className="w-full mb-4 rounded border border-gray-300 p-2 dark:bg-gray-800 dark:text-white"
+                                className="w-full mb-4 rounded border border-gray-300 p-2"
                             />
                             <div className="flex justify-end space-x-3">
                                 <button
                                     onClick={() => setShowEditModal(false)}
-                                    className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
+                                    className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
                                 >
                                     Cancel
                                 </button>
@@ -221,13 +221,13 @@ const ReviewCard = ({ review, userId: currentUserId, setReviews }) => {
             {showDeleteConfirm &&
                 createPortal(
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                        <div className="rounded-xl bg-white p-6 w-full max-w-sm dark:bg-gray-900 shadow-xl">
-                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Delete this review?</h3>
-                            <p className="text-gray-600 dark:text-gray-300 mb-4">This action cannot be undone.</p>
+                        <div className="rounded-xl bg-white p-6 w-full max-w-sm shadow-xl">
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Delete this review?</h3>
+                            <p className="text-gray-600 mb-4">This action cannot be undone.</p>
                             <div className="flex justify-end space-x-3">
                                 <button
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
+                                    className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
                                 >
                                     Cancel
                                 </button>

@@ -57,9 +57,9 @@ const ChatSidebar = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    <div className="flex flex-col h-full bg-white border-r border-gray-200">
       {/* Search Input */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-gray-200">
         <div className="relative">
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
@@ -67,7 +67,7 @@ const ChatSidebar = () => {
             placeholder="Search or start new chat"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500"
+            className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500"
             aria-label="Search conversations"
           />
         </div>
@@ -80,15 +80,15 @@ const ChatSidebar = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
           </div>
         ) : filteredChats.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-gray-500 dark:text-gray-400">
-            <FiMessageCircle className="w-12 h-12 mb-2 text-gray-300 dark:text-gray-600" />
+          <div className="flex flex-col items-center justify-center h-32 text-gray-500">
+            <FiMessageCircle className="w-12 h-12 mb-2 text-gray-300" />
             <p className="text-sm">{searchTerm ? "No chats found" : "No conversations yet"}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               {searchTerm ? "Try a different search term" : "Start a new conversation"}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-gray-700">
+          <div className="divide-y divide-gray-100">
             {filteredChats.map((chat) => (
               <ChatListItem
                 key={chat._id}
@@ -104,16 +104,16 @@ const ChatSidebar = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Delete Chat</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Delete Chat</h3>
+            <p className="text-gray-600 mb-4">
               Are you sure you want to delete this chat? This action cannot be undone and will delete the chat for both
               users.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Cancel
               </button>

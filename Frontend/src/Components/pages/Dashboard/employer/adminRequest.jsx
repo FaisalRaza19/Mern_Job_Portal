@@ -54,15 +54,15 @@ const AdminRequests = ()=>{
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300"
+        return "bg-yellow-100 text-yellow-800"
       case "Under Review":
-        return "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300"
+        return "bg-blue-100 text-blue-800"
       case "Approved":
-        return "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300"
+        return "bg-green-100 text-green-800"
       case "Rejected":
-        return "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300"
+        return "bg-red-100 text-red-800"
       default:
-        return "bg-gray-100 dark:bg-gray-900/20 text-gray-800 dark:text-gray-300"
+        return "bg-gray-100 text-gray-800"
     }
   }
 
@@ -114,7 +114,7 @@ const AdminRequests = ()=>{
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Requests</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Admin Requests</h1>
         <button
           onClick={() => setShowNewRequestModal(true)}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -129,7 +129,7 @@ const AdminRequests = ()=>{
         <DashboardCard>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Pending Requests</p>
+              <p className="text-sm text-gray-600">Pending Requests</p>
               <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
             </div>
             <FiClock className="w-8 h-8 text-yellow-600" />
@@ -138,7 +138,7 @@ const AdminRequests = ()=>{
         <DashboardCard>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Under Review</p>
+              <p className="text-sm text-gray-600">Under Review</p>
               <p className="text-2xl font-bold text-blue-600">{underReviewCount}</p>
             </div>
             <FiEye className="w-8 h-8 text-blue-600" />
@@ -147,8 +147,8 @@ const AdminRequests = ()=>{
         <DashboardCard>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Requests</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{requests.length}</p>
+              <p className="text-sm text-gray-600 ">Total Requests</p>
+              <p className="text-2xl font-bold text-gray-900 ">{requests.length}</p>
             </div>
             <FiCheck className="w-8 h-8 text-green-600" />
           </div>
@@ -161,12 +161,12 @@ const AdminRequests = ()=>{
           {requests.map((request) => (
             <div
               key={request.id}
-              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
                       {getTypeLabel(request.type)}
                     </span>
                     <span
@@ -176,18 +176,18 @@ const AdminRequests = ()=>{
                       <span>{request.status}</span>
                     </span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{request.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{request.description}</p>
-                  <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                  <h3 className="font-semibold text-gray-900  mb-1">{request.title}</h3>
+                  <p className="text-gray-600  text-sm mb-2">{request.description}</p>
+                  <div className="flex items-center space-x-4 text-xs text-gray-500 ">
                     <span>Submitted: {new Date(request.submittedDate).toLocaleDateString()}</span>
                     {request.responseDate && (
                       <span>Responded: {new Date(request.responseDate).toLocaleDateString()}</span>
                     )}
                   </div>
                   {request.adminNotes && (
-                    <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-sm">
-                      <p className="font-medium text-blue-800 dark:text-blue-300">Admin Notes:</p>
-                      <p className="text-blue-700 dark:text-blue-400">{request.adminNotes}</p>
+                    <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
+                      <p className="font-medium text-blue-800">Admin Notes:</p>
+                      <p className="text-blue-700">{request.adminNotes}</p>
                     </div>
                   )}
                 </div>
@@ -204,7 +204,7 @@ const AdminRequests = ()=>{
 
         {requests.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">No requests submitted yet.</p>
+            <p className="text-gray-500 ">No requests submitted yet.</p>
           </div>
         )}
       </DashboardCard>
@@ -212,15 +212,15 @@ const AdminRequests = ()=>{
       {/* New Request Modal */}
       {showNewRequestModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Submit New Request</h3>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900  mb-4">Submit New Request</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Request Type</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Request Type</label>
                 <select
                   value={newRequest.type}
                   onChange={(e) => setNewRequest({ ...newRequest, type: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                 >
                   <option value="job_approval">Job Approval</option>
                   <option value="account_verification">Account Verification</option>
@@ -228,22 +228,22 @@ const AdminRequests = ()=>{
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Title</label>
                 <input
                   type="text"
                   value={newRequest.title}
                   onChange={(e) => setNewRequest({ ...newRequest, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                   placeholder="Enter request title"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700  mb-1">Description</label>
                 <textarea
                   rows={4}
                   value={newRequest.description}
                   onChange={(e) => setNewRequest({ ...newRequest, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900  resize-none"
                   placeholder="Provide detailed description of your request"
                 />
               </div>
@@ -251,7 +251,7 @@ const AdminRequests = ()=>{
             <div className="flex space-x-3 mt-6">
               <button
                 onClick={() => setShowNewRequestModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700  rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
@@ -270,19 +270,19 @@ const AdminRequests = ()=>{
       {/* Request Detail Modal */}
       {selectedRequest && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
             <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Request Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 ">Request Details</h3>
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="text-gray-500 hover:text-gray-700"
               >
                 <FiX className="w-6 h-6" />
               </button>
             </div>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded">
+                <span className="px-2 py-1 bg-gray-100  text-gray-700  text-sm rounded">
                   {getTypeLabel(selectedRequest.type)}
                 </span>
                 <span
@@ -293,29 +293,29 @@ const AdminRequests = ()=>{
                 </span>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{selectedRequest.title}</h4>
-                <p className="text-gray-600 dark:text-gray-400">{selectedRequest.description}</p>
+                <h4 className="font-semibold text-gray-900  mb-2">{selectedRequest.title}</h4>
+                <p className="text-gray-600 ">{selectedRequest.description}</p>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Submitted Date:</p>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="font-medium text-gray-900 ">Submitted Date:</p>
+                  <p className="text-gray-600 ">
                     {new Date(selectedRequest.submittedDate).toLocaleDateString()}
                   </p>
                 </div>
                 {selectedRequest.responseDate && (
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">Response Date:</p>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="font-medium text-gray-900 ">Response Date:</p>
+                    <p className="text-gray-600 ">
                       {new Date(selectedRequest.responseDate).toLocaleDateString()}
                     </p>
                   </div>
                 )}
               </div>
               {selectedRequest.adminNotes && (
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <h5 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Admin Notes:</h5>
-                  <p className="text-blue-700 dark:text-blue-400">{selectedRequest.adminNotes}</p>
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h5 className="font-medium text-blue-800 mb-2">Admin Notes:</h5>
+                  <p className="text-blue-700 ">{selectedRequest.adminNotes}</p>
                 </div>
               )}
             </div>

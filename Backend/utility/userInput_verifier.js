@@ -68,8 +68,8 @@ const isLinkedInLink = (url) =>
 const isGithubLink = (url) =>
   /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+$/.test(url);
 
-const isTwitterLink = (url) =>
-  /^https?:\/\/(www\.)?twitter\.com\/[A-Za-z0-9_]+$/.test(url);
+const isXLink = (url) =>
+  /^https?:\/\/(www\.)?X\.com\/[A-Za-z0-9_]+$/.test(url);
 
 const isInstagramLink = (url) =>
   /^https?:\/\/(www\.)?instagram\.com\/[A-Za-z0-9_.]+$/.test(url);
@@ -91,8 +91,8 @@ const validateSocialLinks = (links) => {
       case 'github':
         results.github = isGithubLink(url);
         break;
-      case 'twitter':
-        results.twitter = isTwitterLink(url);
+      case 'X':
+        results.X = isXLink(url);
         break;
       case 'instagram':
         results.instagram = isInstagramLink(url);

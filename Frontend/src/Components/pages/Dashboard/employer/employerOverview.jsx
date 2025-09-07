@@ -38,8 +38,8 @@ const EmployerOverview = ({setActiveTab,jobData})=>{
             <DashboardCard key={index}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                 </div>
                 <Icon className={`w-8 h-8 ${stat.color}`} />
               </div>
@@ -63,18 +63,18 @@ const EmployerOverview = ({setActiveTab,jobData})=>{
           }
         >
           <div className="flex items-start space-x-4">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
               <FiEdit className="w-8 h-8 text-blue-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{user?.companyInfo?.companyName || ""}</h3>
-              <p className="text-gray-600 dark:text-gray-400">{user?.companyInfo?.companyType || "Technology Company"}</p>
+              <h3 className="text-lg font-semibold text-gray-900 ">{user?.companyInfo?.companyName || ""}</h3>
+              <p className="text-gray-600 ">{user?.companyInfo?.companyType || "Technology Company"}</p>
               <div className="mt-2">
-                <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-xs rounded-full">
+                <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                   Verified Employer
                 </span>
               </div>
-              <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+              <div className="mt-3 text-sm text-gray-600 ">
                 <p>San Francisco, CA</p>
                 <p>{user?.companyInfo?.companySize + " Employes" || "0 Employes"}</p>
               </div>
@@ -85,15 +85,15 @@ const EmployerOverview = ({setActiveTab,jobData})=>{
         {/* Quick Actions */}
         <DashboardCard title="Quick Actions">
           <div className="space-y-3">
-            <button onClick={()=>setActiveTab("post-job")} className="w-full flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+            <button onClick={()=>setActiveTab("post-job")} className="w-full flex items-center space-x-3 p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
               <FiBriefcase className="w-5 h-5" />
               <span className="font-medium">Post New Job</span>
             </button>
-            <button className="w-full flex items-center space-x-3 p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
+            <button className="w-full flex items-center space-x-3 p-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
               <FiUsers className="w-5 h-5" />
               <span className="font-medium">View Applications</span>
             </button>
-            <button className="w-full flex items-center space-x-3 p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+            <button className="w-full flex items-center space-x-3 p-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors">
               <FiCalendar className="w-5 h-5" />
               <span className="font-medium">Schedule Interviews</span>
             </button>
@@ -107,7 +107,7 @@ const EmployerOverview = ({setActiveTab,jobData})=>{
           {recentApplications.map((application, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center space-x-3">
                 <img
@@ -116,28 +116,28 @@ const EmployerOverview = ({setActiveTab,jobData})=>{
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{application.name}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{application.position}</p>
+                  <p className="font-medium text-gray-900 ">{application.name}</p>
+                  <p className="text-sm text-gray-600 ">{application.position}</p>
                 </div>
               </div>
               <div className="text-right">
                 <span
                   className={`px-2 py-1 text-xs rounded-full ${
                     application.status === "New"
-                      ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300"
+                      ? "bg-blue-100 text-blue-800"
                       : application.status === "Reviewed"
-                        ? "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300"
-                        : "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-green-100 text-green-800"
                   }`}
                 >
                   {application.status}
                 </span>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{application.time}</p>
+                <p className="text-xs text-gray-500  mt-1">{application.time}</p>
               </div>
             </div>
           ))}
         </div>
-        <button className="w-full mt-4 py-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+        <button className="w-full mt-4 py-2 text-blue-600 hover:text-blue-700 font-medium">
           View All Applications
         </button>
       </DashboardCard>

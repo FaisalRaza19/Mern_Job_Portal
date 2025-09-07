@@ -62,7 +62,7 @@ const EmployerDashboard = ({ setIsLoggedIn }) => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-gray-50">
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />

@@ -91,7 +91,7 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
   const renderMessageContent = () => {
     if (message.isDeletedForEveryone) {
       return (
-        <div className="italic text-gray-500 dark:text-gray-400 text-sm flex items-center">
+        <div className="italic text-gray-500 text-sm flex items-center">
           <FiTrash2 className="w-4 h-4 inline mr-1" />
           This message was deleted
         </div>
@@ -105,14 +105,14 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
           <textarea
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
+            className="w-full p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
             rows={2}
             autoFocus
           />
           <div className="flex space-x-2 justify-end">
             <button
               onClick={() => setIsEditing(false)}
-              className="px-3 py-1 text-xs bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors dark:bg-gray-600 dark:text-gray-100 dark:hover:bg-gray-500"
+              className="px-3 py-1 text-xs bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
             >
               Cancel
             </button>
@@ -142,14 +142,14 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
           <div className="flex items-center space-x-3 min-w-[200px]">
             <button
               onClick={toggleAudio}
-              className={`p-2 rounded-full ${isOwn ? "bg-green-600 text-white" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-100"} hover:opacity-80 transition-opacity`}
+              className={`p-2 rounded-full ${isOwn ? "bg-green-600 text-white" : "bg-gray-200 text-gray-700"} hover:opacity-80 transition-opacity`}
               aria-label={isPlaying ? "Pause voice message" : "Play voice message"}
             >
               {isPlaying ? <FiPause className="w-4 h-4" /> : <FiPlay className="w-4 h-4" />}
             </button>
 
             <div className="flex-1">
-              <div className="flex items-center space-x-1 mb-1 text-xs text-gray-600 dark:text-gray-300">
+              <div className="flex items-center space-x-1 mb-1 text-xs text-gray-600">
                 <FiMic className="w-3 h-3" />
                 <span>Voice message</span>
               </div>
@@ -158,14 +158,14 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
                 {[...Array(15)].map((_, i) => (
                   <div
                     key={i}
-                    className={`w-1 rounded-full ${isOwn ? "bg-green-200" : "bg-gray-400 dark:bg-gray-500"}`}
+                    className={`w-1 rounded-full ${isOwn ? "bg-green-200" : "bg-gray-400"}`}
                     style={{ height: `${Math.random() * 20 + 8}px` }}
                   />
                 ))}
               </div>
             </div>
 
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-gray-500 ">
               {message.duration ? `${Math.floor(message.duration)}s` : "0:00"}
             </span>
 
@@ -207,8 +207,8 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
 
       case "audio":
         return (
-          <div className="flex items-center space-x-3 p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700 min-w-[200px]">
-            <FiVolume2 className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          <div className="flex items-center space-x-3 p-2 border border-gray-200 rounded-lg bg-gray-50 min-w-[200px]">
+            <FiVolume2 className="w-5 h-5 text-gray-500 " />
             <audio controls className="flex-1" preload="none">
               <source src={message.content} type="audio/mpeg" />
               Your browser does not support the audio element.
@@ -218,16 +218,16 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
 
       case "file":
         return (
-          <div className="flex items-center space-x-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
-            <FiFile className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+          <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+            <FiFile className="w-6 h-6 text-gray-500 " />
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{message.fileName || "File"}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Document</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{message.fileName || "File"}</p>
+              <p className="text-xs text-gray-500 ">Document</p>
             </div>
             <a
               href={message.content}
               download={message.fileName || "download"}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full transition-colors dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-600"
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full transition-colors"
               aria-label={`Download ${message.fileName || "file"}`}
             >
               <FiDownload className="w-4 h-4" />
@@ -236,7 +236,7 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
         );
 
       default:
-        return <p className="text-sm text-gray-900 dark:text-gray-100">{message.content}</p>;
+        return <p className="text-sm text-gray-900">{message.content}</p>;
     }
   };
 
@@ -273,7 +273,7 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
               ${isOwn
                 ? `bg-green-500 text-white ${isFirstInGroup ? "rounded-tr-md" : ""
                 } ${isLastInGroup ? "rounded-br-md" : ""}`
-                : `bg-white text-gray-900 border border-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 ${isFirstInGroup ? "rounded-tl-md" : ""
+                : `bg-white text-gray-900 border border-gray-200 ${isFirstInGroup ? "rounded-tl-md" : ""
                 } ${isLastInGroup ? "rounded-bl-md" : ""}`
               }`}
           >
@@ -283,7 +283,7 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
           {/* Message Info (time and status) - only for the last bubble in a group and not editing */}
           {isLastInGroup && !isEditing && (
             <div
-              className={`flex items-center mt-1 space-x-1 text-xs text-gray-500 dark:text-gray-400 ${isOwn ? "flex-row-reverse space-x-reverse" : ""
+              className={`flex items-center mt-1 space-x-1 text-xs text-gray-500 ${isOwn ? "flex-row-reverse space-x-reverse" : ""
                 }`}
             >
               <span>{formatTime(message.createdAt)}</span>
@@ -297,32 +297,32 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
           <div className="relative flex items-center">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="message-dropdown-button p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+              className="message-dropdown-button p-1 rounded-full hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
               title="Message options"
               aria-label="Message options"
             >
-              <FiMoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <FiMoreVertical className="w-4 h-4 text-gray-500 " />
             </button>
 
             {showDropdown && (
-              <div className="message-dropdown-menu absolute bottom-full right-0 mb-1 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-1 min-w-max z-50 border border-gray-200 dark:border-gray-700">
+              <div className="message-dropdown-menu absolute bottom-full right-0 mb-1 bg-white shadow-lg rounded-lg py-1 min-w-max z-50 border border-gray-200">
                 {message.messageType === "text" && (
                   <button
                     onClick={() => { setIsEditing(true); setShowDropdown(false); }}
-                    className="block w-full px-3 py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
+                    className="block w-full px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 text-left"
                   >
                     <FiEdit3 className="inline mr-2" /> Edit message
                   </button>
                 )}
                 <button
                   onClick={() => handleDelete("me")}
-                  className="block w-full px-3 py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
+                  className="block w-full px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 text-left"
                 >
                   <FiTrash2 className="inline mr-2" /> Delete for me
                 </button>
                 <button
                   onClick={() => handleDelete("everyone")}
-                  className="block w-full px-3 py-1 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
+                  className="block w-full px-3 py-1 text-sm text-red-600 hover:bg-gray-100 text-left"
                 >
                   <FiTrash2 className="inline mr-2" /> Delete for everyone
                 </button>

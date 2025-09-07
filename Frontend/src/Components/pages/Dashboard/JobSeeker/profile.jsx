@@ -1,4 +1,4 @@
-import React,{ useContext, useState, useRef } from "react"
+import React, { useContext, useState, useRef } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiUpload, FiFileText, FiX, FiLoader, FiSave, FiCalendar } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
@@ -7,9 +7,9 @@ import SelectSkills from "../shared/selectSkills.jsx"
 
 const JobSeekerProfile = () => {
   const navigate = useNavigate()
-  const { userAuth, userData, userImage, userProfile,showAlert} = useContext(Context)
+  const { userAuth, userData, userImage, userProfile, showAlert } = useContext(Context)
   const { setIsEditProfile } = userProfile
-  const { updateAvatar, editProfile, update_Edu_Exp, update_skills_resume} = userAuth;
+  const { updateAvatar, editProfile, update_Edu_Exp, update_skills_resume } = userAuth;
   const { image, setImage } = userImage
   const user = userData;
   const [isLoading, setLoading] = useState(false);
@@ -162,7 +162,7 @@ const JobSeekerProfile = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 ">Profile Management</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -171,7 +171,7 @@ const JobSeekerProfile = () => {
         <DashboardCard title="Personal Information">
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 border-2 rounded-lg flex items-center justify-center overflow-hidden">
                 {userData?.avatar?.avatar_Url ? (
                   <img
                     src={image || userData.avatar.avatar_Url}
@@ -179,12 +179,12 @@ const JobSeekerProfile = () => {
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <span className="text-sm text-gray-500 dark:text-gray-300">{userData?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
+                  <span className="text-sm text-gray-500">{userData?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
                 )}
               </div>
               <div className="flex-1">
                 <button type="button" onClick={handleButtonClick}
-                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <FiUpload className="w-4 h-4" />
                   <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
@@ -197,92 +197,92 @@ const JobSeekerProfile = () => {
             <form action="" onSubmit={handleSumbit}>
               <div className="grid grid-cols-1 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Full Name</label>
                   <input
                     type="text"
                     placeholder="user"
                     onChange={(e) => handleInputChange("fullName", e.target.value)}
                     value={userInfo.fullName || ""}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Email</label>
                   <input
                     type="email"
                     placeholder="example123@gmail.com"
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     value={userInfo.email || ""}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">userName</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">userName</label>
                   <input
                     type="userName"
                     placeholder="user_123"
                     onChange={(e) => handleInputChange("userName", e.target.value)}
                     value={userInfo.userName || ""}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Bio</label>
                   <textarea name="bio" id="bio"
                     value={userInfo.bio || ""}
                     placeholder="e.g. Passionate frontend developer with 3+ years of experience"
                     onChange={(e) => handleInputChange("bio", e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300  rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-gray-900 resize-none"
                     rows={4}
                     minLength={50}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Facebook Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="https://facebook.com"
                     value={userInfo.socialLinks.facebook || ""}
                     onChange={(e) => handleInputChange("facebook", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Linkedin Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Linkedin Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
                     placeholder="https://linkedin.com"
                     value={userInfo.socialLinks.linkedin || ""}
                     onChange={(e) => handleInputChange("linkedin", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Instagram Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
                     placeholder="https://instagram.com"
                     value={userInfo.socialLinks.instagram || ""}
                     onChange={(e) => handleInputChange("instagram", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Twitter Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
                     placeholder="https://twitter.com"
                     value={userInfo.socialLinks.twitter || ""}
                     onChange={(e) => handleInputChange("twitter", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Github Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Github Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
                     placeholder="https://github.com"
                     value={userInfo.socialLinks.github || ""}
                     onChange={(e) => handleInputChange("github", e.target.value, "socialLinks")}
@@ -306,7 +306,7 @@ const JobSeekerProfile = () => {
               <DashboardCard title="Eduaction">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-2">Degree/Qualification *</label>
+                    <label className="block text-sm font-medium mb-2">Degree/Qualification *</label>
                     <input
                       type="text"
                       value={edu_exp.degree || ""}
@@ -317,7 +317,7 @@ const JobSeekerProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-2">Field of Study *</label>
+                    <label className="block text-sm font-medium mb-2">Field of Study *</label>
                     <input
                       type="text"
                       value={edu_exp.fieldOfStudy || ""}
@@ -328,7 +328,7 @@ const JobSeekerProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-2">Institution *</label>
+                    <label className="block text-sm font-medium  mb-2">Institution *</label>
                     <input
                       type="text"
                       value={edu_exp.Institute || ""}
@@ -339,7 +339,7 @@ const JobSeekerProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-2">
+                    <label className="block text-sm font-medium  mb-2">
                       <FiCalendar className="inline mr-1" /> Start Year *
                     </label>
                     <input
@@ -352,7 +352,7 @@ const JobSeekerProfile = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-2">
+                    <label className="block text-sm font-medium  mb-2">
                       <FiCalendar className="inline mr-1" /> End Year *
                     </label>
                     <input
@@ -372,59 +372,59 @@ const JobSeekerProfile = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Job Title */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-1">Job Title *</label>
+                    <label className="block text-sm font-medium  mb-1">Job Title *</label>
                     <input
                       type="text"
                       value={edu_exp.jobTitle}
                       onChange={(e) => handleInfoChange("jobTitle", e.target.value)}
                       placeholder="e.g. Software Engineer"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                     />
                   </div>
 
                   {/* Company Name */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-1">Company *</label>
+                    <label className="block text-sm font-medium  mb-1">Company *</label>
                     <input
                       type="text"
                       value={edu_exp.companyName}
                       onChange={(e) => handleInfoChange("companyName", e.target.value)}
                       placeholder="e.g. TechCorp"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                     />
                   </div>
 
                   {/* Employment Type */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-1">Employment Type *</label>
+                    <label className="block text-sm font-medium  mb-1">Employment Type *</label>
                     <input
                       type="text"
                       value={edu_exp.employmentType}
                       onChange={(e) => handleInfoChange("employmentType", e.target.value)}
                       placeholder="Full-time / Internship"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                     />
                   </div>
 
                   {/* Location */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-1">Location *</label>
+                    <label className="block text-sm font-medium  mb-1">Location *</label>
                     <input
                       type="text"
                       value={edu_exp.location}
                       onChange={(e) => handleInfoChange("location", e.target.value)}
                       placeholder="e.g. Karachi, Pakistan"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                     />
                   </div>
 
                   {/* Start Date */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-1 flex items-center gap-1">
+                    <label className="block text-sm font-medium  mb-1 flex items-center gap-1">
                       <FiCalendar /> Start Date *
                     </label>
                     <input
@@ -432,13 +432,13 @@ const JobSeekerProfile = () => {
                       value={formatDateInput(edu_exp.startDate)}
                       onChange={(e) => handleInfoChange("startDate", e.target.value)}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                     />
                   </div>
 
                   {/* End Date */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-1 flex items-center gap-1">
+                    <label className="block text-sm font-medium  mb-1 flex items-center gap-1">
                       <FiCalendar /> End Date *
                     </label>
                     <input
@@ -446,7 +446,7 @@ const JobSeekerProfile = () => {
                       value={formatDateInput(edu_exp.endDate)}
                       onChange={(e) => handleInfoChange("endDate", e.target.value)}
                       disabled={edu_exp.current}
-                      className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${edu_exp.current ? "opacity-50" : ""}`}
+                      className={`w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900  ${edu_exp.current ? "opacity-50" : ""}`}
                     />
                   </div>
 
@@ -465,13 +465,13 @@ const JobSeekerProfile = () => {
 
                   {/* Description */}
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-200 mb-1">Description</label>
+                    <label className="block text-sm font-medium  mb-1">Description</label>
                     <textarea
                       rows="4"
                       value={edu_exp.description}
                       onChange={(e) => handleInfoChange("description", e.target.value)}
                       placeholder="Describe your role, achievements, and responsibilities..."
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                     />
                   </div>
                 </div>
@@ -494,12 +494,12 @@ const JobSeekerProfile = () => {
             <div className="space-y-4">
               {/* Resume Upload */}
               <label htmlFor="resume-upload" className="cursor-pointer">
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                <div className="border-2 border-dashed border-gray-300  rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                   <FiUpload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600">
                     Drop a new resume here or <span className="text-blue-600">browse files</span>
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, DOC, DOCX up to 5MB</p>
+                  <p className="text-xs text-gray-500 mt-1">PDF, DOC, DOCX up to 5MB</p>
                 </div>
               </label>
               <input
@@ -513,10 +513,10 @@ const JobSeekerProfile = () => {
               {/* Resume Display */}
 
               {(resumeFile || resumeUrl) && (
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                <div className="border-2 border-dashed border-gray-300  rounded-lg p-6 text-center">
                   <FiFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Current Resume</h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  <h3 className="text-lg font-medium text-gray-900  mb-2">Current Resume</h3>
+                  <p className="text-gray-600  mb-4">
                     {resumeFile ? resumeFile?.name : user?.jobSeekerInfo?.resumeUrl?.file_name || "Uploaded Resume "}
                     <span className="ml-4">
                       {resumeFile ? resumeFile?.size / 1024 + "Kb" : user?.jobSeekerInfo?.resumeUrl?.size || ""}
@@ -540,7 +540,7 @@ const JobSeekerProfile = () => {
             {/* Resume Preview Modal */}
             {showPreview && resumeUrl && (
               <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full relative">
+                <div className="bg-white p-6 rounded-lg max-w-4xl w-full relative">
                   <button
                     onClick={() => setShowPreview(false)}
                     className="absolute top-2 right-2 text-red-500 hover:text-red-700"

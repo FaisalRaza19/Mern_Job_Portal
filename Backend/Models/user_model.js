@@ -47,7 +47,7 @@ const reviewSchema = {
 const socialLinksSchema = {
     linkedin: String,
     facebook: String,
-    twitter: String,
+    X : String,
     instagram: String,
     github: String,
 }

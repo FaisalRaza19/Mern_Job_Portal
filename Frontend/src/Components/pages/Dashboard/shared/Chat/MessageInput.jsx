@@ -167,32 +167,32 @@ const MessageInput = () => {
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700">
+    <div className="border-t border-gray-200 bg-white">
       {/* File Preview Section */}
       {attachedFile && (
-        <div className="p-2 px-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+        <div className="p-2 px-4 border-b border-gray-200  bg-gray-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 overflow-hidden">
-              <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+              <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
                 {filePreview && attachedFile.type.startsWith("image/") ? (
                   <img src={filePreview} alt="Preview" className="w-full h-full object-cover" />
                 ) : filePreview && attachedFile.type.startsWith("video/") ? (
                   <video src={filePreview} className="w-full h-full object-cover" />
                 ) : (
-                  <FiFile className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                  <FiFile className="w-6 h-6 text-gray-500 " />
                 )}
               </div>
               <div className="overflow-hidden">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{attachedFile.name}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{(attachedFile.size / 1024).toFixed(2)} KB</p>
+                <p className="text-sm font-medium text-gray-900  truncate">{attachedFile.name}</p>
+                <p className="text-xs text-gray-500 ">{(attachedFile.size / 1024).toFixed(2)} KB</p>
               </div>
             </div>
             <button
               onClick={resetState}
-              className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-200 rounded-full transition-colors"
               aria-label="Remove attached file"
             >
-              <FiX className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <FiX className="w-4 h-4 text-gray-500 " />
             </button>
           </div>
         </div>
@@ -204,7 +204,7 @@ const MessageInput = () => {
         <div ref={emojiPickerRef} className="relative">
           <button
             onClick={() => setShowEmojiPicker((p) => !p)}
-            className="emoji-button p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            className="emoji-button p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Open emoji picker"
           >
             <FiSmile className="w-5 h-5" />
@@ -220,28 +220,28 @@ const MessageInput = () => {
         <div ref={attachMenuRef} className="relative">
           <button
             onClick={() => setShowAttachMenu((p) => !p)}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Attach file"
           >
             <FiPaperclip className="w-5 h-5" />
           </button>
           {showAttachMenu && (
-            <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-900 shadow-lg rounded-lg py-2 min-w-max z-50 border border-gray-200 dark:border-gray-700">
+            <div className="absolute bottom-full mb-2 left-0 bg-white shadow-lg rounded-lg py-2 min-w-max z-50 border border-gray-200 ">
               <button
                 onClick={() => openFileDialog("image/*")}
-                className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
                 <FiImage className="w-4 h-4 text-blue-500" /> <span>Photo</span>
               </button>
               <button
                 onClick={() => openFileDialog("video/*")}
-                className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
                 <FiVideo className="w-4 h-4 text-green-500" /> <span>Video</span>
               </button>
               <button
                 onClick={() => openFileDialog("*/*")}
-                className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
                 <FiFile className="w-4 h-4 text-purple-500" /> <span>Document</span>
               </button>
@@ -260,7 +260,7 @@ const MessageInput = () => {
             }}
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent max-h-32 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 custom-scrollbar"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent max-h-32 bg-gray-100  text-gray-900  placeholder-gray-500 custom-scrollbar"
             rows={1}
           />
         </div>

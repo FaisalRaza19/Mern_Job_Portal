@@ -1,8 +1,8 @@
-import React,{ useState } from "react"
+import React, { useState } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
 import { FiBriefcase, FiUsers, FiCalendar, FiTrendingUp, FiEye, FiDownload } from "react-icons/fi"
 
-const EmployerAnalytics = ()=>{
+const EmployerAnalytics = () => {
   const [timeRange, setTimeRange] = useState("30")
 
   const stats = [
@@ -32,12 +32,12 @@ const EmployerAnalytics = ()=>{
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
         <div className="flex items-center space-x-4">
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 "
           >
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
@@ -59,9 +59,9 @@ const EmployerAnalytics = ()=>{
             <DashboardCard key={index}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400">{stat.change} from last period</p>
+                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-2xl font-bold text-gray-900 ">{stat.value}</p>
+                  <p className="text-sm text-green-600">{stat.change} from last period</p>
                 </div>
                 <Icon className={`w-8 h-8 ${stat.color}`} />
               </div>
@@ -82,12 +82,12 @@ const EmployerAnalytics = ()=>{
                     style={{ height: `${(data.applications / 70) * 100}%`, minHeight: "20px" }}
                     title={`${data.applications} applications`}
                   ></div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{data.month}</p>
+                  <p className="text-xs text-gray-600 mt-2">{data.month}</p>
                 </div>
               ))}
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Monthly application volume</p>
+              <p className="text-sm text-gray-600">Monthly application volume</p>
             </div>
           </div>
         </DashboardCard>
@@ -96,10 +96,10 @@ const EmployerAnalytics = ()=>{
         <DashboardCard title="Job Performance">
           <div className="space-y-4">
             {jobPerformance.map((job, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 dark:text-white">{job.job}</h4>
-                  <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  <h4 className="font-medium text-gray-900 ">{job.job}</h4>
+                  <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600 ">
                     <span className="flex items-center space-x-1">
                       <FiUsers className="w-3 h-3" />
                       <span>{job.applications} applications</span>
@@ -111,8 +111,8 @@ const EmployerAnalytics = ()=>{
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900 dark:text-white">{job.hires} hires</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="font-semibold text-gray-900 ">{job.hires} hires</p>
+                  <p className="text-xs text-gray-500 ">
                     {job.applications > 0 ? ((job.hires / job.applications) * 100).toFixed(1) : 0}% conversion
                   </p>
                 </div>
@@ -135,10 +135,10 @@ const EmployerAnalytics = ()=>{
             ].map((source, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">{source.source}</span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{source.count}</span>
+                  <span className="text-sm font-medium text-gray-900 ">{source.source}</span>
+                  <span className="text-sm text-gray-600 ">{source.count}</span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-200  rounded-full h-2">
                   <div
                     className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${source.percentage}%` }}
@@ -161,16 +161,15 @@ const EmployerAnalytics = ()=>{
             ].map((stage, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">{stage.stage}</span>
+                  <span className="text-sm font-medium text-gray-900 ">{stage.stage}</span>
                   <div className="text-right">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{stage.count}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({stage.percentage}%)</span>
+                    <span className="text-sm font-semibold text-gray-900 ">{stage.count}</span>
+                    <span className="text-xs text-gray-500  ml-1">({stage.percentage}%)</span>
                   </div>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-200  rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      index === 0
+                    className={`h-2 rounded-full transition-all duration-300 ${index === 0
                         ? "bg-blue-600"
                         : index === 1
                           ? "bg-green-600"
@@ -179,7 +178,7 @@ const EmployerAnalytics = ()=>{
                             : index === 3
                               ? "bg-orange-600"
                               : "bg-purple-600"
-                    }`}
+                      }`}
                     style={{ width: `${stage.percentage}%` }}
                   ></div>
                 </div>
@@ -192,8 +191,8 @@ const EmployerAnalytics = ()=>{
         <DashboardCard title="Time to Hire">
           <div className="space-y-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">18</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Average days to hire</p>
+              <p className="text-3xl font-bold text-gray-900">18</p>
+              <p className="text-sm text-gray-600">Average days to hire</p>
             </div>
             <div className="space-y-3">
               {[
@@ -203,8 +202,8 @@ const EmployerAnalytics = ()=>{
                 { position: "DevOps Engineer", days: 12 },
               ].map((item, index) => (
                 <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-900 dark:text-white">{item.position}</span>
-                  <span className="text-gray-600 dark:text-gray-400">{item.days} days</span>
+                  <span className="text-gray-900">{item.position}</span>
+                  <span className="text-gray-600">{item.days} days</span>
                 </div>
               ))}
             </div>
@@ -224,10 +223,10 @@ const EmployerAnalytics = ()=>{
           ].map((activity, index) => (
             <div
               key={index}
-              className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+              className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
             >
-              <p className="text-gray-900 dark:text-white">{activity.action}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{activity.time}</p>
+              <p className="text-gray-900">{activity.action}</p>
+              <p className="text-sm text-gray-500 ">{activity.time}</p>
             </div>
           ))}
         </div>

@@ -26,7 +26,7 @@ const employerSettings = () => {
     socialLinks: {
       facebook: user?.companyInfo?.socialLinks?.facebook || "",
       linkedin: user?.companyInfo?.socialLinks?.linkedin || "",
-      twitter: user?.companyInfo?.socialLinks?.twitter || "",
+      X: user?.companyInfo?.socialLinks?.X || "",
       instagram: user?.companyInfo?.socialLinks?.instagram || "",
       github: user?.companyInfo?.socialLinks?.github || "",
     },
@@ -111,7 +111,7 @@ const employerSettings = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Account Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
@@ -119,7 +119,7 @@ const employerSettings = () => {
         <DashboardCard title="Company Information">
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center overflow-hidden">
                 {user?.companyInfo ? (
                   <img
                     src={image || user?.avatar?.avatar_Url}
@@ -127,12 +127,12 @@ const employerSettings = () => {
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <span className="text-sm text-gray-500 dark:text-gray-300">{user?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
+                  <span className="text-sm text-gray-500">{user?.companyInfo?.companyName?.charAt(0)?.toUpperCase()}</span>
                 )}
               </div>
               <div className="flex-1">
                 <button type="button" onClick={handleButtonClick}
-                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <FiUpload className="w-4 h-4" />
                   <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Upload Logo"}</span>
@@ -144,36 +144,36 @@ const employerSettings = () => {
             <form typeof="sumbit" onSubmit={handleSumbit}>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Email</label>
                   <input
                     type="text"
                     value={companyData.email || ""}
                     onChange={(e) => handleInputChange("email", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Company Name</label>
                   <input
                     type="text"
                     value={companyData.companyName || ""}
                     onChange={(e) => handleInputChange("companyName", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User Name</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">User Name</label>
                   <input
                     type="text"
                     value={companyData.userName || ""}
                     onChange={(e) => handleInputChange("userName", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Industry</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Industry</label>
                   <select value={companyData.companyType || ""} onChange={(e) => handleInputChange("companyType", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                   >
                     <option value="">Select Industry</option>
                     {industryOptions.map((industry) => (
@@ -184,11 +184,11 @@ const employerSettings = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Size</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Company Size</label>
                   <select
                     value={companyData.companySize || ""}
                     onChange={(e) => handleInputChange("companySize", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                   >
                     <option value="">Select Company Size</option>
                     <option value="1-10">1–10 employees</option>
@@ -202,83 +202,83 @@ const employerSettings = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Website</label>
                   <input
                     type="url"
                     value={companyData.companyWeb || ""}
                     onChange={(e) => handleInputChange("companyWeb", e.target.value)}
                     placeholder="https://www.company.com"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">company Location</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">company Location</label>
                   <input
                     type="text"
                     value={companyData.companyLocation || ""}
                     onChange={(e) => handleInputChange("companyLocation", e.target.value)}
                     placeholder="e.g New York"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900 "
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Facebook Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="https://facebook.com"
                     value={companyData.socialLinks.facebook || ""}
                     onChange={(e) => handleInputChange("facebook", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Linkedin Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Linkedin Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="https://linkedin.com"
                     value={companyData.socialLinks.linkedin || ""}
                     onChange={(e) => handleInputChange("linkedin", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Instagram Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
                     placeholder="https://instagram.com"
                     value={companyData.socialLinks.instagram || ""}
                     onChange={(e) => handleInputChange("instagram", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">X Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                    placeholder="https://twitter.com"
-                    value={companyData.socialLinks.twitter || ""}
-                    onChange={(e) => handleInputChange("twitter", e.target.value, "socialLinks")}
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
+                    placeholder="https://X.com"
+                    value={companyData.socialLinks.X || ""}
+                    onChange={(e) => handleInputChange("X", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Github Link</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Github Link</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
                     placeholder="https://github.com"
                     value={companyData.socialLinks.github || ""}
                     onChange={(e) => handleInputChange("github", e.target.value, "socialLinks")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700  mb-1">Description</label>
                   <textarea
                     rows={6}
                     value={companyData.companyDescription || ""}
                     onChange={(e) => handleInputChange("companyDescription", e.target.value)}
                     placeholder="Write a brief description of your company, culture, and what makes it a great place to work..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                    className="w-full px-3 py-2 border border-gray-300  rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white  text-gray-900  resize-none"
                   />
                 </div>
               </div>
@@ -297,8 +297,8 @@ const employerSettings = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white">Email Notifications</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Receive notifications about your job postings</p>
+              <h4 className="font-medium text-gray-900">Email Notifications</h4>
+              <p className="text-sm text-gray-600">Receive notifications about your job postings</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -307,14 +307,14 @@ const employerSettings = () => {
                 onChange={(e) => handleInputChange("emailNotifications", e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all  peer-checked:bg-blue-600"></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white">Application Alerts</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Get notified when someone applies to your jobs</p>
+              <h4 className="font-medium text-gray-900 ">Application Alerts</h4>
+              <p className="text-sm text-gray-600">Get notified when someone applies to your jobs</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -323,14 +323,14 @@ const employerSettings = () => {
                 onChange={(e) => handleInputChange("applicationAlerts", e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all  peer-checked:bg-blue-600"></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white">Marketing Emails</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Receive updates about new features and tips</p>
+              <h4 className="font-medium text-gray-900 ">Marketing Emails</h4>
+              <p className="text-sm text-gray-600 ">Receive updates about new features and tips</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -339,7 +339,7 @@ const employerSettings = () => {
                 onChange={(e) => handleInputChange("marketingEmails", e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all  peer-checked:bg-blue-600"></div>
             </label>
           </div>
 
@@ -353,9 +353,9 @@ const employerSettings = () => {
       {/* Danger Zone */}
       <DashboardCard title="Danger Zone">
         <div className="space-y-4">
-          <div className="p-4 border border-red-200 dark:border-red-800 rounded-lg bg-red-50 dark:bg-red-900/20">
-            <h4 className="font-medium text-red-800 dark:text-red-300 mb-2">Delete Account</h4>
-            <p className="text-sm text-red-600 dark:text-red-400 mb-4">
+          <div className="p-4 border border-red-200 rounded-lg bg-red-50">
+            <h4 className="font-medium text-red-800 mb-2">Delete Account</h4>
+            <p className="text-sm text-red-600 mb-4">
               Once you delete your account, there is no going back. All your job postings and data will be permanently
               removed.
             </p>
@@ -373,16 +373,16 @@ const employerSettings = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Confirm Account Deletion</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900  mb-4">Confirm Account Deletion</h3>
+            <p className="text-gray-600  mb-6">
               Are you absolutely sure you want to delete your account? This action cannot be undone and you will lose
               all your data, job postings, and applicant information.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300  text-gray-700  rounded-lg hover:bg-gray-50  transition-colors"
               >
                 Cancel
               </button>
