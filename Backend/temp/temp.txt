@@ -1,0 +1,8 @@
+this file add for to resolve this error because git did not track empty folder so he did not add that's why multer need temp folder to store temp file so it's give this error 
+Unhandled error: [Error: ENOENT: no such file or directory, open 'temp/1757256347777-979456957-code.jpg'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'temp/1757256347777-979456957-code.jpg',
+  storageErrors: []
+}
