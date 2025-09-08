@@ -1,57 +1,116 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, useContext, useRef } from "react"
 import DashboardCard from "../shared/dashboardCard.jsx"
-import { FiBriefcase, FiUsers, FiCalendar, FiTrendingUp, FiEye, FiDownload } from "react-icons/fi"
+import {
+  FiBriefcase, FiUsers, FiCalendar, FiTrendingUp,
+  FiDownload, FiX
+} from "react-icons/fi"
+import { Context } from "../../../../Context/context.jsx"
+import jsPDF from "jspdf"
+import html2canvas from "html2canvas"
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts"
 
 const EmployerAnalytics = () => {
-  const [timeRange, setTimeRange] = useState("30")
+  const { Jobs, userData, reviews } = useContext(Context)
+  const { getAllJobs } = Jobs
+  const { getAllReviews } = reviews
+
+  const [jobs, setJobs] = useState([])
+  const [reviewList, setReviewList] = useState([])
+  const [showPreview, setShowPreview] = useState(false)
+
+  const reportRef = useRef()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!userData?._id) return
+      const allJobs = await getAllJobs()
+      setJobs(allJobs?.data)
+
+      const employerReviews = await getAllReviews(userData._id)
+      setReviewList(employerReviews?.data?.companyInfo?.companyReviews || [])
+    }
+    fetchData()
+  }, [userData])
+
+  // === Derived Stats ===
+  const totalApplications = jobs.reduce((sum, job) => sum + (job.applicants?.length || 0), 0)
+  const interviews = jobs.reduce(
+    (sum, job) => sum + (job.applicants?.filter(a => a.status === "Interview").length || 0),
+    0
+  )
+  const hires = jobs.reduce(
+    (sum, job) => sum + (job.applicants?.filter(a => a.status === "Hired").length || 0),
+    0
+  )
 
   const stats = [
-    { label: "Total Jobs Posted", value: "24", change: "+12%", icon: FiBriefcase, color: "text-blue-600" },
-    { label: "Total Applications", value: "456", change: "+23%", icon: FiUsers, color: "text-green-600" },
-    { label: "Interviews Scheduled", value: "32", change: "+8%", icon: FiCalendar, color: "text-purple-600" },
-    { label: "Successful Hires", value: "8", change: "+15%", icon: FiTrendingUp, color: "text-orange-600" },
+    { label: "Total Jobs Posted", value: jobs?.length || 0, icon: FiBriefcase },
+    { label: "Total Applications", value: totalApplications, icon: FiUsers },
+    { label: "Interviews Scheduled", value: interviews, icon: FiCalendar },
+    { label: "Successful Hires", value: hires, icon: FiTrendingUp },
   ]
 
-  const jobPerformance = [
-    { job: "Frontend Developer", applications: 45, views: 234, hires: 2 },
-    { job: "UI/UX Designer", applications: 32, views: 189, hires: 1 },
-    { job: "Backend Developer", applications: 28, views: 156, hires: 1 },
-    { job: "Product Manager", applications: 19, views: 98, hires: 0 },
-    { job: "DevOps Engineer", applications: 15, views: 87, hires: 1 },
-  ]
+  const jobPerformance = jobs
+    .map(job => ({
+      job: job.title,
+      applications: job.applicants?.length || 0,
+      views: job.views || 0,
+      hires: job.applicants?.filter(a => a.status === "Hired").length || 0,
+    }))
+    .sort((a, b) => b.applications - a.applications)
+    .slice(0, 5)
 
-  const applicationTrends = [
-    { month: "Jan", applications: 45 },
-    { month: "Feb", applications: 52 },
-    { month: "Mar", applications: 48 },
-    { month: "Apr", applications: 61 },
-    { month: "May", applications: 55 },
-    { month: "Jun", applications: 67 },
-  ]
+  // === Monthly Applications Chart Data ===
+  const applicationsByMonth = jobs.reduce((acc, job) => {
+    job.applicants?.forEach(app => {
+      const month = new Date(app.appliedAt).toLocaleString("default", { month: "short" })
+      acc[month] = (acc[month] || 0) + 1
+    })
+    return acc
+  }, {})
+
+  const monthlyData = Object.entries(applicationsByMonth).map(([month, count]) => ({
+    month,
+    applications: count,
+  }))
+
+  // === PDF Export ===
+  const handleDownload = async () => {
+    const input = reportRef.current
+    const canvas = await html2canvas(input, { scale: 2 })
+    const imgData = canvas.toDataURL("image/png")
+    const pdf = new jsPDF("p", "mm", "a4")
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight)
+    pdf.save("employer-report.pdf")
+  }
 
   return (
     <div className="space-y-6">
+      {/* === Header === */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-        <div className="flex items-center space-x-4">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 "
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setShowPreview(true)}
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
           >
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="90">Last 3 months</option>
-            <option value="365">Last year</option>
-          </select>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Preview Report
+          </button>
+          <button
+            onClick={handleDownload}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <FiDownload className="w-4 h-4" />
-            <span>Export Report</span>
+            <span>Download Report</span>
           </button>
         </div>
       </div>
 
-      {/* Key Metrics */}
+      {/* === Stats Cards === */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon
@@ -60,177 +119,142 @@ const EmployerAnalytics = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 ">{stat.value}</p>
-                  <p className="text-sm text-green-600">{stat.change} from last period</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                 </div>
-                <Icon className={`w-8 h-8 ${stat.color}`} />
+                <Icon className="w-8 h-8 text-blue-600" />
               </div>
             </DashboardCard>
           )
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Application Trends Chart */}
-        <DashboardCard title="Application Trends">
-          <div className="space-y-4">
-            <div className="h-64 flex items-end justify-between space-x-2">
-              {applicationTrends.map((data, index) => (
-                <div key={index} className="flex flex-col items-center flex-1">
-                  <div
-                    className="w-full bg-blue-600 rounded-t-lg transition-all duration-300 hover:bg-blue-700"
-                    style={{ height: `${(data.applications / 70) * 100}%`, minHeight: "20px" }}
-                    title={`${data.applications} applications`}
-                  ></div>
-                  <p className="text-xs text-gray-600 mt-2">{data.month}</p>
-                </div>
-              ))}
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600">Monthly application volume</p>
-            </div>
-          </div>
-        </DashboardCard>
-
-        {/* Top Performing Jobs */}
-        <DashboardCard title="Job Performance">
-          <div className="space-y-4">
-            {jobPerformance.map((job, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 ">{job.job}</h4>
-                  <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600 ">
-                    <span className="flex items-center space-x-1">
-                      <FiUsers className="w-3 h-3" />
-                      <span>{job.applications} applications</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <FiEye className="w-3 h-3" />
-                      <span>{job.views} views</span>
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-gray-900 ">{job.hires} hires</p>
-                  <p className="text-xs text-gray-500 ">
-                    {job.applications > 0 ? ((job.hires / job.applications) * 100).toFixed(1) : 0}% conversion
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </DashboardCard>
-      </div>
-
-      {/* Detailed Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Application Sources */}
-        <DashboardCard title="Application Sources">
-          <div className="space-y-3">
-            {[
-              { source: "Direct Applications", count: 156, percentage: 45 },
-              { source: "Job Boards", count: 98, percentage: 28 },
-              { source: "Social Media", count: 67, percentage: 19 },
-              { source: "Referrals", count: 28, percentage: 8 },
-            ].map((source, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-900 ">{source.source}</span>
-                  <span className="text-sm text-gray-600 ">{source.count}</span>
-                </div>
-                <div className="w-full bg-gray-200  rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${source.percentage}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </DashboardCard>
-
-        {/* Hiring Funnel */}
-        <DashboardCard title="Hiring Funnel">
-          <div className="space-y-4">
-            {[
-              { stage: "Applications", count: 456, percentage: 100 },
-              { stage: "Reviewed", count: 234, percentage: 51 },
-              { stage: "Shortlisted", count: 89, percentage: 19 },
-              { stage: "Interviewed", count: 32, percentage: 7 },
-              { stage: "Hired", count: 8, percentage: 2 },
-            ].map((stage, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-900 ">{stage.stage}</span>
-                  <div className="text-right">
-                    <span className="text-sm font-semibold text-gray-900 ">{stage.count}</span>
-                    <span className="text-xs text-gray-500  ml-1">({stage.percentage}%)</span>
-                  </div>
-                </div>
-                <div className="w-full bg-gray-200  rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full transition-all duration-300 ${index === 0
-                        ? "bg-blue-600"
-                        : index === 1
-                          ? "bg-green-600"
-                          : index === 2
-                            ? "bg-yellow-600"
-                            : index === 3
-                              ? "bg-orange-600"
-                              : "bg-purple-600"
-                      }`}
-                    style={{ width: `${stage.percentage}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </DashboardCard>
-
-        {/* Time to Hire */}
-        <DashboardCard title="Time to Hire">
-          <div className="space-y-4">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-gray-900">18</p>
-              <p className="text-sm text-gray-600">Average days to hire</p>
-            </div>
-            <div className="space-y-3">
-              {[
-                { position: "Frontend Developer", days: 15 },
-                { position: "UI/UX Designer", days: 22 },
-                { position: "Backend Developer", days: 19 },
-                { position: "DevOps Engineer", days: 12 },
-              ].map((item, index) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-900">{item.position}</span>
-                  <span className="text-gray-600">{item.days} days</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </DashboardCard>
-      </div>
-
-      {/* Recent Activity */}
-      <DashboardCard title="Recent Activity">
+      {/* === Top Jobs === */}
+      <DashboardCard title="Top Jobs">
         <div className="space-y-3">
-          {[
-            { action: "New application received for Frontend Developer", time: "2 hours ago" },
-            { action: "Interview scheduled with Jane Smith", time: "4 hours ago" },
-            { action: "Job posting 'Backend Developer' went live", time: "1 day ago" },
-            { action: "Candidate John Doe was hired for UI/UX Designer", time: "2 days ago" },
-            { action: "Job posting 'Product Manager' received 5 new applications", time: "3 days ago" },
-          ].map((activity, index) => (
-            <div
-              key={index}
-              className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
-            >
-              <p className="text-gray-900">{activity.action}</p>
-              <p className="text-sm text-gray-500 ">{activity.time}</p>
+          {jobPerformance.map((job, index) => (
+            <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+              <p className="text-gray-900">{job.job}</p>
+              <span className="text-sm text-gray-600">{job.applications} applications</span>
             </div>
           ))}
         </div>
       </DashboardCard>
+
+      {/* === Report Preview Modal === */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white w-11/12 md:w-3/4 lg:w-2/3 h-[90vh] rounded-lg shadow-lg overflow-y-auto relative p-6">
+            <button
+              onClick={() => setShowPreview(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
+              <FiX className="w-6 h-6" />
+            </button>
+
+            {/* === Report Content === */}
+            <div ref={reportRef} className="p-6 space-y-8">
+              <h2 className="text-xl font-bold mb-4">Employer Analytics Report</h2>
+
+              {/* Overview */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                {stats.map((s, idx) => (
+                  <div key={idx} className="bg-gray-100 p-3 rounded-lg text-center">
+                    <p className="text-sm text-gray-600">{s.label}</p>
+                    <p className="text-lg font-semibold">{s.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Top Jobs Table */}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">Top Performing Jobs</h3>
+                <table className="w-full text-sm border">
+                  <thead className="bg-gray-200">
+                    <tr>
+                      <th className="p-2 text-left">Job</th>
+                      <th className="p-2">Applications</th>
+                      <th className="p-2">Views</th>
+                      <th className="p-2">Hires</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {jobPerformance.map((job, i) => (
+                      <tr key={i} className="border-t">
+                        <td className="p-2">{job.job}</td>
+                        <td className="p-2 text-center">{job.applications}</td>
+                        <td className="p-2 text-center">{job.views}</td>
+                        <td className="p-2 text-center">{job.hires}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Monthly Applications Chart */}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">Monthly Applications Trend</h3>
+                <div className="w-full h-64 bg-white border rounded-lg">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="applications" stroke="#2563eb" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Monthly Applications Table */}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">Monthly Applications Summary</h3>
+                <table className="w-full text-sm border">
+                  <thead className="bg-gray-200">
+                    <tr>
+                      <th className="p-2 text-left">Month</th>
+                      <th className="p-2 text-center">Applications</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyData.map((row, i) => (
+                      <tr key={i} className="border-t">
+                        <td className="p-2">{row.month}</td>
+                        <td className="p-2 text-center">{row.applications}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Recent Reviews */}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">Recent Reviews</h3>
+                {reviewList?.length > 0 ? (
+                  <ul className="space-y-2">
+                    {reviewList.slice(0, 5).map((r, i) => (
+                      <li key={i} className="bg-gray-50 p-3 rounded-md">
+                        <div className="flex items-center mb-2">
+                          <img
+                            src={r?.userId?.avatar?.avatar_Url || "/"}
+                            className="h-10 w-10 rounded-full object-cover border border-gray-300"
+                            alt=""
+                          />
+                          <p className="font-medium text-gray-900 ml-3">{r.title}</p>
+                        </div>
+                        <p className="text-sm text-gray-600">{r.comment}</p>
+                        <p className="text-sm font-semibold text-gray-500 mt-1">Rating: {r.rating}★</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 text-sm">No reviews available</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
