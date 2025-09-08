@@ -6,7 +6,8 @@ import {
 } from "react-icons/fi"
 import { Context } from "../../../../Context/context.jsx"
 import jsPDF from "jspdf"
-import html2canvas from "html2canvas"
+import * as htmlToImage from "html-to-image"
+
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts"
@@ -19,14 +20,16 @@ const EmployerAnalytics = () => {
   const [jobs, setJobs] = useState([])
   const [reviewList, setReviewList] = useState([])
   const [showPreview, setShowPreview] = useState(false)
+  const [pdfUrl, setPdfUrl] = useState(null) // store PDF blob for preview
 
-  const reportRef = useRef()
+  // 🔹 Wrap everything inside this ref (dashboard + modal content)
+  const dashboardRef = useRef(null)
 
   useEffect(() => {
     const fetchData = async () => {
       if (!userData?._id) return
       const allJobs = await getAllJobs()
-      setJobs(allJobs?.data)
+      setJobs(allJobs?.data || [])
 
       const employerReviews = await getAllReviews(userData._id)
       setReviewList(employerReviews?.data?.companyInfo?.companyReviews || [])
@@ -76,16 +79,76 @@ const EmployerAnalytics = () => {
     applications: count,
   }))
 
-  // === PDF Export ===
+  //generate pdf 
+  const generatePdf = async () => {
+    if (!dashboardRef.current) return null
+
+    try {
+      const dataUrl = await htmlToImage.toPng(dashboardRef.current, {
+        cacheBust: true,
+        backgroundColor: "#ffffff",
+        pixelRatio: 2,
+      })
+
+      const pdf = new jsPDF("p", "mm", "a4")
+      const imgProps = pdf.getImageProperties(dataUrl)
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+
+      let heightLeft = pdfHeight
+      let position = 0
+
+      const employerName = userData?.companyName || userData?.name || "Employer"
+      const dateStr = new Date().toLocaleDateString()
+
+      const addHeader = (pageNumber) => {
+        pdf.setFontSize(12)
+        pdf.setTextColor(40)
+        pdf.text(`${employerName} - Analytics Report`, 10, 10)
+        pdf.text(`Date: ${dateStr}`, pdfWidth - 50, 10)
+        pdf.setLineWidth(0.5)
+        pdf.line(10, 12, pdfWidth - 10, 12) // horizontal line below header
+        pdf.setFontSize(10)
+        pdf.text(`Page ${pageNumber}`, pdfWidth / 2 - 5, pdf.internal.pageSize.getHeight() - 10)
+      }
+
+      let pageNumber = 1
+      addHeader(pageNumber)
+      pdf.addImage(dataUrl, "PNG", 0, 15, pdfWidth, pdfHeight)
+      heightLeft -= pdf.internal.pageSize.getHeight() - 15
+
+      while (heightLeft > 0) {
+        pageNumber += 1
+        position = heightLeft - pdfHeight
+        pdf.addPage()
+        addHeader(pageNumber)
+        pdf.addImage(dataUrl, "PNG", 0, 15, pdfWidth, pdfHeight)
+        heightLeft -= pdf.internal.pageSize.getHeight() - 15
+      }
+
+      return pdf
+    } catch (err) {
+      console.error("PDF generation failed", err)
+      return null
+    }
+  }
+
+
+  // === Download PDF ===
   const handleDownload = async () => {
-    const input = reportRef.current
-    const canvas = await html2canvas(input, { scale: 2 })
-    const imgData = canvas.toDataURL("image/png")
-    const pdf = new jsPDF("p", "mm", "a4")
-    const pdfWidth = pdf.internal.pageSize.getWidth()
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight)
-    pdf.save("employer-report.pdf")
+    const pdf = await generatePdf()
+    if (pdf) pdf.save("employer-dashboard.pdf")
+  }
+
+  // === Preview PDF ===
+  const handlePreview = async () => {
+    const pdf = await generatePdf()
+    if (pdf) {
+      const pdfBlob = pdf.output("blob")
+      const url = URL.createObjectURL(pdfBlob)
+      setPdfUrl(url)
+      setShowPreview(true)
+    }
   }
 
   return (
@@ -95,7 +158,7 @@ const EmployerAnalytics = () => {
         <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => setShowPreview(true)}
+            onClick={handlePreview}
             className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
           >
             Preview Report
@@ -110,148 +173,97 @@ const EmployerAnalytics = () => {
         </div>
       </div>
 
-      {/* === Stats Cards === */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon
-          return (
-            <DashboardCard key={index}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+      {/* === Everything to export === */}
+      <div ref={dashboardRef} className="p-6 bg-white rounded-lg shadow space-y-8">
+        {/* 🔹 Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon
+            return (
+              <DashboardCard key={index}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">{stat.label}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  </div>
+                  <Icon className="w-8 h-8 text-blue-600" />
                 </div>
-                <Icon className="w-8 h-8 text-blue-600" />
+              </DashboardCard>
+            )
+          })}
+        </div>
+
+        {/* 🔹 Top Jobs */}
+        <DashboardCard title="Top Jobs">
+          <div className="space-y-3">
+            {jobPerformance.map((job, index) => (
+              <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <p className="text-gray-900">{job.job}</p>
+                <span className="text-sm text-gray-600">{job.applications} applications</span>
               </div>
-            </DashboardCard>
-          )
-        })}
+            ))}
+          </div>
+        </DashboardCard>
+
+        {/* 🔹 Chart */}
+        <DashboardCard title="Monthly Applications Trend">
+          <div className="w-full h-64 bg-white border rounded-lg">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="applications" stroke="#2563eb" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </DashboardCard>
+
+        {/* 🔹 Reviews */}
+        <DashboardCard title="Recent Reviews">
+          {reviewList?.length > 0 ? (
+            <ul className="space-y-2">
+              {reviewList.slice(0, 5).map((r, i) => (
+                <li key={i} className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex items-center mb-2">
+                    <img
+                      src={r?.userId?.avatar?.avatar_Url || "/"}
+                      className="h-10 w-10 rounded-full object-cover border border-gray-300"
+                      alt=""
+                    />
+                    <p className="font-medium text-gray-900 ml-3">{r.title}</p>
+                  </div>
+                  <p className="text-sm text-gray-600">{r.comment}</p>
+                  <p className="text-sm font-semibold text-gray-500 mt-1">Rating: {r.rating}★</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 text-sm">No reviews available</p>
+          )}
+        </DashboardCard>
       </div>
 
-      {/* === Top Jobs === */}
-      <DashboardCard title="Top Jobs">
-        <div className="space-y-3">
-          {jobPerformance.map((job, index) => (
-            <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-              <p className="text-gray-900">{job.job}</p>
-              <span className="text-sm text-gray-600">{job.applications} applications</span>
-            </div>
-          ))}
-        </div>
-      </DashboardCard>
-
-      {/* === Report Preview Modal === */}
+      {/* === Report Preview Modal (with real PDF) === */}
       {showPreview && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white w-11/12 md:w-3/4 lg:w-2/3 h-[90vh] rounded-lg shadow-lg overflow-y-auto relative p-6">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white w-11/12 md:w-3/4 lg:w-2/3 h-[90vh] rounded-lg shadow-lg overflow-hidden relative">
             <button
-              onClick={() => setShowPreview(false)}
+              onClick={() => {
+                setShowPreview(false)
+                setPdfUrl(null)
+              }}
               className="absolute top-3 right-3 text-gray-600 hover:text-black"
             >
               <FiX className="w-6 h-6" />
             </button>
 
-            {/* === Report Content === */}
-            <div ref={reportRef} className="p-6 space-y-8">
-              <h2 className="text-xl font-bold mb-4">Employer Analytics Report</h2>
-
-              {/* Overview */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                {stats.map((s, idx) => (
-                  <div key={idx} className="bg-gray-100 p-3 rounded-lg text-center">
-                    <p className="text-sm text-gray-600">{s.label}</p>
-                    <p className="text-lg font-semibold">{s.value}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Top Jobs Table */}
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Top Performing Jobs</h3>
-                <table className="w-full text-sm border">
-                  <thead className="bg-gray-200">
-                    <tr>
-                      <th className="p-2 text-left">Job</th>
-                      <th className="p-2">Applications</th>
-                      <th className="p-2">Views</th>
-                      <th className="p-2">Hires</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {jobPerformance.map((job, i) => (
-                      <tr key={i} className="border-t">
-                        <td className="p-2">{job.job}</td>
-                        <td className="p-2 text-center">{job.applications}</td>
-                        <td className="p-2 text-center">{job.views}</td>
-                        <td className="p-2 text-center">{job.hires}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Monthly Applications Chart */}
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Monthly Applications Trend</h3>
-                <div className="w-full h-64 bg-white border rounded-lg">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={monthlyData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="applications" stroke="#2563eb" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Monthly Applications Table */}
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Monthly Applications Summary</h3>
-                <table className="w-full text-sm border">
-                  <thead className="bg-gray-200">
-                    <tr>
-                      <th className="p-2 text-left">Month</th>
-                      <th className="p-2 text-center">Applications</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monthlyData.map((row, i) => (
-                      <tr key={i} className="border-t">
-                        <td className="p-2">{row.month}</td>
-                        <td className="p-2 text-center">{row.applications}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Recent Reviews */}
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Recent Reviews</h3>
-                {reviewList?.length > 0 ? (
-                  <ul className="space-y-2">
-                    {reviewList.slice(0, 5).map((r, i) => (
-                      <li key={i} className="bg-gray-50 p-3 rounded-md">
-                        <div className="flex items-center mb-2">
-                          <img
-                            src={r?.userId?.avatar?.avatar_Url || "/"}
-                            className="h-10 w-10 rounded-full object-cover border border-gray-300"
-                            alt=""
-                          />
-                          <p className="font-medium text-gray-900 ml-3">{r.title}</p>
-                        </div>
-                        <p className="text-sm text-gray-600">{r.comment}</p>
-                        <p className="text-sm font-semibold text-gray-500 mt-1">Rating: {r.rating}★</p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-500 text-sm">No reviews available</p>
-                )}
-              </div>
-            </div>
+            {pdfUrl ? (
+              <iframe src={pdfUrl} title="PDF Preview" className="w-full h-full"></iframe>
+            ) : (
+              <p className="p-6 text-gray-500">Generating preview...</p>
+            )}
           </div>
         </div>
       )}
