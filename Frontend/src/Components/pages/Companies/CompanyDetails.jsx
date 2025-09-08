@@ -239,7 +239,7 @@ const CompanyDetails = () => {
 
                 {/* Review Section */}
                 <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    <ReviewForm onSubmit={handleReviewSubmit} />
+                    <ReviewForm onSubmit={handleReviewSubmit} user={userData}/>
                     <ReviewList reviews={allReviews} userId={userData?._id} setReviews={setAllReviews} />
                 </section>
             </div>

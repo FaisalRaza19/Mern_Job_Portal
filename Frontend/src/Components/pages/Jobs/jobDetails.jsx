@@ -161,9 +161,9 @@ const JobDetails = () => {
                         </p>
                     </div>
                     {userData ? (
-                        <button disabled={isApplied}
+                        <button disabled={isApplied || user?.role === "employer"}
                             onClick={() => setShowApplyForm(true)}
-                            className={`mt-2 px-4 py-2 rounded-md text-white text-sm font-medium ${isApplied
+                            className={`mt-2 px-4 py-2 rounded-md disabled:cursor-not-allowed disabled:bg-gray-400 text-white text-sm font-medium ${isApplied
                                 ? "bg-green-500 cursor-not-allowed"
                                 : "bg-blue-600 hover:bg-blue-700"
                                 }`}
