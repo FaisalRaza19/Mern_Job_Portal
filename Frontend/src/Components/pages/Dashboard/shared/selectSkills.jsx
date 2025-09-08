@@ -21,7 +21,6 @@ const selectSkills = ({ bio, userSkills, setUserSkills }) => {
         const timeout = setTimeout(async () => {
             setIsLoadingSuggestions(true);
             const suggestions = await fetchSuggestedSkills(bio, newSkill, skills);
-            console.log(suggestions);
             setSuggestedSkills(suggestions || []);
             setIsLoadingSuggestions(false);
         }, 500);
@@ -29,10 +28,20 @@ const selectSkills = ({ bio, userSkills, setUserSkills }) => {
         setTypingTimeout(timeout);
     }, [newSkill]);
 
+    const handleAddSuggestion = (suggestion) => {
+        if (!skills.includes(suggestion)) {
+            const updatedSkills = [...skills, suggestion];
+            setSkills(updatedSkills);
+            setUserSkills(updatedSkills);
+        }
+        setNewSkill("");
+        setSuggestedSkills([]);
+    }
 
     const handleAddSkill = () => {
         if (newSkill.trim() && !skills.includes(newSkill.trim())) {
             const updated = [...skills, newSkill.trim()];
+
             setSkills(updated);
             setUserSkills(updated);
             setNewSkill("")
@@ -96,13 +105,7 @@ const selectSkills = ({ bio, userSkills, setUserSkills }) => {
                                     {suggestedSkills.map((suggestion) => (
                                         <li
                                             key={suggestion}
-                                            onClick={() => {
-                                                if (!skills.includes(suggestion)) {
-                                                    setSkills([...skills, suggestion]);
-                                                }
-                                                setNewSkill("");
-                                                setSuggestedSkills([]);
-                                            }}
+                                            onClick={() => handleAddSuggestion(suggestion)}
                                             className="px-3 py-2 text-sm bg-gray-400 text-gray-800 hover:bg-blue-100 cursor-pointer"
                                         >
                                             {suggestion}

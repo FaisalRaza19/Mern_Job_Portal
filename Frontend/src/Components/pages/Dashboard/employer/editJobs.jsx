@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { FiX } from "react-icons/fi";
+import { FiX,FiLoader} from "react-icons/fi";
 import CurrencyDropdown from "./currencyDropDown.jsx";
 import SelectSkills from "../shared/selectSkills.jsx";
 import { Context } from "../../../../Context/context.jsx";
@@ -7,6 +7,7 @@ import { Context } from "../../../../Context/context.jsx";
 const EditJobs = ({ job, onClose, onUpdate }) => {
     const { Jobs, showAlert } = useContext(Context)
     const { editJob } = Jobs;
+    const [isLoading, setIsLoading] = useState(false)
 
     const formatJobData = (job) => ({
         jobId: job._id,
@@ -65,6 +66,7 @@ const EditJobs = ({ job, onClose, onUpdate }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setIsLoading(true)
             const updatedJob = {
                 ...formData,
                 salary: {
@@ -80,8 +82,9 @@ const EditJobs = ({ job, onClose, onUpdate }) => {
                 onUpdate(data?.data)
             }
         } catch (error) {
-            console.log("Error of edit the job", error.message)
+            console.log("Error of edit the job")
         } finally {
+            setIsLoading(false)
             onClose()
         }
     };
@@ -329,7 +332,7 @@ const EditJobs = ({ job, onClose, onUpdate }) => {
                                 type="submit"
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                             >
-                                Save Changes
+                                {isLoading ? <FiLoader className="animate-spin h-8 w-8 text-blue-500 mx-auto" /> : "Save Changes"}
                             </button>
                         </div>
                     </form>

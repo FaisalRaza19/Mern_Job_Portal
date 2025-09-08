@@ -37,7 +37,7 @@ const EmployerDashboard = ({ setIsLoggedIn }) => {
 
   useEffect(() => {
     JobsData()
-  }, [jobData])
+  }, [])
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
@@ -45,7 +45,7 @@ const EmployerDashboard = ({ setIsLoggedIn }) => {
       case "post-job":
         return <PostJob setJobData={setJobData} />
       case "manage-jobs":
-        return <ManageJobs setActiveTab={setActiveTab} jobData={jobData} />
+        return <ManageJobs setActiveTab={setActiveTab}/>
       case "applicants":
         return <ChatProvider><ApplicantManagement jobData={jobData} setActiveTab={setActiveTab}/></ChatProvider>
       case "messages":
