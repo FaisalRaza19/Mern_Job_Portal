@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useChat } from "../../../../../Context/chatContext.jsx";
 import { Context } from "../../../../../Context/context.jsx";
-import { FiArrowLeft, FiMoreVertical, FiPhone, FiVideo, FiSearch, FiTrash2, FiArchive, FiInfo } from "react-icons/fi";
+import { FiArrowLeft, FiMoreVertical, FiSearch, FiTrash2, FiArchive, FiInfo } from "react-icons/fi";
 
 const ChatHeader = () => {
   const { activeChat, setActiveChat, deleteChat } = useChat();
@@ -85,16 +85,6 @@ const ChatHeader = () => {
 
       {/* Action Buttons */}
       <div className="flex items-center space-x-2">
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Video Call">
-          <FiVideo className="w-5 h-5 text-gray-600 " />
-        </button>
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Audio Call">
-          <FiPhone className="w-5 h-5 text-gray-600 " />
-        </button>
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Search in chat">
-          <FiSearch className="w-5 h-5 text-gray-600 " />
-        </button>
-
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}

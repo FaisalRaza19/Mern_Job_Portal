@@ -1,6 +1,6 @@
 import { useContext, useState } from "react"
 import { Context } from "../../../../Context/context.jsx"
-import { FiBell, FiUser, FiSettings, FiLogOut, FiMenu, FiMessageSquare} from "react-icons/fi"
+import { FiBell, FiUser, FiSettings, FiLogOut, FiMenu, FiMessageSquare } from "react-icons/fi"
 import { FaRobot } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
 import ChatBot from "./ChatBot.jsx"
@@ -49,7 +49,10 @@ const Topbar = ({ onMenuClick, notifications = [], setIsLoggedIn, activeTab, isE
           >
             <FiMenu className="w-5 h-5 text-gray-600" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-900">
+          {/* <h1 className="text-xl font-semibold text-gray-900 sm:hidden">
+            {user?.role === "jobseeker" ? "Job Seeker Dashboard" : "Employer Dashboard"}
+          </h1> */}
+          <h1 className="hidden sm:block font-semibold text-gray-900 text-2xl">
             {user?.role === "jobseeker" ? "Job Seeker Dashboard" : "Employer Dashboard"}
           </h1>
         </div>

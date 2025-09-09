@@ -16,7 +16,7 @@ const EmployerOverview = ({ setActiveTab, jobData }) => {
     { label: "Hires This Month", value: "3", icon: FiTrendingUp, color: "text-orange-600" },
   ]
 
-  const applicantsArray = jobData.flatMap((job) => {
+  const applicantsArray = jobData?.flatMap((job) => {
     return job?.applicants?.map((applicant) => ({
       ...applicant,
       title: job.title,
@@ -28,7 +28,7 @@ const EmployerOverview = ({ setActiveTab, jobData }) => {
   const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
 
   // Filter applicants based on appliedAt date being within the last 5 hours
-  const recentApplications = applicantsArray.filter((applicant) => {
+  const recentApplications = applicantsArray?.filter((applicant) => {
     const appliedDate = new Date(applicant.appliedAt);
     return appliedDate >= fiveHoursAgo;
   });

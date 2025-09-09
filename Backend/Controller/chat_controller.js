@@ -161,7 +161,7 @@ const handleSendMessage = async (socket, data, io) => {
                 fileName = uploadResult.original_filename
 
                 // For voice messages, extract duration if available
-                if (messageType === "voice" && uploadResult.duration) {
+                if (messageType === "voice" || messageType === "audio" && uploadResult.duration) {
                     duration = uploadResult.duration
                 }
             } catch (err) {

@@ -147,23 +147,29 @@ const PostJob = ({ setJobData }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700  mb-1">Employment Type *</label>
-                <div className="flex space-x-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Employment Type *
+                </label>
+                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                   {['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'].map((type) => (
-                    <label key={type} className="flex items-center">
+                    <label
+                      key={type}
+                      className="flex items-center p-2 rounded-md cursor-pointer hover:ring-1 hover:ring-blue-500 transition"
+                    >
                       <input
                         type="radio"
                         name="employmentType"
                         value={type}
                         checked={formData.employmentType === type}
                         onChange={(e) => handleInputChange("employmentType", e.target.value)}
-                        className="mr-2 text-blue-600 focus:ring-blue-500"
+                        className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700 ">{type}</span>
+                      <span className="text-sm text-gray-700">{type}</span>
                     </label>
                   ))}
                 </div>
               </div>
+
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>

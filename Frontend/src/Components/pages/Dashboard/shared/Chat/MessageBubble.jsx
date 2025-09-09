@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useChat } from "../../../../../Context/chatContext.jsx";
 import {
-  FiCheck, FiCheckCircle, FiClock, FiEdit3, FiTrash2, FiDownload, FiPlay, FiPause, FiMic, FiFile,
-  FiVolume2, FiMoreVertical,
+  FiCheck, FiCheckCircle, FiClock, FiEdit3, FiTrash2, FiDownload, FiPlay, FiPause, FiMic, FiFile, FiMoreVertical,
 } from "react-icons/fi";
 
 const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
@@ -11,18 +10,59 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.content || "");
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [showSpeedDropdown, setShowSpeedDropdown] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const speedDropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showDropdown && !event.target.closest(".message-dropdown-button") && !event.target.closest(".message-dropdown-menu")) {
+      if (
+        showDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
         setShowDropdown(false);
+      }
+      if (
+        showSpeedDropdown &&
+        speedDropdownRef.current &&
+        !speedDropdownRef.current.contains(event.target)
+      ) {
+        setShowSpeedDropdown(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showDropdown]);
+  }, [showDropdown, showSpeedDropdown]);
+
+  // Update current time on audio playback
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    audio.addEventListener("timeupdate", updateTime);
+
+    return () => {
+      audio.removeEventListener("timeupdate", updateTime);
+    };
+  }, []);
+
+  // Handle playback speed change
+  const handleSpeedChange = (speed) => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+      setPlaybackSpeed(speed);
+      setShowSpeedDropdown(false);
+    }
+  };
 
   // Formats timestamp for display
   const formatTime = (timestamp) => {
@@ -33,24 +73,32 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
     });
   };
 
+  // Formats seconds into MM:SS format
+  const formatDuration = (seconds) => {
+    if (isNaN(seconds)) return "0:00";
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    const formattedSeconds = remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
+    return `${minutes}:${formattedSeconds}`;
+  };
+
   // Determines the message status icon
   const getMessageStatus = () => {
     if (!isOwn) return null;
 
-    // Check if current user's ID is present
     const hasBeenSeenByOther = message.seenBy?.some(user => user._id !== userData._id);
     const hasBeenDeliveredToOther = message.deliveredTo?.some(user =>
       activeChat && user._id === (activeChat.sender._id === userData._id ? activeChat.receiver._id : activeChat.sender._id)
     );
 
     if (hasBeenSeenByOther) {
-      return <FiCheckCircle className="w-4 h-4 text-blue-500" />;
+      return <FiCheckCircle className="w-4 h-4 text-blue-400" />;
     }
     if (hasBeenDeliveredToOther) {
       return (
         <span className="relative">
-          <FiCheck className="w-4 h-4 text-gray-500 absolute left-0 top-0" />
-          <FiCheck className="w-4 h-4 text-gray-500 absolute left-2 top-0" />
+          <FiCheck className="w-4 h-4 text-gray-400 absolute left-0 top-0" />
+          <FiCheck className="w-4 h-4 text-gray-400 absolute left-2 top-0" />
         </span>
       );
     }
@@ -91,7 +139,7 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
   const renderMessageContent = () => {
     if (message.isDeletedForEveryone) {
       return (
-        <div className="italic text-gray-500 text-sm flex items-center">
+        <div className="italic text-gray-400 text-sm flex items-center">
           <FiTrash2 className="w-4 h-4 inline mr-1" />
           This message was deleted
         </div>
@@ -147,13 +195,11 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
             >
               {isPlaying ? <FiPause className="w-4 h-4" /> : <FiPlay className="w-4 h-4" />}
             </button>
-
             <div className="flex-1">
               <div className="flex items-center space-x-1 mb-1 text-xs text-gray-600">
                 <FiMic className="w-3 h-3" />
                 <span>Voice message</span>
               </div>
-              {/* Simplified waveform visualization */}
               <div className="flex items-center space-x-1">
                 {[...Array(15)].map((_, i) => (
                   <div
@@ -164,11 +210,9 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
                 ))}
               </div>
             </div>
-
             <span className="text-xs text-gray-500 ">
               {message.duration ? `${Math.floor(message.duration)}s` : "0:00"}
             </span>
-
             <audio
               ref={audioRef}
               src={message.content}
@@ -176,6 +220,63 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               preload="none"
+            />
+          </div>
+        );
+
+      case "audio":
+        const remainingTime = formatDuration(message.duration - currentTime);
+        const displayTime = isPlaying ? remainingTime : formatDuration(message.duration);
+
+        return (
+          <div className={`relative flex items-center space-x-3 p-2 rounded-full w-full min-w-48 max-w-sm sm:max-w-md ${isOwn ? "bg-gray-300" : "bg-gray-900"} text-white`}>
+            <button
+              onClick={toggleAudio}
+              className={`p-2 rounded-full transition-colors duration-200 ease-in-out ${isPlaying ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
+                } text-white focus:outline-none focus:ring-2 focus:ring-green-400`}
+              aria-label={isPlaying ? "Pause audio message" : "Play audio message"}
+            >
+              {isPlaying ? <FiPause className="w-5 h-5" /> : <FiPlay className="w-5 h-5" />}
+            </button>
+
+            {/* Progress bar and time */}
+            <div className="flex-1 flex items-center space-x-2">
+              <span className={`text-xs ${isOwn ? "text-gray-600" : "text-gray-400"}`}>
+                {displayTime}
+              </span>
+              <div className={`h-1 w-full rounded-full ${isOwn ? "bg-gray-400" : "bg-gray-700"}`}>
+                <div
+                  className={`h-1 rounded-full ${isOwn ? "bg-green-600" : "bg-green-600"}`}
+                  style={{ width: `${(currentTime / message.duration) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Playback speed options */}
+            <div className="relative" ref={speedDropdownRef}>
+              <button
+                onClick={() => setShowSpeedDropdown(!showSpeedDropdown)}
+                className={`px-2 py-1 text-xs font-semibold rounded-full ${isOwn ? "text-gray-700 bg-gray-200" : "text-white bg-gray-700"} hover:opacity-80 transition-opacity`}
+              >
+                {playbackSpeed.toFixed(1)}x
+              </button>
+              {showSpeedDropdown && (
+                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-lg shadow-lg py-1 min-w-max z-50">
+                  <button onClick={() => handleSpeedChange(1)} className="block w-full px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 text-left">1.0x</button>
+                  <button onClick={() => handleSpeedChange(1.5)} className="block w-full px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 text-left">1.5x</button>
+                  <button onClick={() => handleSpeedChange(2)} className="block w-full px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 text-left">2.0x</button>
+                </div>
+              )}
+            </div>
+
+            <audio
+              ref={audioRef}
+              src={message.content}
+              onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              preload="none"
+              className="hidden" // Hides the default audio element
             />
           </div>
         );
@@ -202,17 +303,6 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
               <source src={message.content} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
-          </div>
-        );
-
-      case "audio":
-        return (
-          <div className="flex items-center space-x-3 p-2 border border-gray-200 rounded-lg bg-gray-50 min-w-[200px]">
-            <FiVolume2 className="w-5 h-5 text-gray-500 " />
-            <audio controls className="flex-1" preload="none">
-              <source src={message.content} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
           </div>
         );
 
@@ -245,7 +335,6 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
     return null;
   }
 
-
   return (
     <div
       className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
@@ -269,11 +358,11 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
         <div className={`flex flex-col ${isOwn ? "items-end" : "items-start"}`}>
           {/* Message Bubble */}
           <div
-            className={`px-4 py-2 rounded-2xl shadow-sm max-w-full
+            className={`px-4 py-2 rounded-2xl shadow-sm max-w-full text-white
               ${isOwn
-                ? `bg-green-500 text-white ${isFirstInGroup ? "rounded-tr-md" : ""
+                ? `bg-gray-500 ${isFirstInGroup ? "rounded-tr-md" : ""
                 } ${isLastInGroup ? "rounded-br-md" : ""}`
-                : `bg-white text-gray-900 border border-gray-200 ${isFirstInGroup ? "rounded-tl-md" : ""
+                : `bg-gray-900 border border-gray-200 ${isFirstInGroup ? "rounded-tl-md" : ""
                 } ${isLastInGroup ? "rounded-bl-md" : ""}`
               }`}
           >
@@ -281,7 +370,7 @@ const MessageBubble = ({ message, isOwn, isFirstInGroup, isLastInGroup }) => {
           </div>
 
           {/* Message Info (time and status) - only for the last bubble in a group and not editing */}
-          {isLastInGroup && !isEditing && (
+          {isLastInGroup && !isEditing && message.messageType !== "audio" && (
             <div
               className={`flex items-center mt-1 space-x-1 text-xs text-gray-500 ${isOwn ? "flex-row-reverse space-x-reverse" : ""
                 }`}

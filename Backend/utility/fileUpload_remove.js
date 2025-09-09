@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
 import dotenv from "dotenv"
 dotenv.config({
     path: "./.env"
@@ -19,10 +18,8 @@ export const fileUploadOnCloudinary = async (fileData, folder, resource_type) =>
             resource_type: resource_type,
             type: 'upload'
         });
-        fs.unlinkSync(fileData);
         return uploadFile;
     } catch (error) {
-        fs.unlinkSync(fileData);
         console.error("Error uploading file to Cloudinary:", error);
     }
 };

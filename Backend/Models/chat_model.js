@@ -20,7 +20,7 @@ const messageSchema = {
         media_Name: String,
     },
     duration: {
-        type: Number,
+        type: String,
         default: null,
     },
     deletedFor: [

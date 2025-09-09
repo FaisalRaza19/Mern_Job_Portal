@@ -1,4 +1,4 @@
-import React,{ useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import Topbar from "../shared/Topbar.jsx"
 import JobSeekerSidebar from "./sidebar.jsx"
 import JobSeekerOverview from "./overview.jsx"
@@ -18,7 +18,7 @@ const mockNotifications = [
 ]
 
 const JobSeekerDashboard = ({ setIsLoggedIn }) => {
-  const { Jobs,userData } = useContext(Context)
+  const { Jobs, userData } = useContext(Context)
   const { saved_applied_jobs } = Jobs
   const [jobs, setJobs] = useState({});
   const [activeTab, setActiveTab] = useState("overview")
@@ -39,7 +39,7 @@ const JobSeekerDashboard = ({ setIsLoggedIn }) => {
 
   useEffect(() => {
     saved_applied()
-  },[])
+  }, [])
 
   const renderContent = () => {
     switch (activeTab) {
@@ -48,7 +48,7 @@ const JobSeekerDashboard = ({ setIsLoggedIn }) => {
       case "saved-jobs":
         return <SavedJobs jobs={jobs?.jobSeekerInfo?.savedJobs} />
       case "applied-jobs":
-        return <AppliedJobs jobs={jobs?.jobSeekerInfo?.appliedJobs} userId = {userData?._id}/>
+        return <AppliedJobs jobs={jobs?.jobSeekerInfo?.appliedJobs} userId={userData?._id} />
       case "profile":
         return <JobSeekerProfile />
       case "messages":
@@ -65,7 +65,7 @@ const JobSeekerDashboard = ({ setIsLoggedIn }) => {
     <div className="flex h-screen bg-gray-50">
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
+        <div className="fixed inset-0 bg-black/20 bg-opacity-50 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
       )}
 
       {/* Sidebar */}
@@ -73,15 +73,17 @@ const JobSeekerDashboard = ({ setIsLoggedIn }) => {
         className={`fixed lg:static inset-y-0 left-0 z-50 lg:z-auto transition-transform duration-300 lg:translate-x-0 ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
-        <JobSeekerSidebar
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab)
-            setMobileMenuOpen(false)
-          }}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+        <ChatProvider>
+          <JobSeekerSidebar
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setActiveTab(tab)
+              setMobileMenuOpen(false)
+            }}
+            isCollapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+        </ChatProvider>
       </div>
 
       {/* Main Content */}
