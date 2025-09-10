@@ -17,7 +17,7 @@ const Chatbot = ({ isOpen, onClose }) => {
           {
             id: 1,
             type: "bot",
-            content: `Hello ${user?.companyInfo?.companyName || user?.User?.fullName || "there"}! I'm your AI Assistant. How can I assist you today?`,
+            content: `Hello ${user?.companyInfo?.companyName || user?.jobSeekerInfo?.fullName || "User"}! I'm your AI Assistant. How can I assist you today?`,
             timestamp: new Date(),
           },
         ]
@@ -92,7 +92,7 @@ const Chatbot = ({ isOpen, onClose }) => {
     const welcomeMessage = {
       id: 1,
       type: "bot",
-      content: `Hello ${user?.companyInfo?.companyName || user?.User?.fullName || "there"}! I'm your AI Assistant. How can I assist you today?`,
+      content: `Hello ${user?.companyInfo?.companyName || user?.jobSeekerInfo?.fullName || "User"}! I'm your AI Assistant. How can I assist you today?`,
       timestamp: new Date(),
     }
     setMessages([welcomeMessage])

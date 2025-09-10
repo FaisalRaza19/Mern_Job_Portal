@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
 import { useChat } from "../../../../../Context/chatContext.jsx";
-import {FiSend,FiPaperclip,FiMic,FiX,FiImage,FiVideo,FiFile,FiSmile,FiMoreHorizontal,} from "react-icons/fi";
+import { FiSend, FiPaperclip, FiMic, FiX, FiImage, FiVideo, FiFile, FiSmile, FiMoreHorizontal, } from "react-icons/fi";
 import VoiceRecorder from "./VoiceRecorder.jsx";
 import EmojiPicker from "./emojiPicker.jsx";
 import { Context } from "../../../../../Context/context.jsx";
@@ -315,16 +315,12 @@ const MessageInput = () => {
       <input ref={fileInputRef} type="file" onChange={handleFileSelect} className="hidden" />
 
       {/* Mobile Emoji Picker */}
-      <div className="lg:hidden md:hidden">
-        {showEmojiPicker && (
-          <div ref={emojiPickerRef}>
-            <EmojiPicker
-              onEmojiSelect={handleEmojiSelect}
-              onClose={() => setShowEmojiPicker(false)}
-            />
-          </div>
-        )}
-      </div>
+      {showEmojiPicker && (
+        <EmojiPicker
+          onEmojiSelect={handleEmojiSelect}
+          onClose={() => setShowEmojiPicker(false)}
+        />
+      )}
     </div>
   );
 };
