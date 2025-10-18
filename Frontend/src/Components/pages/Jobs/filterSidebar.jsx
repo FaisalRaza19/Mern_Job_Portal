@@ -23,7 +23,7 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters }) => {
   };
 
   return (
-    <aside className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 sticky top-16 h-fit transition-all duration-300">
+    <aside className="bg-white shadow-lg rounded-2xl m-3 p-4 border border-gray-200 sticky top-16 h-fit transition-all duration-300">
       <div className="space-y-8">
         {/* Keyword */}
         <div>

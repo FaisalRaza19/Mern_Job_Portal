@@ -12,13 +12,13 @@ export const verify_token = async (req, res, next) => {
         try {
             decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         } catch (err) {
-            return res.status(400).json({statusCode: 400,message: "Token is invalid or expired" });
+            return res.status(400).json({statusCode: 400,message: "User is not authenticated" });
         }
         //find the user
         const user = await User.findById(decoded.id).select("-password -refreshToken");
 
         if (!user) {
-            return res.status(401).json({ statusCode: 400, message: "Unauthorized request, user not found" });
+            return res.status(401).json({ statusCode: 400, message: "User is not authenticated" });
         }
 
         req.user = user;

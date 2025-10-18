@@ -85,7 +85,7 @@ const Companies = () => {
     }, [loadMoreCompanies])
 
     return (
-        <main className="min-h-screen md:p-8 border-b-cyan-600">
+        <main className="min-h-screen m-4 md:p-8 border-b-cyan-600">
             <section className="mx-auto max-w-6xl">
                 <h1 className="mb-6 text-3xl font-bold text-gray-900">Find Your Next Company</h1>
 

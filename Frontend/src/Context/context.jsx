@@ -29,7 +29,7 @@ export const ContextApi = ({ children }) => {
     const verifyToken = async () => {
         try {
             const data = await verifyJWT(setIsVerify);
-            if (data.message === "Token is invalid or expired") {
+            if (data.message === "User is not authenticated") {
                 setIsVerify(false);
                 setIsLoggedIn(false);
                 localStorage.removeItem("user_token");

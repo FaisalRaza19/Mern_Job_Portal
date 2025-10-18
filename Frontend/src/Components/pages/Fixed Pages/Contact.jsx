@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { Context } from "../../../Context/context";
 
 const Contact = () => {
+    const {showAlert} = useContext(Context)
     const [openFaq, setOpenFaq] = useState(null);
 
     const [formData, setFormData] = useState({
@@ -17,7 +19,7 @@ const Contact = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert("Thank you for your message! We'll get back to you soon.");
+        showAlert({statusCode : 200,message : "Message Send Successfully"});
         setFormData({ name: "", email: "", subject: "", message: "" });
     };
 

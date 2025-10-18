@@ -2,7 +2,7 @@ import React from "react";
 
 const JobSkeleton = () => {
     return (
-        <div className="bg-white text-zinc-800 rounded-2xl shadow p-6 border border-zinc-200 flex flex-col gap-4 animate-pulse transition-colors duration-300">
+        <div className="bg-white m-3 text-zinc-800 rounded-2xl shadow p-6 border border-zinc-200 flex flex-col gap-4 animate-pulse transition-colors duration-300">
             <div className="h-6 bg-zinc-200 rounded w-3/4" />
             <div className="h-4 bg-zinc-200 rounded w-1/2" />
             <div className="h-4 bg-zinc-200 rounded w-2/3" />

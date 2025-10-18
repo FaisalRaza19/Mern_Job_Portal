@@ -485,23 +485,35 @@ const JobSeekerProfile = () => {
         </DashboardCard>
       </div>
 
-      {/* Skills Management */}
-      <form action="" onSubmit={handle_resume_skills}>
-        <div className="grid gap-4">
-          <SelectSkills bio={userInfo?.bio || ""} userSkills={skills} setUserSkills={setSkills} />
 
+      <form onSubmit={handle_resume_skills} className="w-full">
+        <div className="grid gap-6">
+          <div className="w-full">
+            <SelectSkills
+              bio={userInfo?.bio || ""}
+              userSkills={skills}
+              setUserSkills={setSkills}
+            />
+          </div>
           <DashboardCard title="Resume Management">
-            <div className="space-y-4">
-              {/* Resume Upload */}
-              <label htmlFor="resume-upload" className="cursor-pointer">
-                <div className="border-2 border-dashed border-gray-300  rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
-                  <FiUpload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-600">
-                    Drop a new resume here or <span className="text-blue-600">browse files</span>
+            <div className="space-y-6">
+              {/* Resume Upload Section */}
+              <label
+                htmlFor="resume-upload"
+                className="cursor-pointer block w-full"
+              >
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center hover:border-blue-500 transition-colors duration-200 bg-white shadow-sm">
+                  <FiUpload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    Drop your new resume here or{" "}
+                    <span className="text-blue-600 font-medium">browse files</span>
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">PDF, DOC, DOCX up to 5MB</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Supported: PDF, DOC, DOCX (Max 5MB)
+                  </p>
                 </div>
               </label>
+
               <input
                 id="resume-upload"
                 type="file"
@@ -510,24 +522,32 @@ const JobSeekerProfile = () => {
                 onChange={handleResumeChange}
               />
 
-              {/* Resume Display */}
-
+              {/* Resume Display Section */}
               {(resumeFile || resumeUrl) && (
-                <div className="border-2 border-dashed border-gray-300  rounded-lg p-6 text-center">
-                  <FiFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900  mb-2">Current Resume</h3>
-                  <p className="text-gray-600  mb-4">
-                    {resumeFile ? resumeFile?.name : user?.jobSeekerInfo?.resumeUrl?.file_name || "Uploaded Resume "}
-                    <span className="ml-4">
-                      {resumeFile ? resumeFile?.size / 1024 + "Kb" : user?.jobSeekerInfo?.resumeUrl?.size || ""}
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center bg-white shadow-sm">
+                  <FiFileText className="w-10 h-10 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                    Current Resume
+                  </h3>
+
+                  <p className="text-gray-600 text-sm sm:text-base mb-4 break-all">
+                    {resumeFile
+                      ? resumeFile?.name
+                      : user?.jobSeekerInfo?.resumeUrl?.file_name ||
+                      "Uploaded Resume"}
+                    <span className="ml-2 text-xs sm:text-sm text-gray-500">
+                      {resumeFile
+                        ? (resumeFile?.size / 1024).toFixed(1) + " KB"
+                        : user?.jobSeekerInfo?.resumeUrl?.size || ""}
                     </span>
                   </p>
-                  <div className="flex space-x-2 justify-center">
+
+                  <div className="flex flex-wrap justify-center gap-3">
                     {resumeUrl && (
                       <button
                         type="button"
                         onClick={() => setShowPreview(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        className="px-5 py-2 rounded-lg bg-blue-600 text-white font-medium text-sm sm:text-base hover:bg-blue-700 transition-colors duration-200"
                       >
                         Preview
                       </button>
@@ -539,33 +559,44 @@ const JobSeekerProfile = () => {
 
             {/* Resume Preview Modal */}
             {showPreview && resumeUrl && (
-              <div className="fixed inset-0 backdrop-blur-sm bg-black/20 bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-lg max-w-4xl w-full relative">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+                <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-5xl h-[90vh] sm:h-[85vh] flex flex-col overflow-hidden">
                   <button
                     onClick={() => setShowPreview(false)}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                    className="absolute top-3 right-3 z-10 text-red-500 hover:text-red-700 transition-colors bg-white/80 rounded-full p-1"
                   >
-                    <FiX size={20} />
+                    <FiX size={22} />
                   </button>
-                  <iframe
-                    src={resumeUrl}
-                    title="Resume Preview"
-                    className="w-full h-[600px] rounded border"
-                    allow="fullscreen"
-                    frameBorder="0"
-                  />
+                  <div className="flex-1 overflow-auto rounded-b-lg">
+                    <iframe
+                      src={resumeUrl}
+                      title="Resume Preview"
+                      className="w-full h-full border-none rounded-b-lg"
+                      allow="fullscreen"
+                    />
+                  </div>
                 </div>
               </div>
             )}
+
           </DashboardCard>
-          <button type="sumbit" className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <FiSave className="w-4 h-4" />
-            <span>{isLoading ? <FiLoader className="animate-spin h-6 w-6 text-blue-500" /> : "Update Resume and Skills"}</span>
-          </button>
+          <div className="w-full flex justify-center">
+            <button
+              type="submit"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-blue-600 text-white font-medium text-sm sm:text-base hover:bg-blue-700 transition-all shadow-md"
+            >
+              {isLoading ? (
+                <FiLoader className="animate-spin h-5 w-5 text-white" />
+              ) : (
+                <>
+                  <FiSave className="w-5 h-5" />
+                  <span>Update Resume & Skills</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
-
-
     </div>
   )
 }

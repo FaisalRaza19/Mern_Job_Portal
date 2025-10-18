@@ -137,7 +137,7 @@ const JobDetails = () => {
     return (
         <div>
             {/* Job Detail Section */}
-            <div className="bg-white mt-9 mb-6 text-gray-900 rounded-lg shadow-sm p-8 border">
+            <div className="bg-white m-3 mt-9 mb-6 text-gray-900 rounded-lg shadow-sm p-8 border">
                 <div className="flex items-center mb-6">
                     <button
                         onClick={() => navigate("/jobs")}

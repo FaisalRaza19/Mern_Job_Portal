@@ -163,7 +163,7 @@ const JobContent = () => {
                 />
             </aside>
 
-            <section>
+            <section className="m-3">
                 <h2 className="text-2xl font-bold mb-6 text-primary">Available Jobs</h2>
 
                 {initialLoading ? (

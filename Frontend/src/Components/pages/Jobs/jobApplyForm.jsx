@@ -85,7 +85,7 @@ const JobApplyForm = ({ jobId, jobTitle, companyName, companyLogo, onBack, curre
     };
 
     return (
-        <div className="bg-white text-gray-900 rounded-lg shadow-md p-6 border border-gray-200">
+        <div className="bg-white m-3 text-gray-900 rounded-lg shadow-md p-6 border border-gray-200">
             <div className="flex items-center mb-6">
                 <button
                     onClick={onBack}

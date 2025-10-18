@@ -21,7 +21,7 @@ const About = () => {
                 Find Your Dream Job
               </button>
             </Link>
-            <Link to={isEmployer ? "/employer-dashboard" : null}>
+            <Link to={isEmployer ? "/employer-dashboard" : "/register"}>
               <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-[14px] hover:bg-white hover:text-blue-600 transition-all duration-300 transform hover:scale-105">
                 Post a Job
               </button>
