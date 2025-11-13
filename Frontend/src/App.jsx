@@ -78,7 +78,7 @@ function App() {
             element={<EmailVerify setIsLogedIn={setIsLoggedIn} />}
           />
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-          <Route path="/change-password/:token" element={<h1>change password</h1>} />
+          <Route path="/change-password" element={<h1>change password</h1>} />
         </Routes>
         {!isAuthPage && <Footer />}
       </div>
