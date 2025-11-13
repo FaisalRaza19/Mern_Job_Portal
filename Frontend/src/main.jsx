@@ -7,7 +7,7 @@ import { ContextApi } from './Context/context.jsx'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename='/'>
       <ContextApi>
         <App />
       </ContextApi>
