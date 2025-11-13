@@ -39,7 +39,7 @@ const sendEmail = async (email) => {
 const pas_Email = async (email, token) => {
     try {
         const transactionalEmailsApi = new SibApiV3Sdk.TransactionalEmailsApi();
-        const link = `http://localhost:5173/change-password/${token}`;
+        const link = `https://job-portal-5882.vercel.app/change-password/${token}`;
 
         const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
         sendSmtpEmail.to = [{ email }];
